@@ -1,17 +1,45 @@
 {% load static %}
-<!doctype html><html lang='ru'><head><meta charset='utf-8'><title>{% block title %}ЛК{% endblock %}</title><link rel='stylesheet' href='{% static "css/style.css" %}'></head>
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Личный кабинет{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
 <body>
-<div class='layout'>
-<aside class='sidebar'>
-  <div class='brand' style='margin-bottom:20px'>ИРКПО<br>Центр карьеры</div>
-  <nav class='menu'>
-    <a class='{% if request.resolver_match.url_name == "student_dashboard" %}active{% endif %}' href='{% url "accounts:student_dashboard" %}'>Личный кабинет</a>
-    <a class='{% if request.resolver_match.namespace == "portfolio" %}active{% endif %}' href='{% url "portfolio:list" %}'>Моё портфолио</a>
-    <a class='{% if request.resolver_match.namespace == "resumes" %}active{% endif %}' href='{% url "resumes:builder" %}'>Конструктор резюме</a>
-    <a class='{% if request.resolver_match.namespace == "vacancies" %}active{% endif %}' href='{% url "vacancies:list" %}'>Вакансии</a>
-    <a class='{% if request.resolver_match.namespace == "courses" %}active{% endif %}' href='{% url "courses:list" %}'>Курсы и семинары</a>
-  </nav>
-</aside>
-<main class='container'>{% block content %}{% endblock %}</main>
-</div>
-</body></html>
+  <div class="layout-dashboard">
+    <aside class="sidebar">
+      <div class="brand">Центр карьеры ИРКПО</div>
+      <nav class="menu">
+        {% if request.user.role == 'student' %}
+          <a class="{% if request.resolver_match.url_name == 'student_dashboard' %}active{% endif %}" href="{% url 'accounts:student_dashboard' %}">Главная</a>
+          <a class="{% if request.resolver_match.url_name == 'profile_edit' %}active{% endif %}" href="{% url 'accounts:profile_edit' %}">Профиль</a>
+          <a class="{% if request.resolver_match.namespace == 'portfolio' %}active{% endif %}" href="{% url 'portfolio:list' %}">Моё портфолио</a>
+          <a class="{% if request.resolver_match.namespace == 'resumes' %}active{% endif %}" href="{% url 'resumes:builder' %}">Резюме</a>
+          <a class="{% if request.resolver_match.namespace == 'vacancies' %}active{% endif %}" href="{% url 'vacancies:list' %}">Вакансии</a>
+          <a class="{% if request.resolver_match.namespace == 'courses' %}active{% endif %}" href="{% url 'courses:list' %}">Курсы</a>
+          <a href="{% url 'accounts:logout' %}">Выход</a>
+        {% elif request.user.role == 'curator' %}
+          <a class="{% if request.resolver_match.url_name == 'curator_dashboard' %}active{% endif %}" href="{% url 'accounts:curator_dashboard' %}">Главная</a>
+          <a class="{% if request.resolver_match.url_name == 'curator_students' %}active{% endif %}" href="{% url 'accounts:curator_dashboard' %}">Мои студенты</a>
+          <a class="{% if request.resolver_match.url_name == 'review_queue' %}active{% endif %}" href="{% url 'portfolio:review_queue' %}">Проверка портфолио</a>
+          <a href="{% url 'accounts:logout' %}">Выход</a>
+        {% else %}
+          <a class="{% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}" href="{% url 'accounts:admin_dashboard' %}">Панель</a>
+          <a href="#">Студенты</a>
+          <a href="#">Кураторы</a>
+          <a href="#">Вакансии</a>
+          <a href="#">Курсы/семинары</a>
+          <a href="#">Отклики</a>
+          <a href="#">Записи на курсы</a>
+          <a href="{% url 'accounts:logout' %}">Выход</a>
+        {% endif %}
+      </nav>
+    </aside>
+    <main class="dashboard-content">
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+</body>
+</html>

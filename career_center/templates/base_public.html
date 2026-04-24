@@ -1,6 +1,31 @@
 {% load static %}
-<!doctype html><html lang='ru'><head><meta charset='utf-8'><title>{% block title %}Центр карьеры ИРКПО{% endblock %}</title><link rel='stylesheet' href='{% static "css/style.css" %}'></head>
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Центр карьеры ИРКПО{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
 <body>
-<header class='header'><div class='container'><div class='brand'>ИРКПО · Центр карьеры ИРКПО</div><div><a class='btn' href='{% url "accounts:login" %}'>Войти</a></div></div></header>
-<main class='container'>{% block content %}{% endblock %}</main>
-</body></html>
+  <div class="page-wrap">
+    <header class="topbar">
+      <div class="container topbar-inner">
+        <div>
+          <div class="brand">Центр карьеры ИРКПО</div>
+          <div class="brand-sub">Электронное портфолио, резюме и карьерные возможности</div>
+        </div>
+        <div class="inline-actions">
+          <a class="btn" href="{% url 'public:home' %}">Главная</a>
+          <a class="btn btn-primary" href="{% url 'accounts:login' %}">Войти</a>
+        </div>
+      </div>
+    </header>
+    <main class="main-content">
+      <div class="container">
+        {% block content %}{% endblock %}
+      </div>
+    </main>
+  </div>
+</body>
+</html>
