@@ -1,0 +1,12 @@
+{% extends 'base_dashboard.html' %}
+{% block title %}Управление студентами{% endblock %}
+{% block content %}
+<section class="hero"><div class="hero-kicker">Администрирование</div><h1>Управление студентами</h1><p>Просмотр, фильтрация и контроль профилей студентов.</p></section>
+<section class="section card">
+  <h2>Список студентов</h2>
+  <table class="table-like">
+    <tr><td>Иванов Иван</td><td class="muted">ПИ-21 • ИСиП</td><td><span class="badge badge-active">Активен</span></td></tr>
+    <tr><td>Петрова Анна</td><td class="muted">ДЗ-11 • Дизайн</td><td><span class="badge badge-active">Активен</span></td></tr>
+  </table>
+</section>
+{% endblock %}

@@ -1,2 +1,16 @@
 {% extends 'base_dashboard.html' %}
-{% block content %}<div class='card'><h1>{% if entry %}Редактирование{% else %}Добавление{% endif %} записи</h1><form method='post' enctype='multipart/form-data'>{% csrf_token %}{{ form.as_p }}<button class='btn btn-primary'>Сохранить</button></form></div>{% endblock %}
+{% block title %}{% if entry %}Редактирование записи{% else %}Новая запись{% endif %}{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="hero-kicker">Портфолио</div>
+  <h1>{% if entry %}Редактирование записи{% else %}Добавление достижения{% endif %}</h1>
+  <p>Заполняйте поля подробно: это влияет на качество публичного резюме.</p>
+</section>
+<section class="section card form-card">
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <div class="inline-actions"><button class="btn btn-primary" type="submit">Сохранить</button></div>
+  </form>
+</section>
+{% endblock %}

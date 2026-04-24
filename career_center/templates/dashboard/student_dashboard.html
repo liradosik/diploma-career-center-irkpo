@@ -1,9 +1,48 @@
 {% extends 'base_dashboard.html' %}
+{% block title %}Кабинет студента{% endblock %}
 {% block content %}
-<div class='hero'><h4 style='color:#2566de'>ЛИЧНЫЙ КАБИНЕТ СТУДЕНТА</h4><h1>Добрый день, {{ request.user.full_name }}</h1>
-<p class='muted'>Здесь можно редактировать портфолио, создавать резюме и просматривать вакансии.</p>
-<a class='btn btn-primary' href='{% url "portfolio:create" %}'>Добавить достижение</a> <a class='btn' href='{% url "resumes:builder" %}'>Открыть резюме</a></div>
-<div class='grid grid-2' style='margin-top:20px'>
-<div class='card'><h2>Последние достижения</h2>{% for entry in entries %}<div class='list-item'><h3>{{ entry.title }}</h3><div class='muted'>{{ entry.type }} · {{ entry.date }}</div><p>{{ entry.description|truncatechars:150 }}</p></div>{% empty %}<p>Пока нет записей.</p>{% endfor %}</div>
-<div class='card'><h2>Профиль</h2><p>{{ request.user.full_name }}</p><p class='muted'>{{ request.user.specialty }}<br>Группа {{ request.user.group }}</p><a class='btn' href='{% url "accounts:profile_edit" %}'>Изменить</a></div>
-</div>{% endblock %}
+<section class="hero">
+  <div class="hero-kicker">Кабинет студента</div>
+  <h1>Здравствуйте, {{ request.user.full_name }}</h1>
+  <p>Обновляйте профиль, ведите портфолио и быстро переходите к вакансиям и курсам.</p>
+  <div class="hero-actions">
+    <a class="btn btn-primary" href="{% url 'portfolio:create' %}">Добавить достижение</a>
+    <a class="btn" href="{% url 'resumes:builder' %}">Открыть резюме</a>
+  </div>
+</section>
+
+<section class="section grid grid-4">
+  <article class="stat-card"><div class="label">Достижений в портфолио</div><div class="value">{{ entries|length }}</div><div class="muted">последние записи</div></article>
+  <article class="stat-card"><div class="label">Статус профиля</div><div class="value">100%</div><div class="muted">готовность к откликам</div></article>
+  <article class="stat-card"><div class="label">Резюме</div><div class="value">1</div><div class="muted">доступно по ссылке</div></article>
+  <article class="stat-card"><div class="label">Активные разделы</div><div class="value">3</div><div class="muted">вакансии, курсы, портфолио</div></article>
+</section>
+
+<section class="section grid grid-2">
+  <div class="card">
+    <h2>Последние достижения</h2>
+    {% for entry in entries %}
+      <div class="list-item">
+        <h3>{{ entry.title }}</h3>
+        <p class="muted">{{ entry.type }} • {{ entry.date }}</p>
+        <p>{{ entry.description|truncatechars:140 }}</p>
+      </div>
+    {% empty %}
+      <p class="muted">Пока нет достижений. Добавьте первую запись.</p>
+    {% endfor %}
+  </div>
+  <div class="card">
+    <h2>Быстрые действия</h2>
+    <div class="list-item">
+      <h3>Профиль</h3>
+      <p class="muted">Заполните специализацию и контактные данные.</p>
+      <div class="inline-actions"><a class="btn btn-link" href="{% url 'accounts:profile_edit' %}">Редактировать</a></div>
+    </div>
+    <div class="list-item">
+      <h3>Вакансии</h3>
+      <p class="muted">Подберите предложения по направлению подготовки.</p>
+      <div class="inline-actions"><a class="btn btn-link" href="{% url 'vacancies:list' %}">Открыть вакансии</a></div>
+    </div>
+  </div>
+</section>
+{% endblock %}
