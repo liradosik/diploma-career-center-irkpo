@@ -1,0 +1,2 @@
+{% extends 'base_dashboard.html' %}
+{% block content %}<div class='card'><h1>{% if entry %}Редактирование{% else %}Добавление{% endif %} записи</h1><form method='post' enctype='multipart/form-data'>{% csrf_token %}{{ form.as_p }}<button class='btn btn-primary'>Сохранить</button></form></div>{% endblock %}

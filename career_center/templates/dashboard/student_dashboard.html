@@ -1,0 +1,9 @@
+{% extends 'base_dashboard.html' %}
+{% block content %}
+<div class='hero'><h4 style='color:#2566de'>ЛИЧНЫЙ КАБИНЕТ СТУДЕНТА</h4><h1>Добрый день, {{ request.user.full_name }}</h1>
+<p class='muted'>Здесь можно редактировать портфолио, создавать резюме и просматривать вакансии.</p>
+<a class='btn btn-primary' href='{% url "portfolio:create" %}'>Добавить достижение</a> <a class='btn' href='{% url "resumes:builder" %}'>Открыть резюме</a></div>
+<div class='grid grid-2' style='margin-top:20px'>
+<div class='card'><h2>Последние достижения</h2>{% for entry in entries %}<div class='list-item'><h3>{{ entry.title }}</h3><div class='muted'>{{ entry.type }} · {{ entry.date }}</div><p>{{ entry.description|truncatechars:150 }}</p></div>{% empty %}<p>Пока нет записей.</p>{% endfor %}</div>
+<div class='card'><h2>Профиль</h2><p>{{ request.user.full_name }}</p><p class='muted'>{{ request.user.specialty }}<br>Группа {{ request.user.group }}</p><a class='btn' href='{% url "accounts:profile_edit" %}'>Изменить</a></div>
+</div>{% endblock %}
