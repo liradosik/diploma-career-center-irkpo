@@ -1,0 +1,17 @@
+{% load static %}
+<!doctype html><html lang='ru'><head><meta charset='utf-8'><title>{% block title %}ЛК{% endblock %}</title><link rel='stylesheet' href='{% static "css/style.css" %}'></head>
+<body>
+<div class='layout'>
+<aside class='sidebar'>
+  <div class='brand' style='margin-bottom:20px'>ИРКПО<br>Центр карьеры</div>
+  <nav class='menu'>
+    <a class='{% if request.resolver_match.url_name == "student_dashboard" %}active{% endif %}' href='{% url "accounts:student_dashboard" %}'>Личный кабинет</a>
+    <a class='{% if request.resolver_match.namespace == "portfolio" %}active{% endif %}' href='{% url "portfolio:list" %}'>Моё портфолио</a>
+    <a class='{% if request.resolver_match.namespace == "resumes" %}active{% endif %}' href='{% url "resumes:builder" %}'>Конструктор резюме</a>
+    <a class='{% if request.resolver_match.namespace == "vacancies" %}active{% endif %}' href='{% url "vacancies:list" %}'>Вакансии</a>
+    <a class='{% if request.resolver_match.namespace == "courses" %}active{% endif %}' href='{% url "courses:list" %}'>Курсы и семинары</a>
+  </nav>
+</aside>
+<main class='container'>{% block content %}{% endblock %}</main>
+</div>
+</body></html>

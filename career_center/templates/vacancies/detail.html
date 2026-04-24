@@ -1,0 +1,4 @@
+{% extends 'base_dashboard.html' %}
+{% block content %}<div class='card'><h1>{{ vacancy.title }}</h1><p class='muted'>{{ vacancy.company }} · {{ vacancy.employment_type }} · {{ vacancy.format_type }}</p><p>{{ vacancy.description }}</p>
+<form method='post' action='{% url "vacancies:respond" vacancy.pk %}'>{% csrf_token %}<button class='btn btn-primary'>Откликнуться</button></form></div>
+<div class='card' style='margin-top:20px'><h3>Обязанности</h3><p>{{ vacancy.responsibilities }}</p><h3>Требования</h3><p>{{ vacancy.requirements }}</p><h3>Условия</h3><p>{{ vacancy.conditions }}</p><h3>Контакты</h3><p>{{ vacancy.contacts }}</p></div>{% endblock %}

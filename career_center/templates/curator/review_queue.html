@@ -1,0 +1,2 @@
+{% extends 'base_public.html' %}
+{% block content %}<div class='card'><h1>Записи на проверку</h1>{% for e in entries %}<div class='list-item'><b>{{ e.student.full_name }}</b>: {{ e.title }} ({{ e.type }})</div>{% empty %}Нет записей.{% endfor %}</div>{% endblock %}

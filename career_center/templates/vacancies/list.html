@@ -1,0 +1,4 @@
+{% extends 'base_dashboard.html' %}
+{% block content %}<div class='hero'><h4 style='color:#2566de'>РАЗДЕЛ ЗАНЯТОСТИ</h4><h1>Вакансии и стажировки</h1>
+<form method='get'><input name='q' placeholder='Поиск по вакансиям'><button class='btn btn-primary' style='margin-top:10px'>Найти</button></form></div>
+<div class='card' style='margin-top:20px'>{% for v in vacancies %}<div class='list-item'><h3>{{ v.title }}</h3><div class='muted'>{{ v.company }} · {{ v.format_type }}</div><p>{{ v.description|truncatechars:150 }}</p><a class='btn btn-primary' href='{% url "vacancies:detail" v.pk %}'>Подробнее</a></div>{% empty %}<p>Нет активных вакансий.</p>{% endfor %}</div>{% endblock %}

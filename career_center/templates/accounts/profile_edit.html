@@ -1,0 +1,3 @@
+{% extends 'base_dashboard.html' %}
+{% block content %}<div class='card'><h1>Профиль студента</h1><form method='post' enctype='multipart/form-data'>{% csrf_token %}
+{{ user_form.as_p }}{{ profile_form.as_p }}<button class='btn btn-primary'>Сохранить</button></form></div>{% endblock %}

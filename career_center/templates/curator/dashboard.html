@@ -1,0 +1,2 @@
+{% extends 'base_public.html' %}
+{% block content %}<div class='card'><h1>Панель куратора</h1><p>Закрепленных студентов: {{ students.count }}</p><p>Записей на проверку: {{ pending_count }}</p><a class='btn btn-primary' href='{% url "portfolio:review_queue" %}'>К проверке</a></div>{% endblock %}

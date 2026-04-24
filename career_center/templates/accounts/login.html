@@ -1,0 +1,3 @@
+{% extends 'base_public.html' %}{% block title %}Вход{% endblock %}
+{% block content %}<div class='hero'><h4 style='color:#2566de'>ВХОД</h4><h1>Войдите в свой аккаунт</h1>
+<form method='post'>{% csrf_token %}{{ form.non_field_errors }}<label>Email</label>{{ form.username }}<label>Пароль</label>{{ form.password }}<button class='btn btn-primary' type='submit'>Войти</button></form></div>{% endblock %}

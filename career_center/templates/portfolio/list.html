@@ -1,0 +1,3 @@
+{% extends 'base_dashboard.html' %}
+{% block content %}<div class='hero'><h4 style='color:#2566de'>ЭЛЕКТРОННОЕ ПОРТФОЛИО</h4><h1>Моё портфолио</h1><a class='btn btn-primary' href='{% url "portfolio:create" %}'>Добавить запись</a></div>
+<div class='card' style='margin-top:20px'>{% for entry in entries %}<div class='list-item'><h3>{{ entry.title }}</h3><div class='muted'>{{ entry.type }} · {{ entry.date }} · {{ entry.get_status_display }}</div><p>{{ entry.description }}</p></div>{% empty %}Нет записей.{% endfor %}</div>{% endblock %}

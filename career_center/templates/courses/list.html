@@ -1,0 +1,4 @@
+{% extends 'base_dashboard.html' %}
+{% block content %}<div class='hero'><h1>Курсы, семинары и практики</h1><p class='muted'>Образовательные возможности и запись на мероприятия.</p></div>
+<div class='card' style='margin-top:20px'>{% for c in courses %}<div class='list-item'><h3>{{ c.title }}</h3><div class='muted'>{{ c.get_kind_display }} · {{ c.get_format_type_display }} · {{ c.date }}</div><p>{{ c.description|truncatechars:160 }}</p>
+<form method='post' action='{% url "courses:register" c.pk %}'>{% csrf_token %}<button class='btn btn-primary'>Записаться</button></form></div>{% empty %}<p>Активных событий пока нет.</p>{% endfor %}</div>{% endblock %}
