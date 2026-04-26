@@ -1,0 +1,38 @@
+{% extends 'base_dashboard.html' %}
+{% block title %}Кураторы{% endblock %}
+{% block content %}
+<section class="hero"><div class="hero-kicker">Администрирование</div><h1>Кураторы</h1><p>Управление кураторами и закреплением студентов.</p></section>
+
+<section class="section card form-card">
+  <h2>Создать куратора</h2>
+  <form method="post" class="form-grid">
+    {% csrf_token %}
+    <p class="full"><label>{{ form.full_name.label }}</label>{{ form.full_name }}</p>
+    <p class="full"><label>{{ form.email.label }}</label>{{ form.email }}</p>
+    <p class="full"><label>{{ form.password.label }}</label>{{ form.password }}</p>
+    <p class="full"><button class="btn btn-primary" type="submit">Создать</button></p>
+  </form>
+</section>
+
+<section class="section card">
+  <h2>Список кураторов</h2>
+  <form method="get" class="filters">
+    <input name="q" placeholder="Поиск по ФИО/email" value="{{ request.GET.q }}">
+    <button class="btn btn-link" type="submit">Применить</button>
+  </form>
+
+  <div class="row-list">
+    {% for curator in curators %}
+      <div class="row-item">
+        <div><strong>{{ curator.full_name }}</strong><div class="muted">{{ curator.email }}</div></div>
+        <div class="muted">Роль: Куратор</div>
+        <div class="muted">Закреплено студентов: {{ curator.students_count }}</div>
+        <div></div>
+        <a class="btn btn-link" href="{% url 'accounts:admin_curator_detail' curator.id %}">Открыть</a>
+      </div>
+    {% empty %}
+      <p class="muted">Кураторы не найдены.</p>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

@@ -1,4 +1,5 @@
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
 
 from apps.accounts.decorators import role_required
 from apps.accounts.models import User
@@ -43,5 +44,34 @@ def edit_entry(request, pk):
 @role_required(User.Role.CURATOR)
 def review_queue(request):
     students = User.objects.filter(role=User.Role.STUDENT, curator=request.user)
-    entries = PortfolioEntry.objects.filter(student__in=students, status=PortfolioEntry.Status.PENDING)
-    return render(request, 'curator/review_queue.html', {'entries': entries})
+    entries_qs = PortfolioEntry.objects.filter(student__in=students).select_related('student').order_by('-created_at')
+
+    if request.method == 'POST':
+        entry_id = request.POST.get('entry_id')
+        decision = request.POST.get('decision')
+        comment = request.POST.get('curator_comment', '').strip()
+
+        entry = get_object_or_404(entries_qs, id=entry_id)
+        if entry.status == PortfolioEntry.Status.PENDING and decision in {PortfolioEntry.Status.APPROVED, PortfolioEntry.Status.REJECTED}:
+            entry.status = decision
+            entry.curator_comment = comment
+            entry.reviewed_by = request.user
+            entry.reviewed_at = timezone.now()
+            entry.save(update_fields=['status', 'curator_comment', 'reviewed_by', 'reviewed_at', 'updated_at'])
+
+        return redirect('portfolio:review_queue')
+
+    status_filter = request.GET.get('status', 'all')
+    if status_filter in {PortfolioEntry.Status.PENDING, PortfolioEntry.Status.APPROVED, PortfolioEntry.Status.REJECTED}:
+        entries_qs = entries_qs.filter(status=status_filter)
+    else:
+        status_filter = 'all'
+
+    return render(
+        request,
+        'curator/review_queue.html',
+        {
+            'entries': entries_qs[:50],
+            'status_filter': status_filter,
+        },
+    )

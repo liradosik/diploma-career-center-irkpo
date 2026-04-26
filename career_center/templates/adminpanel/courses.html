@@ -1,0 +1,48 @@
+{% extends 'base_dashboard.html' %}
+{% load ui_extras %}
+{% block title %}Курсы и семинары{% endblock %}
+{% block content %}
+<section class="hero"><div class="hero-kicker">Администрирование</div><h1>Курсы и семинары</h1><p>Создание и управление обучающими событиями.</p></section>
+
+<section class="section card form-card">
+  <h2>Создать курс</h2>
+  <form method="post" class="form-grid">
+    {% csrf_token %}
+    <p class="full"><label>{{ form.title.label }}</label>{{ form.title }}</p>
+    <p><label>{{ form.kind.label }}</label>{{ form.kind }}</p>
+    <p><label>{{ form.format_type.label }}</label>{{ form.format_type }}</p>
+    <p class="full"><label>{{ form.description.label }}</label>{{ form.description }}</p>
+    <p><label>{{ form.organization.label }}</label>{{ form.organization }}</p>
+    <p><label>{{ form.contacts.label }}</label>{{ form.contacts }}</p>
+    <p><label>{{ form.date.label }}</label>{{ form.date }}</p>
+    <p><label>{{ form.places.label }}</label>{{ form.places }}</p>
+    <p><label>{{ form.status.label }}</label>{{ form.status }}</p>
+    <p class="full"><button class="btn btn-primary" name="action" value="create" type="submit">Создать</button></p>
+  </form>
+</section>
+
+<section class="section card">
+  <h2>Список курсов</h2>
+  <form method="get" class="filters">
+    <input name="q" placeholder="Поиск по названию/организации" value="{{ request.GET.q }}">
+    <select name="status"><option value="">Статус</option><option value="active" {% if request.GET.status == 'active' %}selected{% endif %}>Активно</option><option value="hidden" {% if request.GET.status == 'hidden' %}selected{% endif %}>Скрыто</option><option value="archive" {% if request.GET.status == 'archive' %}selected{% endif %}>Архив</option></select>
+    <select name="kind"><option value="">Тип</option><option value="course" {% if request.GET.kind == 'course' %}selected{% endif %}>Курс</option><option value="seminar" {% if request.GET.kind == 'seminar' %}selected{% endif %}>Семинар</option><option value="practice" {% if request.GET.kind == 'practice' %}selected{% endif %}>Практика</option></select>
+    <select name="format_type"><option value="">Формат</option><option value="online" {% if request.GET.format_type == 'online' %}selected{% endif %}>Онлайн</option><option value="offline" {% if request.GET.format_type == 'offline' %}selected{% endif %}>Очно</option></select>
+    <button class="btn btn-link" type="submit">Применить</button>
+  </form>
+
+  <div class="row-list">
+    {% for course in courses %}
+      <div class="row-item">
+        <div><strong>{{ course.title }}</strong><div class="muted">{{ course.organization }}</div></div>
+        <div class="muted">{{ KIND_LABELS|dict_get:course.kind }} • {{ FORMAT_LABELS|dict_get:course.format_type }}</div>
+        <div class="muted">{{ STATUS_LABELS|dict_get:course.status }}</div>
+        <div class="muted">{% if course.format_type == 'offline' %}Мест: {{ course.places }} / {{ course.registrations_count }}{% else %}Онлайн{% endif %}</div>
+        <a class="btn btn-link" href="{% url 'accounts:admin_course_detail' course.id %}">Открыть</a>
+      </div>
+    {% empty %}
+      <p class="muted">Курсы не найдены.</p>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

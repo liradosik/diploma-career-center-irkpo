@@ -1,0 +1,56 @@
+{% extends 'base_dashboard.html' %}
+{% block title %}Карточка студента{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="hero-kicker">Карточка студента</div>
+  <h1>{{ student.full_name }}</h1>
+  <p>Группа: {{ student.group|default:'—' }} • Специальность: {{ student.specialty|default:'—' }}</p>
+</section>
+
+<section class="section grid grid-2">
+  <div class="card">
+    <h2>Контакты и профиль</h2>
+    <div class="list-item">
+      <p><strong>Email:</strong> {{ student.email }}</p>
+      <p><strong>Телефон:</strong> {% if profile and profile.phone %}{{ profile.phone }}{% else %}<span class="muted">не указан</span>{% endif %}</p>
+      <p><strong>Город:</strong> {% if profile and profile.city %}{{ profile.city }}{% else %}<span class="muted">не указан</span>{% endif %}</p>
+      <p><strong>О себе:</strong> {% if profile and profile.about %}{{ profile.about }}{% else %}<span class="muted">информация отсутствует</span>{% endif %}</p>
+      {% if resume_public_url %}
+        <p><strong>Публичное резюме:</strong> <a style="color:#1E66D0;" href="{{ resume_public_url }}">{{ resume_public_url }}</a></p>
+      {% else %}
+        <p><strong>Публичное резюме:</strong> <span class="muted">не опубликовано</span></p>
+      {% endif %}
+    </div>
+  </div>
+  <div class="card">
+    <h2>Статистика портфолио</h2>
+    <section class="grid grid-2">
+      <article class="stat-card"><div class="label">Всего</div><div class="value">{{ portfolio_total }}</div></article>
+      <article class="stat-card"><div class="label">Ожидает</div><div class="value">{{ portfolio_pending }}</div></article>
+      <article class="stat-card"><div class="label">Подтверждено</div><div class="value">{{ portfolio_approved }}</div></article>
+      <article class="stat-card"><div class="label">Отклонено</div><div class="value">{{ portfolio_rejected }}</div></article>
+    </section>
+  </div>
+</section>
+
+<section class="section card">
+  <h2>Записи портфолио</h2>
+  {% for entry in entries %}
+    <article class="list-item">
+      <h3>{{ entry.title }}</h3>
+      <p class="muted">{{ entry.type }} • {{ entry.date }}</p>
+      <p>{{ entry.description|truncatechars:220 }}</p>
+      <div class="inline-actions">
+        {% if entry.status == 'pending' %}<span class="badge badge-pending">Ожидает проверки</span>{% endif %}
+        {% if entry.status == 'approved' %}<span class="badge badge-approved">Подтверждено</span>{% endif %}
+        {% if entry.status == 'rejected' %}<span class="badge badge-rejected">Отклонено</span>{% endif %}
+      </div>
+      {% if entry.curator_comment %}
+        <p class="muted">Комментарий куратора: {{ entry.curator_comment }}</p>
+      {% endif %}
+    </article>
+  {% empty %}
+    <p class="muted">У студента пока нет записей портфолио.</p>
+  {% endfor %}
+</section>
+{% endblock %}
