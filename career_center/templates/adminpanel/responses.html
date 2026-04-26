@@ -3,14 +3,25 @@
 {% block content %}
 <section class="hero"><div class="hero-kicker">Администрирование</div><h1>Отклики</h1><p>Список откликов студентов на вакансии.</p></section>
 <section class="section card">
-  {% for response in responses %}
-    <article class="list-item">
-      <h3>{{ response.student.full_name }} → {{ response.vacancy.title }}</h3>
-      <p class="muted">{{ response.created_at|date:'d.m.Y H:i' }}</p>
-      <p class="muted">Резюме: {% if response.resume_link_snapshot %}<a style="color:#1E66D0;" href="{{ response.resume_link_snapshot }}">{{ response.resume_link_snapshot }}</a>{% else %}—{% endif %}</p>
-    </article>
-  {% empty %}
-    <p class="muted">Откликов пока нет.</p>
-  {% endfor %}
+  <form method="get" class="filters">
+    <input name="q" placeholder="Поиск по студенту" value="{{ request.GET.q }}">
+    <input name="vacancy" placeholder="Вакансия" value="{{ request.GET.vacancy }}">
+    <input name="group" placeholder="Группа" value="{{ request.GET.group }}">
+    <button class="btn btn-link" type="submit">Применить</button>
+  </form>
+
+  <div class="row-list">
+    {% for response in responses %}
+      <div class="row-item">
+        <div><strong>{{ response.student.full_name }}</strong><div class="muted">{{ response.student.group|default:'—' }}</div></div>
+        <div class="muted">{{ response.vacancy.title }}</div>
+        <div class="muted">{{ response.created_at|date:'d.m.Y H:i' }}</div>
+        <div class="muted">{% if response.resume_link_snapshot %}<a style="color:#1E66D0;" href="{{ response.resume_link_snapshot }}">Резюме</a>{% else %}—{% endif %}</div>
+        <div></div>
+      </div>
+    {% empty %}
+      <p class="muted">Откликов пока нет.</p>
+    {% endfor %}
+  </div>
 </section>
 {% endblock %}

@@ -19,12 +19,12 @@
           <a class="{% if request.resolver_match.namespace == 'resumes' %}active{% endif %}" href="{% url 'resumes:builder' %}">Резюме</a>
           <a class="{% if request.resolver_match.namespace == 'vacancies' %}active{% endif %}" href="{% url 'vacancies:list' %}">Вакансии</a>
           <a class="{% if request.resolver_match.namespace == 'courses' %}active{% endif %}" href="{% url 'courses:list' %}">Курсы</a>
-          <form method="post" action="{% url 'accounts:logout' %}" class="menu-logout">{% csrf_token %}<button type="submit">Выход</button></form>
+          <form method="post" action="{% url 'accounts:logout' %}" class="menu-logout">{% csrf_token %}<button class="logout-button" type="submit">Выход</button></form>
         {% elif request.user.role == 'curator' %}
           <a class="{% if request.resolver_match.url_name == 'curator_dashboard' %}active{% endif %}" href="{% url 'accounts:curator_dashboard' %}">Главная</a>
           <a class="{% if request.resolver_match.url_name == 'curator_students' or request.resolver_match.url_name == 'curator_student_detail' %}active{% endif %}" href="{% url 'accounts:curator_students' %}">Мои студенты</a>
           <a class="{% if request.resolver_match.url_name == 'review_queue' %}active{% endif %}" href="{% url 'portfolio:review_queue' %}">Проверка портфолио</a>
-          <form method="post" action="{% url 'accounts:logout' %}" class="menu-logout">{% csrf_token %}<button type="submit">Выход</button></form>
+          <form method="post" action="{% url 'accounts:logout' %}" class="menu-logout">{% csrf_token %}<button class="logout-button" type="submit">Выход</button></form>
         {% else %}
           <a class="{% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}" href="{% url 'accounts:admin_dashboard' %}">Панель</a>
           <a class="{% if request.resolver_match.url_name == 'admin_students' %}active{% endif %}" href="{% url 'accounts:admin_students' %}">Студенты</a>
@@ -33,7 +33,7 @@
           <a class="{% if request.resolver_match.url_name == 'admin_courses' %}active{% endif %}" href="{% url 'accounts:admin_courses' %}">Курсы/семинары</a>
           <a class="{% if request.resolver_match.url_name == 'admin_responses' %}active{% endif %}" href="{% url 'accounts:admin_responses' %}">Отклики</a>
           <a class="{% if request.resolver_match.url_name == 'admin_course_registrations' %}active{% endif %}" href="{% url 'accounts:admin_course_registrations' %}">Записи на курсы</a>
-          <form method="post" action="{% url 'accounts:logout' %}" class="menu-logout">{% csrf_token %}<button type="submit">Выход</button></form>
+          <form method="post" action="{% url 'accounts:logout' %}" class="menu-logout">{% csrf_token %}<button class="logout-button" type="submit">Выход</button></form>
         {% endif %}
       </nav>
     </aside>

@@ -15,7 +15,9 @@ from .decorators import role_required
 from .forms import (
     AdminCourseForm,
     AdminCuratorCreateForm,
+    AdminCuratorUpdateForm,
     AdminStudentCreateForm,
+    AdminStudentUpdateForm,
     AdminVacancyForm,
     EmailAuthenticationForm,
     StudentProfileForm,
@@ -235,14 +237,22 @@ def admin_students(request):
 @role_required(User.Role.ADMIN)
 def admin_student_detail(request, student_id):
     student = get_object_or_404(User, id=student_id, role=User.Role.STUDENT)
+    form = AdminStudentUpdateForm(instance=student)
+
     if request.method == 'POST':
         action = request.POST.get('action')
-        if action == 'toggle_active':
+        if action == 'update_profile':
+            form = AdminStudentUpdateForm(request.POST, instance=student)
+            if form.is_valid():
+                form.save()
+                messages.success(request, 'Данные студента обновлены.')
+                return redirect('accounts:admin_student_detail', student_id=student.id)
+        elif action == 'toggle_active':
             student.is_active = not student.is_active
             student.save(update_fields=['is_active'])
             messages.success(request, 'Статус студента обновлён.')
             return redirect('accounts:admin_student_detail', student_id=student.id)
-        if action == 'reset_password':
+        elif action == 'reset_password':
             new_password = request.POST.get('temp_password', '').strip()
             if new_password:
                 student.set_password(new_password)
@@ -252,7 +262,7 @@ def admin_student_detail(request, student_id):
                 messages.error(request, 'Введите временный пароль.')
             return redirect('accounts:admin_student_detail', student_id=student.id)
 
-    return render(request, 'adminpanel/student_detail.html', {'student': student})
+    return render(request, 'adminpanel/student_detail.html', {'student': student, 'form': form})
 
 
 @role_required(User.Role.ADMIN)
@@ -276,14 +286,21 @@ def admin_curators(request):
 @role_required(User.Role.ADMIN)
 def admin_curator_detail(request, curator_id):
     curator = get_object_or_404(User, id=curator_id, role=User.Role.CURATOR)
+    form = AdminCuratorUpdateForm(instance=curator)
     if request.method == 'POST':
         action = request.POST.get('action')
-        if action == 'toggle_active':
+        if action == 'update_profile':
+            form = AdminCuratorUpdateForm(request.POST, instance=curator)
+            if form.is_valid():
+                form.save()
+                messages.success(request, 'Данные куратора обновлены.')
+                return redirect('accounts:admin_curator_detail', curator_id=curator.id)
+        elif action == 'toggle_active':
             curator.is_active = not curator.is_active
             curator.save(update_fields=['is_active'])
             messages.success(request, 'Статус куратора обновлён.')
             return redirect('accounts:admin_curator_detail', curator_id=curator.id)
-        if action == 'reset_password':
+        elif action == 'reset_password':
             new_password = request.POST.get('temp_password', '').strip()
             if new_password:
                 curator.set_password(new_password)
@@ -293,8 +310,8 @@ def admin_curator_detail(request, curator_id):
                 messages.error(request, 'Введите временный пароль.')
             return redirect('accounts:admin_curator_detail', curator_id=curator.id)
 
-    students_count = User.objects.filter(role=User.Role.STUDENT, curator=curator).count()
-    return render(request, 'adminpanel/curator_detail.html', {'curator': curator, 'students_count': students_count})
+    students = User.objects.filter(role=User.Role.STUDENT, curator=curator).order_by('full_name')
+    return render(request, 'adminpanel/curator_detail.html', {'curator': curator, 'form': form, 'students': students})
 
 
 @role_required(User.Role.ADMIN)
@@ -432,12 +449,33 @@ def admin_course_detail(request, course_id):
 @role_required(User.Role.ADMIN)
 def admin_responses(request):
     responses = VacancyResponse.objects.select_related('student', 'vacancy').order_by('-created_at')
+    q = request.GET.get('q', '').strip()
+    vacancy = request.GET.get('vacancy', '').strip()
+    group = request.GET.get('group', '').strip()
+    if q:
+        responses = responses.filter(student__full_name__icontains=q)
+    if vacancy:
+        responses = responses.filter(vacancy__title__icontains=vacancy)
+    if group:
+        responses = responses.filter(student__group__icontains=group)
     return render(request, 'adminpanel/responses.html', {'responses': responses})
 
 
 @role_required(User.Role.ADMIN)
 def admin_course_registrations(request):
     registrations = CourseRegistration.objects.select_related('student', 'course').order_by('-created_at')
+    q = request.GET.get('q', '').strip()
+    course = request.GET.get('course', '').strip()
+    group = request.GET.get('group', '').strip()
+    format_type = request.GET.get('format_type', '').strip()
+    if q:
+        registrations = registrations.filter(student__full_name__icontains=q)
+    if course:
+        registrations = registrations.filter(course__title__icontains=course)
+    if group:
+        registrations = registrations.filter(student__group__icontains=group)
+    if format_type in {Course.Format.ONLINE, Course.Format.OFFLINE}:
+        registrations = registrations.filter(course__format_type=format_type)
     return render(request, 'adminpanel/course_registrations.html', {'registrations': registrations})
 
 

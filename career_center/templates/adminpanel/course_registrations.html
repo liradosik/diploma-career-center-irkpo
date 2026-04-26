@@ -1,15 +1,29 @@
 {% extends 'base_dashboard.html' %}
+{% load ui_extras %}
 {% block title %}Записи на курсы{% endblock %}
 {% block content %}
 <section class="hero"><div class="hero-kicker">Администрирование</div><h1>Записи на курсы</h1><p>Список регистраций студентов на курсы и семинары.</p></section>
 <section class="section card">
-  {% for reg in registrations %}
-    <article class="list-item">
-      <h3>{{ reg.student.full_name }} → {{ reg.course.title }}</h3>
-      <p class="muted">Формат: {{ reg.course.get_format_type_display }} • Запись: {{ reg.created_at|date:'d.m.Y H:i' }}</p>
-    </article>
-  {% empty %}
-    <p class="muted">Записей пока нет.</p>
-  {% endfor %}
+  <form method="get" class="filters">
+    <input name="q" placeholder="Поиск по студенту" value="{{ request.GET.q }}">
+    <input name="course" placeholder="Курс" value="{{ request.GET.course }}">
+    <input name="group" placeholder="Группа" value="{{ request.GET.group }}">
+    <select name="format_type"><option value="">Формат</option><option value="online" {% if request.GET.format_type == 'online' %}selected{% endif %}>Онлайн</option><option value="offline" {% if request.GET.format_type == 'offline' %}selected{% endif %}>Очно</option></select>
+    <button class="btn btn-link" type="submit">Применить</button>
+  </form>
+
+  <div class="row-list">
+    {% for reg in registrations %}
+      <div class="row-item">
+        <div><strong>{{ reg.student.full_name }}</strong><div class="muted">{{ reg.student.group|default:'—' }}</div></div>
+        <div class="muted">{{ reg.course.title }}</div>
+        <div class="muted">{{ FORMAT_LABELS|dict_get:reg.course.format_type }}</div>
+        <div class="muted">{{ reg.created_at|date:'d.m.Y H:i' }}</div>
+        <div></div>
+      </div>
+    {% empty %}
+      <p class="muted">Записей пока нет.</p>
+    {% endfor %}
+  </div>
 </section>
 {% endblock %}
