@@ -1,2 +1,69 @@
-{% extends 'base_public.html' %}
-{% block content %}<div class='card'><h1>Панель администратора</h1><p>Для полного управления используйте <a style='color:#2566de' href='/django-admin/'>Django Admin</a>.</p></div>{% endblock %}
+{% extends 'base_dashboard.html' %}
+{% block title %}Панель администратора{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="hero-kicker">Панель администратора</div>
+  <h1>Панель администратора</h1>
+  <p>Сводная статистика по пользователям, вакансиям, курсам, откликам и регистрациям.</p>
+</section>
+
+<section class="section grid grid-3">
+  <article class="stat-card"><div class="label">Студентов всего</div><div class="value">{{ students_total }}</div></article>
+  <article class="stat-card"><div class="label">Кураторов всего</div><div class="value">{{ curators_total }}</div></article>
+  <article class="stat-card"><div class="label">Активных вакансий</div><div class="value">{{ vacancies_active }}</div></article>
+  <article class="stat-card"><div class="label">Активных курсов</div><div class="value">{{ courses_active }}</div></article>
+  <article class="stat-card"><div class="label">Записей на курсы</div><div class="value">{{ registrations_total }}</div></article>
+  <article class="stat-card"><div class="label">Откликов</div><div class="value">{{ responses_total }}</div></article>
+</section>
+
+<section class="section card">
+  <h2>Сводка по материалам</h2>
+  <div class="grid grid-2">
+    <div class="list-item">
+      <h3>Вакансии</h3>
+      <p class="muted">Active: {{ vacancy_summary.active }} • Hidden: {{ vacancy_summary.hidden }} • Archive: {{ vacancy_summary.archive }}</p>
+    </div>
+    <div class="list-item">
+      <h3>Курсы</h3>
+      <p class="muted">Active: {{ course_summary.active }} • Hidden: {{ course_summary.hidden }} • Archive: {{ course_summary.archive }}</p>
+      <p class="muted">Offline-курсов: {{ offline_courses_count }} • Мест: {{ offline_places_total }}</p>
+    </div>
+  </div>
+</section>
+
+<section class="section grid grid-3">
+  <div class="card">
+    <h2>Последние вакансии</h2>
+    {% for vacancy in latest_vacancies %}
+      <div class="list-item">
+        <h3>{{ vacancy.title }}</h3>
+        <p class="muted">{{ vacancy.company }} • {{ vacancy.created_at|date:'d.m.Y' }}</p>
+      </div>
+    {% empty %}
+      <p class="muted">Вакансий пока нет.</p>
+    {% endfor %}
+  </div>
+  <div class="card">
+    <h2>Последние курсы</h2>
+    {% for course in latest_courses %}
+      <div class="list-item">
+        <h3>{{ course.title }}</h3>
+        <p class="muted">{{ course.get_kind_display }} • {{ course.created_at|date:'d.m.Y' }}</p>
+      </div>
+    {% empty %}
+      <p class="muted">Курсов пока нет.</p>
+    {% endfor %}
+  </div>
+  <div class="card">
+    <h2>Последние студенты</h2>
+    {% for student in latest_students %}
+      <div class="list-item">
+        <h3>{{ student.full_name }}</h3>
+        <p class="muted">{{ student.group|default:'—' }} • {{ student.date_joined|date:'d.m.Y' }}</p>
+      </div>
+    {% empty %}
+      <p class="muted">Студенты пока не добавлены.</p>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}
