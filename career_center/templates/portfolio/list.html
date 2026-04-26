@@ -1,10 +1,11 @@
 {% extends 'base_dashboard.html' %}
+{% load ui_extras %}
 {% block title %}Портфолио{% endblock %}
 {% block content %}
 <section class="hero">
   <div class="hero-kicker">Электронное портфолио</div>
   <h1>Моё портфолио</h1>
-  <p>Собирайте подтверждённые достижения, чтобы автоматически использовать их в резюме.</p>
+  <p>Здесь хранятся ваши достижения для резюме и откликов на вакансии.</p>
   <div class="hero-actions"><a class="btn btn-primary" href="{% url 'portfolio:create' %}">Добавить запись</a></div>
 </section>
 
@@ -13,17 +14,21 @@
   {% for entry in entries %}
     <article class="list-item">
       <h3>{{ entry.title }}</h3>
-      <p class="muted">{{ entry.type }} • {{ entry.date }}</p>
-      <p>{{ entry.description|truncatechars:200 }}</p>
+      <p class="muted">{{ PORTFOLIO_TYPE_LABELS|dict_get:entry.type }} • {{ entry.date }}</p>
+      <p>{{ entry.description|truncatechars:220 }}</p>
+      {% if entry.link %}<p class="muted">Ссылка: <a style="color:#1E66D0;" href="{{ entry.link }}">{{ entry.link }}</a></p>{% endif %}
+      {% if entry.file %}<p class="muted">Файл: <a style="color:#1E66D0;" href="{{ entry.file.url }}">Скачать</a></p>{% endif %}
+      {% if entry.curator_comment %}<p class="muted">Комментарий куратора: {{ entry.curator_comment }}</p>{% endif %}
       <div class="inline-actions">
-        {% if entry.status == 'pending' %}<span class="badge badge-pending">На проверке</span>{% endif %}
+        {% if entry.status == 'pending' %}<span class="badge badge-pending">Ожидает проверки</span>{% endif %}
         {% if entry.status == 'approved' %}<span class="badge badge-approved">Подтверждено</span>{% endif %}
         {% if entry.status == 'rejected' %}<span class="badge badge-rejected">Отклонено</span>{% endif %}
         <a class="btn" href="{% url 'portfolio:edit' entry.pk %}">Редактировать</a>
+        <form method="post" action="{% url 'portfolio:delete' entry.pk %}" onsubmit="return confirm('Удалить запись?');">{% csrf_token %}<button class="btn btn-danger" type="submit">Удалить</button></form>
       </div>
     </article>
   {% empty %}
-    <p class="muted">Записей пока нет. Начните с добавления первого достижения.</p>
+    <p class="muted">Записей пока нет. Добавьте первое достижение.</p>
   {% endfor %}
 </section>
 {% endblock %}

@@ -4,7 +4,23 @@ from django.contrib.auth.forms import AuthenticationForm
 from apps.courses.models import Course
 from apps.vacancies.models import Vacancy
 
-from .models import StudentProfile, User
+from .models import StudentProfile, StudyGroup, User
+
+
+RUS_STATUS_CHOICES = [
+    ('active', 'Активно'),
+    ('hidden', 'Скрыто'),
+    ('archive', 'Архив'),
+]
+RUS_KIND_CHOICES = [
+    ('course', 'Курс'),
+    ('seminar', 'Семинар'),
+    ('practice', 'Практика'),
+]
+RUS_FORMAT_CHOICES = [
+    ('online', 'Онлайн'),
+    ('offline', 'Очно'),
+]
 
 
 RUS_STATUS_CHOICES = [
@@ -48,31 +64,31 @@ class AdminStudentCreateForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ('full_name', 'email', 'password', 'group', 'specialty', 'admission_year', 'curator')
+        fields = ('full_name', 'email', 'password', 'study_group')
         labels = {
             'full_name': 'ФИО',
             'email': 'Email',
-            'group': 'Группа',
-            'specialty': 'Специальность',
-            'admission_year': 'Год поступления',
-            'curator': 'Куратор',
+            'study_group': 'Учебная группа',
         }
         widgets = {
             'full_name': forms.TextInput(attrs={'placeholder': 'Например, Дашинова Валерия Михайловна'}),
             'email': forms.EmailInput(attrs={'placeholder': 'Например, student@irkpo.ru'}),
-            'group': forms.TextInput(attrs={'placeholder': 'Например, И-422'}),
-            'specialty': forms.TextInput(attrs={'placeholder': 'Например, Информационные системы'}),
-            'admission_year': forms.NumberInput(attrs={'placeholder': 'Например, 2022'}),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['curator'].queryset = User.objects.filter(role=User.Role.CURATOR).order_by('full_name')
+        self.fields['study_group'].queryset = StudyGroup.objects.select_related('curator').order_by('name')
 
     def save(self, commit=True):
         user = super().save(commit=False)
         user.role = User.Role.STUDENT
         user.set_password(self.cleaned_data['password'])
+        group = self.cleaned_data.get('study_group')
+        if group:
+            user.group = group.name
+            user.specialty = group.specialty
+            user.admission_year = group.admission_year
+            user.curator = group.curator
         if commit:
             user.save()
         return user
@@ -81,20 +97,29 @@ class AdminStudentCreateForm(forms.ModelForm):
 class AdminStudentUpdateForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ('full_name', 'email', 'group', 'specialty', 'admission_year', 'curator', 'is_active')
+        fields = ('full_name', 'email', 'study_group', 'is_active')
         labels = {
             'full_name': 'ФИО',
             'email': 'Email',
-            'group': 'Группа',
-            'specialty': 'Специальность',
-            'admission_year': 'Год поступления',
-            'curator': 'Куратор',
+            'study_group': 'Учебная группа',
             'is_active': 'Активен',
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['curator'].queryset = User.objects.filter(role=User.Role.CURATOR).order_by('full_name')
+        self.fields['study_group'].queryset = StudyGroup.objects.select_related('curator').order_by('name')
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        group = self.cleaned_data.get('study_group')
+        if group:
+            user.group = group.name
+            user.specialty = group.specialty
+            user.admission_year = group.admission_year
+            user.curator = group.curator
+        if commit:
+            user.save()
+        return user
 
 
 class AdminCuratorCreateForm(forms.ModelForm):

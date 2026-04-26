@@ -75,3 +75,11 @@ def review_queue(request):
             'status_filter': status_filter,
         },
     )
+
+
+@role_required(User.Role.STUDENT)
+def delete_entry(request, pk):
+    entry = get_object_or_404(PortfolioEntry, pk=pk, student=request.user)
+    if request.method == 'POST':
+        entry.delete()
+    return redirect('portfolio:list')

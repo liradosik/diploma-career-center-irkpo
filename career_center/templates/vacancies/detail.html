@@ -6,10 +6,8 @@
   <h1>{{ vacancy.title }}</h1>
   <p>{{ vacancy.company }} • {{ vacancy.employment_type }} • {{ vacancy.format_type }}</p>
   <div class="hero-actions">
-    <form method="post" action="{% url 'vacancies:respond' vacancy.pk %}">
-      {% csrf_token %}
-      <button class="btn btn-primary" type="submit">Откликнуться</button>
-    </form>
+    <form method="post" action="{% url 'vacancies:respond' vacancy.pk %}">{% csrf_token %}<button class="btn btn-primary" type="submit">Откликнуться</button></form>
+    {% if resume_link %}<a class="btn" href="{{ resume_link }}">Открыть публичное резюме</a>{% endif %}
   </div>
 </section>
 
@@ -20,5 +18,6 @@
   <div class="list-item"><h3>Требования</h3><p>{{ vacancy.requirements }}</p></div>
   <div class="list-item"><h3>Условия</h3><p>{{ vacancy.conditions }}</p></div>
   <div class="list-item"><h3>Контакты</h3><p>{{ vacancy.contacts }}</p></div>
+  {% if response %}<div class="list-item"><span class="badge badge-approved">Отклик уже сохранён</span><p class="muted">При отправке работодателю используйте ссылку на публичное резюме.</p></div>{% endif %}
 </section>
 {% endblock %}

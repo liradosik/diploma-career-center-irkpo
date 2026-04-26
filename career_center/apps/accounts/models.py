@@ -4,6 +4,16 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 
+class StudyGroup(models.Model):
+    name = models.CharField(max_length=64, unique=True)
+    specialty = models.CharField(max_length=255)
+    admission_year = models.PositiveIntegerField()
+    curator = models.ForeignKey('User', null=True, blank=True, on_delete=models.SET_NULL, related_name='managed_study_groups')
+
+    def __str__(self):
+        return self.name
+
+
 class User(AbstractUser):
     class Role(models.TextChoices):
         STUDENT = 'student', 'Студент'
@@ -18,6 +28,7 @@ class User(AbstractUser):
     specialty = models.CharField(max_length=255, blank=True)
     admission_year = models.PositiveIntegerField(null=True, blank=True)
     curator = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL, related_name='students')
+    study_group = models.ForeignKey(StudyGroup, null=True, blank=True, on_delete=models.SET_NULL, related_name='students')
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['full_name']

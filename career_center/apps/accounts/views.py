@@ -82,9 +82,10 @@ def student_dashboard(request):
         'resume': resume,
         'resume_is_public': bool(resume and resume.is_public and profile),
         'resume_public_url': resume_public_url,
-        'resume_updated_at': resume.updated_at if resume else None,
+        'resume_updated_at': getattr(resume, 'updated_at', None),
         'registrations': registrations,
         'current_course': current_course,
+        'profile_incomplete': not all([request.user.group, request.user.specialty, request.user.admission_year]),
     }
     return render(request, 'dashboard/student_dashboard.html', context)
 

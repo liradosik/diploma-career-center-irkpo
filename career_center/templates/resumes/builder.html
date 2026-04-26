@@ -1,33 +1,24 @@
 {% extends 'base_dashboard.html' %}
+{% load ui_extras %}
 {% block title %}Конструктор резюме{% endblock %}
 {% block content %}
 <section class="hero">
   <div class="hero-kicker">Конструктор резюме</div>
-  <h1>Настройка публичного резюме</h1>
-  <p>Выберите заголовок и описание, подтверждённые достижения подтянутся автоматически.</p>
+  <h1>Создание резюме</h1>
+  <p>В публичное резюме попадают подтверждённые куратором записи.</p>
 </section>
 
 <section class="section grid grid-2">
   <div class="card">
     <h2>Настройки резюме</h2>
-    <form method="post">
-      {% csrf_token %}
-      {{ form.as_p }}
-      <div class="inline-actions"><button class="btn btn-primary" type="submit">Сохранить</button></div>
-    </form>
+    <form method="post">{% csrf_token %}{{ form.as_p }}<div class="inline-actions"><button class="btn btn-primary" type="submit">Сохранить</button></div></form>
   </div>
   <div class="card">
     <h2>Предпросмотр</h2>
-    <div class="list-item">
-      <h3>{{ request.user.full_name }}</h3>
-      <p class="muted">{{ resume.title|default:'Заголовок резюме' }}</p>
-      <p>{{ resume.about|default:'Описание профиля пока не заполнено.' }}</p>
-    </div>
+    <div class="list-item"><h3>{{ request.user.full_name }}</h3><p class="muted">{{ resume.title|default:'Студент ИРКПО' }}</p><p>{{ resume.about|default:request.user.student_profile.about|default:'О себе пока не заполнено.' }}</p></div>
     {% for e in entries %}
-      <div class="list-item"><h3>{{ e.title }}</h3><p>{{ e.description|truncatechars:100 }}</p></div>
-    {% empty %}
-      <p class="muted">Нет подтверждённых достижений для публикации.</p>
-    {% endfor %}
+      <div class="list-item"><h3>{{ e.title }}</h3><p class="muted">{{ PORTFOLIO_TYPE_LABELS|dict_get:e.type }}</p><p>{{ e.description|truncatechars:120 }}</p></div>
+    {% empty %}<p class="muted">Нет подтверждённых записей для публикации.</p>{% endfor %}
   </div>
 </section>
 {% endblock %}

@@ -9,26 +9,20 @@
 
 <section class="section grid grid-2">
   <article class="card">
-    <h2>О кандидате</h2>
-    <p>{{ resume.about|default:profile.about|default:'Описание пока не заполнено.' }}</p>
-  </article>
-  <article class="card">
     <h2>Контакты</h2>
+    <p class="muted">Email: {{ student.email }}</p>
+    <p class="muted">Телефон: {{ profile.phone|default:'—' }}</p>
     <p class="muted">Специальность: {{ student.specialty|default:'—' }}</p>
     <p class="muted">Группа: {{ student.group|default:'—' }}</p>
   </article>
+  <article class="card">
+    <h2>О себе</h2>
+    <p>{{ resume.about|default:profile.about|default:'Описание не заполнено.' }}</p>
+  </article>
 </section>
 
-<section class="section card">
-  <h2>Подтверждённые достижения</h2>
-  {% for e in entries %}
-    <div class="list-item">
-      <h3>{{ e.title }}</h3>
-      <p class="muted">{{ e.type }} • {{ e.date }}</p>
-      <p>{{ e.description }}</p>
-    </div>
-  {% empty %}
-    <p class="muted">Пока нет подтверждённых достижений.</p>
-  {% endfor %}
-</section>
+{% if grouped_entries.skills %}<section class="section card"><h2>Навыки</h2>{% for e in grouped_entries.skills %}<div class="list-item"><h3>{{ e.title }}</h3><p>{{ e.description }}</p></div>{% endfor %}</section>{% endif %}
+{% if grouped_entries.projects %}<section class="section card"><h2>Проекты и работы</h2>{% for e in grouped_entries.projects %}<div class="list-item"><h3>{{ e.title }}</h3><p>{{ e.description }}</p></div>{% endfor %}</section>{% endif %}
+{% if grouped_entries.achievements %}<section class="section card"><h2>Достижения</h2>{% for e in grouped_entries.achievements %}<div class="list-item"><h3>{{ e.title }}</h3><p>{{ e.description }}</p></div>{% endfor %}</section>{% endif %}
+{% if grouped_entries.recommendations %}<section class="section card"><h2>Рекомендации</h2>{% for e in grouped_entries.recommendations %}<div class="list-item"><h3>{{ e.title }}</h3><p>{{ e.description }}</p></div>{% endfor %}</section>{% endif %}
 {% endblock %}

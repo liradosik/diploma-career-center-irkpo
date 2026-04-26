@@ -1,4 +1,5 @@
 {% extends 'base_dashboard.html' %}
+{% load ui_extras %}
 {% block title %}Кабинет студента{% endblock %}
 {% block content %}
 <section class="hero">
@@ -10,6 +11,8 @@
     Курс: {{ current_course|default:'—' }}
   </p>
 </section>
+
+{% if profile_incomplete %}<section class="section card"><p class="muted">Заполните профиль, чтобы резюме отображалось корректно.</p></section>{% endif %}
 
 <section class="section grid grid-4">
   <article class="stat-card"><div class="label">Всего записей портфолио</div><div class="value">{{ portfolio_total }}</div></article>
@@ -23,7 +26,7 @@
   {% for entry in recent_entries %}
     <article class="list-item">
       <h3>{{ entry.title }}</h3>
-      <p class="muted">{{ entry.type }} • {{ entry.date }}</p>
+      <p class="muted">{{ PORTFOLIO_TYPE_LABELS|dict_get:entry.type }} • {{ entry.date }}</p>
       <div class="inline-actions">
         {% if entry.status == 'pending' %}<span class="badge badge-pending">Ожидает проверки</span>{% endif %}
         {% if entry.status == 'approved' %}<span class="badge badge-approved">Подтверждено</span>{% endif %}
