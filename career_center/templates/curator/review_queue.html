@@ -1,2 +1,25 @@
-{% extends 'base_public.html' %}
-{% block content %}<div class='card'><h1>Записи на проверку</h1>{% for e in entries %}<div class='list-item'><b>{{ e.student.full_name }}</b>: {{ e.title }} ({{ e.type }})</div>{% empty %}Нет записей.{% endfor %}</div>{% endblock %}
+{% extends 'base_dashboard.html' %}
+{% block title %}Проверка портфолио{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="hero-kicker">Проверка портфолио</div>
+  <h1>Очередь записей на модерацию</h1>
+  <p>Проверяйте корректность данных и подтверждайте достижения студентов.</p>
+</section>
+
+<section class="section card">
+  <h2>Записи на проверку</h2>
+  {% for e in entries %}
+    <div class="list-item">
+      <h3>{{ e.title }}</h3>
+      <p class="muted">{{ e.student.full_name }} • {{ e.type }} • {{ e.date }}</p>
+      <p>{{ e.description|truncatechars:200 }}</p>
+      <div class="inline-actions">
+        <span class="badge badge-pending">На проверке</span>
+      </div>
+    </div>
+  {% empty %}
+    <p class="muted">Нет записей, ожидающих модерации.</p>
+  {% endfor %}
+</section>
+{% endblock %}

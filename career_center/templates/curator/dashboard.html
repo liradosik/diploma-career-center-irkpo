@@ -1,2 +1,39 @@
-{% extends 'base_public.html' %}
-{% block content %}<div class='card'><h1>Панель куратора</h1><p>Закрепленных студентов: {{ students.count }}</p><p>Записей на проверку: {{ pending_count }}</p><a class='btn btn-primary' href='{% url "portfolio:review_queue" %}'>К проверке</a></div>{% endblock %}
+{% extends 'base_dashboard.html' %}
+{% block title %}Кабинет куратора{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="hero-kicker">Кабинет куратора</div>
+  <h1>Контроль прогресса закреплённых студентов</h1>
+  <p>Отслеживайте активность, проверяйте портфолио и помогайте студентам усиливать резюме.</p>
+  <div class="hero-actions">
+    <a class="btn btn-primary" href="{% url 'portfolio:review_queue' %}">Перейти к проверке</a>
+    <a class="btn" href="#students">Открыть список студентов</a>
+  </div>
+</section>
+
+<section class="section grid grid-3">
+  <article class="stat-card"><div class="label">Закреплено студентов</div><div class="value">{{ students.count }}</div><div class="muted">в текущем наборе</div></article>
+  <article class="stat-card"><div class="label">На проверке</div><div class="value">{{ pending_count }}</div><div class="muted">записей портфолио</div></article>
+  <article class="stat-card"><div class="label">Проверено сегодня</div><div class="value">0</div><div class="muted">ожидает обновления</div></article>
+</section>
+
+<section class="section grid grid-2">
+  <div class="card" id="students">
+    <h2>Мои студенты</h2>
+    {% for student in students|slice:':8' %}
+      <div class="list-item">
+        <h3>{{ student.full_name }}</h3>
+        <p class="muted">{{ student.specialty|default:'Специальность не указана' }} • группа {{ student.group|default:'—' }}</p>
+      </div>
+    {% empty %}
+      <p class="muted">Пока нет закреплённых студентов.</p>
+    {% endfor %}
+  </div>
+  <div class="card">
+    <h2>Последние действия</h2>
+    <div class="list-item"><strong>Сегодня</strong><p class="muted">Поступили новые записи в очередь проверки портфолио.</p></div>
+    <div class="list-item"><strong>Вчера</strong><p class="muted">Обновлены данные по закреплённой группе.</p></div>
+    <div class="list-item"><strong>Неделя</strong><p class="muted">Проведена проверка портфолио студентов по плану.</p></div>
+  </div>
+</section>
+{% endblock %}

@@ -1,2 +1,46 @@
-{% extends 'base_public.html' %}
-{% block content %}<div class='card'><h1>Панель администратора</h1><p>Для полного управления используйте <a style='color:#2566de' href='/django-admin/'>Django Admin</a>.</p></div>{% endblock %}
+{% extends 'base_dashboard.html' %}
+{% block title %}Панель администратора{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="hero-kicker">Панель администратора</div>
+  <h1>Управление карьерным центром</h1>
+  <p>Контролируйте пользователей, публикации, отклики и записи на обучающие события из единого интерфейса.</p>
+  <div class="hero-actions">
+    <a class="btn btn-primary" href="#vacancies">Добавить вакансию</a>
+    <a class="btn" href="#courses">Создать курс</a>
+  </div>
+</section>
+
+<section class="section grid grid-4">
+  <article class="stat-card"><div class="label">Студенты</div><div class="value">—</div><div class="muted">данные появятся из БД</div></article>
+  <article class="stat-card"><div class="label">Кураторы</div><div class="value">—</div><div class="muted">данные появятся из БД</div></article>
+  <article class="stat-card"><div class="label">Активные вакансии</div><div class="value">—</div><div class="muted">данные появятся из БД</div></article>
+  <article class="stat-card"><div class="label">Записи на курсы</div><div class="value">—</div><div class="muted">данные появятся из БД</div></article>
+</section>
+
+<section class="section grid grid-2">
+  <div class="card">
+    <h2>Последние действия</h2>
+    <div class="list-item"><p class="muted">Здесь будет отображаться журнал последних операций администратора.</p></div>
+    <div class="list-item"><p class="muted">Публикации вакансий, создание курсов и назначения кураторов.</p></div>
+  </div>
+  <div class="card">
+    <h2>Быстрые действия</h2>
+    <div class="inline-actions">
+      <a class="btn btn-link" href="#students">Студенты</a>
+      <a class="btn btn-link" href="#curators">Кураторы</a>
+      <a class="btn btn-link" href="#vacancies">Вакансии</a>
+      <a class="btn btn-link" href="#courses">Курсы/семинары</a>
+      <a class="btn btn-link" href="#responses">Отклики</a>
+      <a class="btn btn-link" href="#registrations">Записи на курсы</a>
+    </div>
+  </div>
+</section>
+
+<section class="section card" id="students"><h2>Студенты</h2><p class="muted">Управление профилями студентов, проверка заполненности и активности.</p></section>
+<section class="section card" id="curators"><h2>Кураторы</h2><p class="muted">Распределение групп и контроль нагрузки кураторов.</p></section>
+<section class="section card" id="vacancies"><h2>Вакансии</h2><p class="muted">Публикация и контроль актуальности предложений работодателей.</p></section>
+<section class="section card" id="courses"><h2>Курсы/семинары</h2><p class="muted">Создание обучающих событий и управление расписанием.</p></section>
+<section class="section card" id="responses"><h2>Отклики</h2><p class="muted">Мониторинг откликов студентов по вакансиям.</p></section>
+<section class="section card" id="registrations"><h2>Записи на курсы</h2><p class="muted">Просмотр регистраций студентов на курсы и семинары.</p></section>
+{% endblock %}

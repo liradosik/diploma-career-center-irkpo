@@ -1,4 +1,29 @@
 {% extends 'base_dashboard.html' %}
-{% block content %}<div class='hero'><h1>Курсы, семинары и практики</h1><p class='muted'>Образовательные возможности и запись на мероприятия.</p></div>
-<div class='card' style='margin-top:20px'>{% for c in courses %}<div class='list-item'><h3>{{ c.title }}</h3><div class='muted'>{{ c.get_kind_display }} · {{ c.get_format_type_display }} · {{ c.date }}</div><p>{{ c.description|truncatechars:160 }}</p>
-<form method='post' action='{% url "courses:register" c.pk %}'>{% csrf_token %}<button class='btn btn-primary'>Записаться</button></form></div>{% empty %}<p>Активных событий пока нет.</p>{% endfor %}</div>{% endblock %}
+{% block title %}Курсы и семинары{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="hero-kicker">Обучение и развитие</div>
+  <h1>Курсы, семинары и практики</h1>
+  <p>Выбирайте образовательные события и записывайтесь в один клик.</p>
+</section>
+
+<section class="section card">
+  <h2>Доступные события</h2>
+  {% for c in courses %}
+    <article class="list-item">
+      <h3>{{ c.title }}</h3>
+      <p class="muted">{{ c.get_kind_display }} • {{ c.get_format_type_display }} • {{ c.date }}</p>
+      <p>{{ c.description|truncatechars:180 }}</p>
+      <form method="post" action="{% url 'courses:register' c.pk %}">
+        {% csrf_token %}
+        <div class="inline-actions">
+          <span class="badge badge-active">Идёт набор</span>
+          <button class="btn btn-primary" type="submit">Записаться</button>
+        </div>
+      </form>
+    </article>
+  {% empty %}
+    <p class="muted">Активных мероприятий пока нет.</p>
+  {% endfor %}
+</section>
+{% endblock %}
