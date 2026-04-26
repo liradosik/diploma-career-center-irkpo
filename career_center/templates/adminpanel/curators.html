@@ -1,0 +1,32 @@
+{% extends 'base_dashboard.html' %}
+{% block title %}Кураторы{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="hero-kicker">Администрирование</div>
+  <h1>Кураторы</h1>
+  <p>Управление кураторами и закреплением студентов.</p>
+</section>
+
+<section class="section card form-card">
+  <h2>Создать куратора</h2>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <div class="inline-actions"><button class="btn btn-primary" type="submit">Создать</button></div>
+  </form>
+</section>
+
+<section class="section card">
+  <h2>Список кураторов</h2>
+  {% for curator in curators %}
+    <article class="list-item">
+      <h3>{{ curator.full_name }}</h3>
+      <p class="muted">{{ curator.email }}</p>
+      <p class="muted">Закреплённых студентов: {{ curator.students_count }}</p>
+      <div class="inline-actions"><a class="btn btn-link" href="{% url 'accounts:admin_curators' %}">Открыть</a></div>
+    </article>
+  {% empty %}
+    <p class="muted">Кураторы пока не созданы.</p>
+  {% endfor %}
+</section>
+{% endblock %}

@@ -1,5 +1,6 @@
 from datetime import date
 
+from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.views import LoginView, LogoutView
 from django.db.models import Count, Max, Q
@@ -12,7 +13,15 @@ from apps.portfolio.models import PortfolioEntry
 from apps.vacancies.models import Vacancy, VacancyResponse
 
 from .decorators import role_required
-from .forms import EmailAuthenticationForm, StudentProfileForm, UserStudentForm
+from .forms import (
+    AdminCourseForm,
+    AdminCuratorCreateForm,
+    AdminStudentCreateForm,
+    AdminVacancyForm,
+    EmailAuthenticationForm,
+    StudentProfileForm,
+    UserStudentForm,
+)
 from .models import User
 
 
@@ -72,7 +81,7 @@ def student_dashboard(request):
         'resume': resume,
         'resume_is_public': bool(resume and resume.is_public and profile),
         'resume_public_url': resume_public_url,
-        'resume_updated_at': getattr(resume, "updated_at", None) if resume else None,
+        'resume_updated_at': resume.updated_at if resume else None,
         'registrations': registrations,
         'current_course': current_course,
     }
@@ -160,9 +169,6 @@ def admin_dashboard(request):
     courses = Course.objects.values('status').annotate(total=Count('id'))
     course_summary = {item['status']: item['total'] for item in courses}
 
-    offline_courses = Course.objects.filter(format_type=Course.Format.OFFLINE)
-    offline_places_total = sum(course.places for course in offline_courses)
-
     context = {
         'students_total': students_total,
         'curators_total': curators_total,
@@ -180,13 +186,142 @@ def admin_dashboard(request):
             'hidden': course_summary.get(Course.Status.HIDDEN, 0),
             'archive': course_summary.get(Course.Status.ARCHIVE, 0),
         },
-        'offline_courses_count': offline_courses.count(),
-        'offline_places_total': offline_places_total,
         'latest_vacancies': Vacancy.objects.order_by('-created_at')[:5],
         'latest_courses': Course.objects.order_by('-created_at')[:5],
         'latest_students': User.objects.filter(role=User.Role.STUDENT).order_by('-date_joined')[:5],
     }
     return render(request, 'adminpanel/dashboard.html', context)
+
+
+@role_required(User.Role.ADMIN)
+def admin_students(request):
+    form = AdminStudentCreateForm()
+    if request.method == 'POST':
+        form = AdminStudentCreateForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Студент создан.')
+            return redirect('accounts:admin_students')
+
+    students = (
+        User.objects.filter(role=User.Role.STUDENT)
+        .select_related('curator')
+        .annotate(portfolio_total=Count('portfolio_entries'))
+        .order_by('full_name')
+    )
+    return render(request, 'adminpanel/students.html', {'students': students, 'form': form})
+
+
+@role_required(User.Role.ADMIN)
+def admin_curators(request):
+    form = AdminCuratorCreateForm()
+    if request.method == 'POST':
+        form = AdminCuratorCreateForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Куратор создан.')
+            return redirect('accounts:admin_curators')
+
+    curators = User.objects.filter(role=User.Role.CURATOR).annotate(students_count=Count('students')).order_by('full_name')
+    return render(request, 'adminpanel/curators.html', {'curators': curators, 'form': form})
+
+
+@role_required(User.Role.ADMIN)
+def admin_vacancies(request):
+    status_filter = request.GET.get('status', 'all')
+    edit_id = request.GET.get('edit')
+    edit_obj = Vacancy.objects.filter(id=edit_id).first() if edit_id else None
+    form = AdminVacancyForm(instance=edit_obj)
+
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        if action in {'create', 'update'}:
+            instance = Vacancy.objects.filter(id=request.POST.get('vacancy_id')).first() if action == 'update' else None
+            form = AdminVacancyForm(request.POST, instance=instance)
+            if form.is_valid():
+                form.save()
+                messages.success(request, 'Вакансия сохранена.')
+                return redirect('accounts:admin_vacancies')
+        elif action == 'delete':
+            vacancy = get_object_or_404(Vacancy, id=request.POST.get('vacancy_id'))
+            vacancy.delete()
+            messages.success(request, 'Вакансия удалена.')
+            return redirect('accounts:admin_vacancies')
+        elif action == 'set_status':
+            vacancy = get_object_or_404(Vacancy, id=request.POST.get('vacancy_id'))
+            new_status = request.POST.get('status')
+            if new_status in {Vacancy.Status.ACTIVE, Vacancy.Status.HIDDEN, Vacancy.Status.ARCHIVE}:
+                vacancy.status = new_status
+                vacancy.save(update_fields=['status', 'updated_at'])
+                messages.success(request, 'Статус вакансии обновлён.')
+            return redirect('accounts:admin_vacancies')
+
+    vacancies = Vacancy.objects.order_by('-created_at')
+    if status_filter in {Vacancy.Status.ACTIVE, Vacancy.Status.HIDDEN, Vacancy.Status.ARCHIVE}:
+        vacancies = vacancies.filter(status=status_filter)
+    else:
+        status_filter = 'all'
+
+    return render(
+        request,
+        'adminpanel/vacancies.html',
+        {'vacancies': vacancies, 'form': form, 'status_filter': status_filter, 'edit_obj': edit_obj},
+    )
+
+
+@role_required(User.Role.ADMIN)
+def admin_courses(request):
+    status_filter = request.GET.get('status', 'all')
+    edit_id = request.GET.get('edit')
+    edit_obj = Course.objects.filter(id=edit_id).first() if edit_id else None
+    form = AdminCourseForm(instance=edit_obj)
+
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        if action in {'create', 'update'}:
+            instance = Course.objects.filter(id=request.POST.get('course_id')).first() if action == 'update' else None
+            form = AdminCourseForm(request.POST, instance=instance)
+            if form.is_valid():
+                form.save()
+                messages.success(request, 'Курс сохранён.')
+                return redirect('accounts:admin_courses')
+        elif action == 'delete':
+            course = get_object_or_404(Course, id=request.POST.get('course_id'))
+            course.delete()
+            messages.success(request, 'Курс удалён.')
+            return redirect('accounts:admin_courses')
+        elif action == 'set_status':
+            course = get_object_or_404(Course, id=request.POST.get('course_id'))
+            new_status = request.POST.get('status')
+            if new_status in {Course.Status.ACTIVE, Course.Status.HIDDEN, Course.Status.ARCHIVE}:
+                course.status = new_status
+                course.save(update_fields=['status', 'updated_at'])
+                messages.success(request, 'Статус курса обновлён.')
+            return redirect('accounts:admin_courses')
+
+    courses = Course.objects.annotate(registrations_count=Count('registrations')).order_by('-created_at')
+    if status_filter in {Course.Status.ACTIVE, Course.Status.HIDDEN, Course.Status.ARCHIVE}:
+        courses = courses.filter(status=status_filter)
+    else:
+        status_filter = 'all'
+
+    return render(
+        request,
+        'adminpanel/courses.html',
+        {'courses': courses, 'form': form, 'status_filter': status_filter, 'edit_obj': edit_obj},
+    )
+
+
+@role_required(User.Role.ADMIN)
+def admin_responses(request):
+    responses = VacancyResponse.objects.select_related('student', 'vacancy').order_by('-created_at')
+    return render(request, 'adminpanel/responses.html', {'responses': responses})
+
+
+@role_required(User.Role.ADMIN)
+def admin_course_registrations(request):
+    registrations = CourseRegistration.objects.select_related('student', 'course').order_by('-created_at')
+    return render(request, 'adminpanel/course_registrations.html', {'registrations': registrations})
 
 
 @role_required(User.Role.STUDENT)
