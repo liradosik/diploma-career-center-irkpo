@@ -1,3 +1,35 @@
 {% extends 'base_public.html' %}
-{% block content %}<div class='card'><h1>{{ student.full_name }}</h1><p style='color:#2566de'>{{ resume.title }}</p><p>{{ resume.about|default:profile.about }}</p></div>
-<div class='card' style='margin-top:20px'><h2>Достижения</h2>{% for e in entries %}<div class='list-item'><h3>{{ e.title }}</h3><p>{{ e.description }}</p></div>{% empty %}<p>Нет данных.</p>{% endfor %}</div>{% endblock %}
+{% block title %}Публичное резюме{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="hero-kicker">Публичное резюме</div>
+  <h1>{{ student.full_name }}</h1>
+  {% if resume and resume.title %}<p>{{ resume.title }}</p>{% endif %}
+</section>
+
+{% if has_resume_data %}
+<section class="section grid grid-2">
+  <article class="card">
+    <h2>Контакты</h2>
+    <p class="muted">Email: {{ student.email }}</p>
+    <p class="muted">Телефон: {{ profile.phone|default:'—' }}</p>
+    <p class="muted">Специальность: {{ student.specialty|default:'—' }}</p>
+    <p class="muted">Группа: {{ student.group|default:'—' }}</p>
+  </article>
+  <article class="card">
+    <h2>О себе</h2>
+    {% if about_text %}<p>{{ about_text }}</p>{% else %}<p class="muted">Описание не заполнено.</p>{% endif %}
+  </article>
+</section>
+
+{% if grouped_entries.skills %}<section class="section card"><h2>Навыки</h2>{% for e in grouped_entries.skills %}<div class="list-item"><h3>{{ e.title }}</h3><p>{{ e.description }}</p></div>{% endfor %}</section>{% endif %}
+{% if grouped_entries.projects %}<section class="section card"><h2>Проекты и работы</h2>{% for e in grouped_entries.projects %}<div class="list-item"><h3>{{ e.title }}</h3><p>{{ e.description }}</p></div>{% endfor %}</section>{% endif %}
+{% if grouped_entries.achievements %}<section class="section card"><h2>Достижения</h2>{% for e in grouped_entries.achievements %}<div class="list-item"><h3>{{ e.title }}</h3><p>{{ e.description }}</p></div>{% endfor %}</section>{% endif %}
+{% if grouped_entries.recommendations %}<section class="section card"><h2>Рекомендации</h2>{% for e in grouped_entries.recommendations %}<div class="list-item"><h3>{{ e.title }}</h3><p>{{ e.description }}</p></div>{% endfor %}</section>{% endif %}
+{% else %}
+<section class="section card">
+  <h2>Резюме пока пустое</h2>
+  <p class="muted">Студент ещё не заполнил профиль и не добавил подтверждённые записи портфолио.</p>
+</section>
+{% endif %}
+{% endblock %}

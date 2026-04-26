@@ -1,0 +1,42 @@
+{% extends 'base_dashboard.html' %}
+{% block title %}Студенты{% endblock %}
+{% block content %}
+<section class="hero"><div class="hero-kicker">Администрирование</div><h1>Студенты</h1><p>Управление студентами и контроль наполнения портфолио.</p></section>
+
+<section class="section card form-card">
+  <h2>Создать студента</h2>
+  <form method="post" class="form-grid">
+    {% csrf_token %}
+    <p class="full"><label>{{ form.full_name.label }}</label>{{ form.full_name }}</p>
+    <p class="full"><label>{{ form.email.label }}</label>{{ form.email }}</p>
+    <p><label>{{ form.password.label }}</label>{{ form.password }}</p>
+    <p class="full"><label>{{ form.study_group.label }}</label>{{ form.study_group }}</p>
+    <p class="full"><button class="btn btn-primary" type="submit">Создать</button></p>
+  </form>
+</section>
+
+<section class="section card">
+  <h2>Список студентов</h2>
+  <form method="get" class="filters">
+    <input name="q" placeholder="Поиск по ФИО/email" value="{{ request.GET.q }}">
+    <input name="group" placeholder="Группа" value="{{ request.GET.group }}">
+    <select name="curator"><option value="">Куратор</option>{% for c in filter_curators %}<option value="{{ c.id }}" {% if request.GET.curator == c.id|stringformat:'s' %}selected{% endif %}>{{ c.full_name }}</option>{% endfor %}</select>
+    <input name="specialty" placeholder="Специальность" value="{{ request.GET.specialty }}">
+    <button class="btn btn-link" type="submit">Применить</button>
+  </form>
+
+  <div class="row-list">
+    {% for student in students %}
+      <div class="row-item">
+        <div><strong>{{ student.full_name }}</strong><div class="muted">{{ student.email }}</div></div>
+        <div class="muted">{{ student.group|default:'—' }}<br>{{ student.specialty|default:'—' }}</div>
+        <div class="muted">{{ student.curator.full_name|default:'не назначен' }}</div>
+        <div class="muted">Портфолио: {{ student.portfolio_total }}</div>
+        <a class="btn btn-link" href="{% url 'accounts:admin_student_detail' student.id %}">Открыть</a>
+      </div>
+    {% empty %}
+      <p class="muted">Студенты не найдены.</p>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

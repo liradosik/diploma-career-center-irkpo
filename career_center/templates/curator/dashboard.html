@@ -1,2 +1,42 @@
-{% extends 'base_public.html' %}
-{% block content %}<div class='card'><h1>Панель куратора</h1><p>Закрепленных студентов: {{ students.count }}</p><p>Записей на проверку: {{ pending_count }}</p><a class='btn btn-primary' href='{% url "portfolio:review_queue" %}'>К проверке</a></div>{% endblock %}
+{% extends 'base_dashboard.html' %}
+{% block title %}Кабинет куратора{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="hero-kicker">Кабинет куратора</div>
+  <h1>Кабинет куратора</h1>
+  <p>Закреплённых студентов: {{ students_count }}</p>
+</section>
+
+<section class="section grid grid-4">
+  <article class="stat-card"><div class="label">Студентов в группе</div><div class="value">{{ students_count }}</div></article>
+  <article class="stat-card"><div class="label">Ожидают проверки</div><div class="value">{{ pending_count }}</div></article>
+  <article class="stat-card"><div class="label">Подтверждено</div><div class="value">{{ approved_count }}</div></article>
+  <article class="stat-card"><div class="label">Отклонено</div><div class="value">{{ rejected_count }}</div></article>
+</section>
+
+<section class="section card">
+  <h2>Записи на проверку</h2>
+  {% for entry in pending_entries %}
+    <article class="list-item">
+      <h3>{{ entry.title }}</h3>
+      <p class="muted">{{ entry.student.full_name }} • {{ entry.type }} • {{ entry.date }}</p>
+      <span class="badge badge-pending">Ожидает проверки</span>
+    </article>
+  {% empty %}
+    <p class="muted">Нет записей, ожидающих проверки.</p>
+  {% endfor %}
+</section>
+
+<section class="section card">
+  <h2>5 студентов с последней активностью</h2>
+  {% for student in students_with_activity %}
+    <article class="list-item">
+      <h3>{{ student.full_name }}</h3>
+      <p class="muted">Группа: {{ student.group|default:'—' }} • {{ student.specialty|default:'Специальность не указана' }}</p>
+      <p class="muted">Последняя активность: {{ student.last_activity|date:'d.m.Y H:i'|default:'Нет активности' }}</p>
+    </article>
+  {% empty %}
+    <p class="muted">Список студентов пока пуст.</p>
+  {% endfor %}
+</section>
+{% endblock %}

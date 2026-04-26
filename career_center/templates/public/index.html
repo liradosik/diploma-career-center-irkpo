@@ -1,5 +1,28 @@
 {% extends 'base_public.html' %}
+{% block title %}Центр карьеры ИРКПО{% endblock %}
 {% block content %}
-<section class='hero'><h1>Электронное портфолио и карьерные возможности студентов</h1><p class='muted'>Платформа Центра карьеры ИРКПО помогает собирать достижения, оформлять резюме и находить вакансии.</p>
-<a href='{% url "accounts:login" %}' class='btn btn-primary'>Создать портфолио</a></section>
+<section class="hero">
+  <div class="hero-kicker">Цифровая платформа</div>
+  <h1>Единое пространство для портфолио, резюме и карьерного роста студентов</h1>
+  <p>Собирайте достижения, публикуйте резюме, откликайтесь на вакансии и записывайтесь на курсы в современном личном кабинете.</p>
+  <div class="hero-actions">
+    <a class="btn btn-primary" href="{% url 'accounts:login' %}">Войти в систему</a>
+    <a class="btn btn-link" href="{% url 'accounts:login' %}">Начать работу</a>
+  </div>
+</section>
+
+<section class="section grid grid-3">
+  <article class="card">
+    <h2>Портфолио</h2>
+    <p class="muted">Загружайте сертификаты, проекты, волонтёрские и учебные достижения в одном месте.</p>
+  </article>
+  <article class="card">
+    <h2>Вакансии</h2>
+    <p class="muted">Получайте актуальные предложения практики, стажировки и трудоустройства от работодателей.</p>
+  </article>
+  <article class="card">
+    <h2>Курсы и семинары</h2>
+    <p class="muted">Записывайтесь на мероприятия для развития soft и hard skills и отслеживайте прогресс.</p>
+  </article>
+</section>
 {% endblock %}
