@@ -201,6 +201,21 @@ h1, h2, h3, h4, p { margin: 0; }
 .menu a:hover { background: #e8f1ff; color: var(--primary); }
 .menu a.active { color: #fff; background: linear-gradient(130deg, var(--primary), var(--primary-2)); }
 
+
+.menu-logout { margin: 0; }
+.menu-logout button {
+  width: 100%;
+  text-align: left;
+  border: 0;
+  background: transparent;
+  border-radius: 14px;
+  padding: 12px 14px;
+  font-weight: 600;
+  color: #3c4b5f;
+  cursor: pointer;
+}
+.menu-logout button:hover { background: #e8f1ff; color: var(--primary); }
+
 .dashboard-content { padding: 24px 24px 40px; }
 
 .form-card { max-width: 720px; }

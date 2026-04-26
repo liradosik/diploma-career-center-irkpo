@@ -3,23 +3,33 @@
 {% block content %}
 <section class="hero">
   <div class="hero-kicker">Кабинет куратора</div>
-  <h1>Контроль прогресса закреплённых студентов</h1>
-  <p>Отслеживайте активность, проверяйте портфолио и помогайте студентам усиливать резюме.</p>
-  <div class="hero-actions">
-    <a class="btn btn-primary" href="{% url 'portfolio:review_queue' %}">Перейти к проверке</a>
-    <a class="btn" href="#students">Открыть список студентов</a>
-  </div>
+  <h1>Кабинет куратора</h1>
+  <p>Закреплённых студентов: {{ students_count }}</p>
 </section>
 
-<section class="section grid grid-3">
-  <article class="stat-card"><div class="label">Закреплено студентов</div><div class="value">{{ students.count }}</div><div class="muted">в текущем наборе</div></article>
-  <article class="stat-card"><div class="label">На проверке</div><div class="value">{{ pending_count }}</div><div class="muted">записей портфолио</div></article>
-  <article class="stat-card"><div class="label">Проверено сегодня</div><div class="value">0</div><div class="muted">ожидает обновления</div></article>
+<section class="section grid grid-4">
+  <article class="stat-card"><div class="label">Студентов в группе</div><div class="value">{{ students_count }}</div></article>
+  <article class="stat-card"><div class="label">Ожидают проверки</div><div class="value">{{ pending_count }}</div></article>
+  <article class="stat-card"><div class="label">Подтверждено</div><div class="value">{{ approved_count }}</div></article>
+  <article class="stat-card"><div class="label">Отклонено</div><div class="value">{{ rejected_count }}</div></article>
+</section>
+
+<section class="section card">
+  <h2>Записи на проверку</h2>
+  {% for entry in pending_entries %}
+    <article class="list-item">
+      <h3>{{ entry.title }}</h3>
+      <p class="muted">{{ entry.student.full_name }} • {{ entry.type }} • {{ entry.date }}</p>
+      <span class="badge badge-pending">Ожидает проверки</span>
+    </article>
+  {% empty %}
+    <p class="muted">Нет записей, ожидающих проверки.</p>
+  {% endfor %}
 </section>
 
 <section class="section grid grid-2">
-  <div class="card" id="students">
-    <h2>Мои студенты</h2>
+  <div class="card">
+    <h2>Студенты группы</h2>
     {% for student in students|slice:':8' %}
       <div class="list-item">
         <h3>{{ student.full_name }}</h3>
@@ -30,10 +40,17 @@
     {% endfor %}
   </div>
   <div class="card">
-    <h2>Последние действия</h2>
-    <div class="list-item"><strong>Сегодня</strong><p class="muted">Поступили новые записи в очередь проверки портфолио.</p></div>
-    <div class="list-item"><strong>Вчера</strong><p class="muted">Обновлены данные по закреплённой группе.</p></div>
-    <div class="list-item"><strong>Неделя</strong><p class="muted">Проведена проверка портфолио студентов по плану.</p></div>
+    <h2>Последние проверки</h2>
+    {% for entry in recent_reviews %}
+      <div class="list-item">
+        <h3>{{ entry.title }}</h3>
+        <p class="muted">{{ entry.student.full_name }} • {{ entry.reviewed_at|date:'d.m.Y H:i' }}</p>
+        {% if entry.status == 'approved' %}<span class="badge badge-approved">Подтверждено</span>{% endif %}
+        {% if entry.status == 'rejected' %}<span class="badge badge-rejected">Отклонено</span>{% endif %}
+      </div>
+    {% empty %}
+      <p class="muted">Пока нет проверенных записей.</p>
+    {% endfor %}
   </div>
 </section>
 {% endblock %}

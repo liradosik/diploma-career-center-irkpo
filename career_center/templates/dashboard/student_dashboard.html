@@ -4,45 +4,59 @@
 <section class="hero">
   <div class="hero-kicker">Кабинет студента</div>
   <h1>Здравствуйте, {{ request.user.full_name }}</h1>
-  <p>Обновляйте профиль, ведите портфолио и быстро переходите к вакансиям и курсам.</p>
-  <div class="hero-actions">
-    <a class="btn btn-primary" href="{% url 'portfolio:create' %}">Добавить достижение</a>
-    <a class="btn" href="{% url 'resumes:builder' %}">Открыть резюме</a>
-  </div>
+  <p>
+    Группа: {{ request.user.group|default:'—' }} •
+    Специальность: {{ request.user.specialty|default:'—' }} •
+    Курс: {{ current_course|default:'—' }}
+  </p>
 </section>
 
 <section class="section grid grid-4">
-  <article class="stat-card"><div class="label">Достижений в портфолио</div><div class="value">{{ entries|length }}</div><div class="muted">последние записи</div></article>
-  <article class="stat-card"><div class="label">Статус профиля</div><div class="value">100%</div><div class="muted">готовность к откликам</div></article>
-  <article class="stat-card"><div class="label">Резюме</div><div class="value">1</div><div class="muted">доступно по ссылке</div></article>
-  <article class="stat-card"><div class="label">Активные разделы</div><div class="value">3</div><div class="muted">вакансии, курсы, портфолио</div></article>
+  <article class="stat-card"><div class="label">Всего записей портфолио</div><div class="value">{{ portfolio_total }}</div></article>
+  <article class="stat-card"><div class="label">Ожидают проверки</div><div class="value">{{ portfolio_pending }}</div></article>
+  <article class="stat-card"><div class="label">Подтверждено</div><div class="value">{{ portfolio_approved }}</div></article>
+  <article class="stat-card"><div class="label">Публичное резюме</div><div class="value">{% if resume_is_public %}Да{% else %}Нет{% endif %}</div></article>
 </section>
 
-<section class="section grid grid-2">
-  <div class="card">
-    <h2>Последние достижения</h2>
-    {% for entry in entries %}
-      <div class="list-item">
-        <h3>{{ entry.title }}</h3>
-        <p class="muted">{{ entry.type }} • {{ entry.date }}</p>
-        <p>{{ entry.description|truncatechars:140 }}</p>
+<section class="section card">
+  <h2>Моё портфолио</h2>
+  {% for entry in recent_entries %}
+    <article class="list-item">
+      <h3>{{ entry.title }}</h3>
+      <p class="muted">{{ entry.type }} • {{ entry.date }}</p>
+      <div class="inline-actions">
+        {% if entry.status == 'pending' %}<span class="badge badge-pending">Ожидает проверки</span>{% endif %}
+        {% if entry.status == 'approved' %}<span class="badge badge-approved">Подтверждено</span>{% endif %}
+        {% if entry.status == 'rejected' %}<span class="badge badge-rejected">Отклонено</span>{% endif %}
       </div>
-    {% empty %}
-      <p class="muted">Пока нет достижений. Добавьте первую запись.</p>
-    {% endfor %}
-  </div>
-  <div class="card">
-    <h2>Быстрые действия</h2>
+    </article>
+  {% empty %}
+    <p class="muted">Записи портфолио пока не добавлены.</p>
+  {% endfor %}
+</section>
+
+<section class="section card">
+  <h2>Мои курсы и мероприятия</h2>
+  {% for reg in registrations %}
+    <article class="list-item">
+      <h3>{{ reg.course.title }}</h3>
+      <p class="muted">{{ reg.course.get_kind_display }} • {{ reg.course.date }} • {{ reg.course.get_format_type_display }}</p>
+    </article>
+  {% empty %}
+    <p class="muted">Пока нет записей на курсы и мероприятия.</p>
+  {% endfor %}
+</section>
+
+<section class="section card">
+  <h2>Публичное резюме</h2>
+  {% if resume_is_public %}
     <div class="list-item">
-      <h3>Профиль</h3>
-      <p class="muted">Заполните специализацию и контактные данные.</p>
-      <div class="inline-actions"><a class="btn btn-link" href="{% url 'accounts:profile_edit' %}">Редактировать</a></div>
+      <p><span class="badge badge-approved">Опубликовано</span></p>
+      <p class="muted">Ссылка: <a style="color:#1E66D0;" href="{{ resume_public_url }}">{{ resume_public_url }}</a></p>
+      <p class="muted">Обновлено: {{ resume_updated_at|date:'d.m.Y H:i' }}</p>
     </div>
-    <div class="list-item">
-      <h3>Вакансии</h3>
-      <p class="muted">Подберите предложения по направлению подготовки.</p>
-      <div class="inline-actions"><a class="btn btn-link" href="{% url 'vacancies:list' %}">Открыть вакансии</a></div>
-    </div>
-  </div>
+  {% else %}
+    <p class="muted">Публичное резюме не опубликовано.</p>
+  {% endif %}
 </section>
 {% endblock %}

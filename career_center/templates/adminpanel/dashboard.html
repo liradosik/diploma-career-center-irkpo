@@ -3,44 +3,67 @@
 {% block content %}
 <section class="hero">
   <div class="hero-kicker">Панель администратора</div>
-  <h1>Управление карьерным центром</h1>
-  <p>Контролируйте пользователей, публикации, отклики и записи на обучающие события из единого интерфейса.</p>
-  <div class="hero-actions">
-    <a class="btn btn-primary" href="#vacancies">Добавить вакансию</a>
-    <a class="btn" href="#courses">Создать курс</a>
-  </div>
+  <h1>Панель администратора</h1>
+  <p>Сводная статистика по пользователям, вакансиям, курсам, откликам и регистрациям.</p>
 </section>
 
-<section class="section grid grid-4">
-  <article class="stat-card"><div class="label">Студенты</div><div class="value">—</div><div class="muted">данные появятся из БД</div></article>
-  <article class="stat-card"><div class="label">Кураторы</div><div class="value">—</div><div class="muted">данные появятся из БД</div></article>
-  <article class="stat-card"><div class="label">Активные вакансии</div><div class="value">—</div><div class="muted">данные появятся из БД</div></article>
-  <article class="stat-card"><div class="label">Записи на курсы</div><div class="value">—</div><div class="muted">данные появятся из БД</div></article>
+<section class="section grid grid-3">
+  <article class="stat-card"><div class="label">Студентов всего</div><div class="value">{{ students_total }}</div></article>
+  <article class="stat-card"><div class="label">Кураторов всего</div><div class="value">{{ curators_total }}</div></article>
+  <article class="stat-card"><div class="label">Активных вакансий</div><div class="value">{{ vacancies_active }}</div></article>
+  <article class="stat-card"><div class="label">Активных курсов</div><div class="value">{{ courses_active }}</div></article>
+  <article class="stat-card"><div class="label">Записей на курсы</div><div class="value">{{ registrations_total }}</div></article>
+  <article class="stat-card"><div class="label">Откликов</div><div class="value">{{ responses_total }}</div></article>
 </section>
 
-<section class="section grid grid-2">
-  <div class="card">
-    <h2>Последние действия</h2>
-    <div class="list-item"><p class="muted">Здесь будет отображаться журнал последних операций администратора.</p></div>
-    <div class="list-item"><p class="muted">Публикации вакансий, создание курсов и назначения кураторов.</p></div>
-  </div>
-  <div class="card">
-    <h2>Быстрые действия</h2>
-    <div class="inline-actions">
-      <a class="btn btn-link" href="#students">Студенты</a>
-      <a class="btn btn-link" href="#curators">Кураторы</a>
-      <a class="btn btn-link" href="#vacancies">Вакансии</a>
-      <a class="btn btn-link" href="#courses">Курсы/семинары</a>
-      <a class="btn btn-link" href="#responses">Отклики</a>
-      <a class="btn btn-link" href="#registrations">Записи на курсы</a>
+<section class="section card">
+  <h2>Сводка по материалам</h2>
+  <div class="grid grid-2">
+    <div class="list-item">
+      <h3>Вакансии</h3>
+      <p class="muted">Active: {{ vacancy_summary.active }} • Hidden: {{ vacancy_summary.hidden }} • Archive: {{ vacancy_summary.archive }}</p>
+    </div>
+    <div class="list-item">
+      <h3>Курсы</h3>
+      <p class="muted">Active: {{ course_summary.active }} • Hidden: {{ course_summary.hidden }} • Archive: {{ course_summary.archive }}</p>
+      <p class="muted">Offline-курсов: {{ offline_courses_count }} • Мест: {{ offline_places_total }}</p>
     </div>
   </div>
 </section>
 
-<section class="section card" id="students"><h2>Студенты</h2><p class="muted">Управление профилями студентов, проверка заполненности и активности.</p></section>
-<section class="section card" id="curators"><h2>Кураторы</h2><p class="muted">Распределение групп и контроль нагрузки кураторов.</p></section>
-<section class="section card" id="vacancies"><h2>Вакансии</h2><p class="muted">Публикация и контроль актуальности предложений работодателей.</p></section>
-<section class="section card" id="courses"><h2>Курсы/семинары</h2><p class="muted">Создание обучающих событий и управление расписанием.</p></section>
-<section class="section card" id="responses"><h2>Отклики</h2><p class="muted">Мониторинг откликов студентов по вакансиям.</p></section>
-<section class="section card" id="registrations"><h2>Записи на курсы</h2><p class="muted">Просмотр регистраций студентов на курсы и семинары.</p></section>
+<section class="section grid grid-3">
+  <div class="card">
+    <h2>Последние вакансии</h2>
+    {% for vacancy in latest_vacancies %}
+      <div class="list-item">
+        <h3>{{ vacancy.title }}</h3>
+        <p class="muted">{{ vacancy.company }} • {{ vacancy.created_at|date:'d.m.Y' }}</p>
+      </div>
+    {% empty %}
+      <p class="muted">Вакансий пока нет.</p>
+    {% endfor %}
+  </div>
+  <div class="card">
+    <h2>Последние курсы</h2>
+    {% for course in latest_courses %}
+      <div class="list-item">
+        <h3>{{ course.title }}</h3>
+        <p class="muted">{{ course.get_kind_display }} • {{ course.created_at|date:'d.m.Y' }}</p>
+      </div>
+    {% empty %}
+      <p class="muted">Курсов пока нет.</p>
+    {% endfor %}
+  </div>
+  <div class="card">
+    <h2>Последние студенты</h2>
+    {% for student in latest_students %}
+      <div class="list-item">
+        <h3>{{ student.full_name }}</h3>
+        <p class="muted">{{ student.group|default:'—' }} • {{ student.date_joined|date:'d.m.Y' }}</p>
+      </div>
+    {% empty %}
+      <p class="muted">Студенты пока не добавлены.</p>
+    {% endfor %}
+  </div>
+</section>
 {% endblock %}

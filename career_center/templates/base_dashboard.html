@@ -19,21 +19,21 @@
           <a class="{% if request.resolver_match.namespace == 'resumes' %}active{% endif %}" href="{% url 'resumes:builder' %}">Резюме</a>
           <a class="{% if request.resolver_match.namespace == 'vacancies' %}active{% endif %}" href="{% url 'vacancies:list' %}">Вакансии</a>
           <a class="{% if request.resolver_match.namespace == 'courses' %}active{% endif %}" href="{% url 'courses:list' %}">Курсы</a>
-          <a href="{% url 'accounts:logout' %}">Выход</a>
+          <form method="post" action="{% url 'accounts:logout' %}" class="menu-logout">{% csrf_token %}<button type="submit">Выход</button></form>
         {% elif request.user.role == 'curator' %}
           <a class="{% if request.resolver_match.url_name == 'curator_dashboard' %}active{% endif %}" href="{% url 'accounts:curator_dashboard' %}">Главная</a>
           <a href="{% url 'accounts:curator_dashboard' %}#students">Мои студенты</a>
           <a class="{% if request.resolver_match.url_name == 'review_queue' %}active{% endif %}" href="{% url 'portfolio:review_queue' %}">Проверка портфолио</a>
-          <a href="{% url 'accounts:logout' %}">Выход</a>
+          <form method="post" action="{% url 'accounts:logout' %}" class="menu-logout">{% csrf_token %}<button type="submit">Выход</button></form>
         {% else %}
           <a class="{% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}" href="{% url 'accounts:admin_dashboard' %}">Панель</a>
-          <a href="{% url 'accounts:admin_dashboard' %}#students">Студенты</a>
-          <a href="{% url 'accounts:admin_dashboard' %}#curators">Кураторы</a>
-          <a href="{% url 'accounts:admin_dashboard' %}#vacancies">Вакансии</a>
-          <a href="{% url 'accounts:admin_dashboard' %}#courses">Курсы/семинары</a>
-          <a href="{% url 'accounts:admin_dashboard' %}#responses">Отклики</a>
-          <a href="{% url 'accounts:admin_dashboard' %}#registrations">Записи на курсы</a>
-          <a href="{% url 'accounts:logout' %}">Выход</a>
+          <a href="{% url 'accounts:admin_dashboard' %}">Студенты</a>
+          <a href="{% url 'accounts:admin_dashboard' %}">Кураторы</a>
+          <a href="{% url 'accounts:admin_dashboard' %}">Вакансии</a>
+          <a href="{% url 'accounts:admin_dashboard' %}">Курсы/семинары</a>
+          <a href="{% url 'accounts:admin_dashboard' %}">Отклики</a>
+          <a href="{% url 'accounts:admin_dashboard' %}">Записи на курсы</a>
+          <form method="post" action="{% url 'accounts:logout' %}" class="menu-logout">{% csrf_token %}<button type="submit">Выход</button></form>
         {% endif %}
       </nav>
     </aside>
