@@ -27,30 +27,16 @@
   {% endfor %}
 </section>
 
-<section class="section grid grid-2">
-  <div class="card">
-    <h2>Студенты группы</h2>
-    {% for student in students|slice:':8' %}
-      <div class="list-item">
-        <h3>{{ student.full_name }}</h3>
-        <p class="muted">{{ student.specialty|default:'Специальность не указана' }} • группа {{ student.group|default:'—' }}</p>
-      </div>
-    {% empty %}
-      <p class="muted">Пока нет закреплённых студентов.</p>
-    {% endfor %}
-  </div>
-  <div class="card">
-    <h2>Последние проверки</h2>
-    {% for entry in recent_reviews %}
-      <div class="list-item">
-        <h3>{{ entry.title }}</h3>
-        <p class="muted">{{ entry.student.full_name }} • {{ entry.reviewed_at|date:'d.m.Y H:i' }}</p>
-        {% if entry.status == 'approved' %}<span class="badge badge-approved">Подтверждено</span>{% endif %}
-        {% if entry.status == 'rejected' %}<span class="badge badge-rejected">Отклонено</span>{% endif %}
-      </div>
-    {% empty %}
-      <p class="muted">Пока нет проверенных записей.</p>
-    {% endfor %}
-  </div>
+<section class="section card">
+  <h2>5 студентов с последней активностью</h2>
+  {% for student in students_with_activity %}
+    <article class="list-item">
+      <h3>{{ student.full_name }}</h3>
+      <p class="muted">Группа: {{ student.group|default:'—' }} • {{ student.specialty|default:'Специальность не указана' }}</p>
+      <p class="muted">Последняя активность: {{ student.last_activity|date:'d.m.Y H:i'|default:'Нет активности' }}</p>
+    </article>
+  {% empty %}
+    <p class="muted">Список студентов пока пуст.</p>
+  {% endfor %}
 </section>
 {% endblock %}

@@ -2,14 +2,13 @@ from datetime import date
 
 from django.contrib.auth import login
 from django.contrib.auth.views import LoginView, LogoutView
-from django.db.models import Count
-from django.shortcuts import redirect, render
+from django.db.models import Count, Max, Q
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.views.decorators.http import require_GET
 
 from apps.courses.models import Course, CourseRegistration
 from apps.portfolio.models import PortfolioEntry
-from apps.resumes.models import ResumeSettings
 from apps.vacancies.models import Vacancy, VacancyResponse
 
 from .decorators import role_required
@@ -47,9 +46,6 @@ def redirect_by_role(request):
 def student_dashboard(request):
     entries_qs = PortfolioEntry.objects.filter(student=request.user)
     recent_entries = entries_qs.order_by('-created_at')[:5]
-    pending_count = entries_qs.filter(status=PortfolioEntry.Status.PENDING).count()
-    approved_count = entries_qs.filter(status=PortfolioEntry.Status.APPROVED).count()
-    total_count = entries_qs.count()
 
     registrations = (
         CourseRegistration.objects
@@ -70,9 +66,9 @@ def student_dashboard(request):
 
     context = {
         'recent_entries': recent_entries,
-        'portfolio_total': total_count,
-        'portfolio_pending': pending_count,
-        'portfolio_approved': approved_count,
+        'portfolio_total': entries_qs.count(),
+        'portfolio_pending': entries_qs.filter(status=PortfolioEntry.Status.PENDING).count(),
+        'portfolio_approved': entries_qs.filter(status=PortfolioEntry.Status.APPROVED).count(),
         'resume': resume,
         'resume_is_public': bool(resume and resume.is_public and profile),
         'resume_public_url': resume_public_url,
@@ -88,38 +84,69 @@ def curator_dashboard(request):
     students = User.objects.filter(role=User.Role.STUDENT, curator=request.user)
     student_ids = students.values_list('id', flat=True)
 
-    pending_entries = (
+    pending_entries_qs = (
         PortfolioEntry.objects
         .filter(student_id__in=student_ids, status=PortfolioEntry.Status.PENDING)
         .select_related('student')
         .order_by('-created_at')
     )
-    approved_count = PortfolioEntry.objects.filter(
-        student_id__in=student_ids,
-        status=PortfolioEntry.Status.APPROVED,
-    ).count()
-    rejected_count = PortfolioEntry.objects.filter(
-        student_id__in=student_ids,
-        status=PortfolioEntry.Status.REJECTED,
-    ).count()
 
-    recent_reviews = (
-        PortfolioEntry.objects
-        .filter(student_id__in=student_ids, reviewed_at__isnull=False)
-        .select_related('student')
-        .order_by('-reviewed_at')[:5]
+    students_with_activity = (
+        students.annotate(last_activity=Max('portfolio_entries__updated_at'))
+        .order_by('-last_activity', 'full_name')[:5]
     )
 
     context = {
-        'students': students,
         'students_count': students.count(),
-        'pending_count': pending_entries.count(),
-        'approved_count': approved_count,
-        'rejected_count': rejected_count,
-        'pending_entries': pending_entries[:5],
-        'recent_reviews': recent_reviews,
+        'pending_count': pending_entries_qs.count(),
+        'approved_count': PortfolioEntry.objects.filter(
+            student_id__in=student_ids, status=PortfolioEntry.Status.APPROVED
+        ).count(),
+        'rejected_count': PortfolioEntry.objects.filter(
+            student_id__in=student_ids, status=PortfolioEntry.Status.REJECTED
+        ).count(),
+        'pending_entries': pending_entries_qs[:5],
+        'students_with_activity': students_with_activity,
     }
     return render(request, 'curator/dashboard.html', context)
+
+
+@role_required(User.Role.CURATOR)
+def curator_students(request):
+    students = (
+        User.objects.filter(role=User.Role.STUDENT, curator=request.user)
+        .annotate(
+            portfolio_total=Count('portfolio_entries'),
+            portfolio_pending=Count('portfolio_entries', filter=Q(portfolio_entries__status=PortfolioEntry.Status.PENDING)),
+            portfolio_approved=Count('portfolio_entries', filter=Q(portfolio_entries__status=PortfolioEntry.Status.APPROVED)),
+            last_activity=Max('portfolio_entries__updated_at'),
+        )
+        .order_by('full_name')
+    )
+    return render(request, 'curator/students.html', {'students': students})
+
+
+@role_required(User.Role.CURATOR)
+def curator_student_detail(request, student_id):
+    student = get_object_or_404(User, id=student_id, role=User.Role.STUDENT, curator=request.user)
+    entries = PortfolioEntry.objects.filter(student=student).order_by('-created_at')
+    resume = getattr(student, 'resume_settings', None)
+    profile = getattr(student, 'student_profile', None)
+    resume_public_url = ''
+    if resume and resume.is_public and profile:
+        resume_public_url = request.build_absolute_uri(f"/resumes/public/{profile.public_resume_token}/")
+
+    context = {
+        'student': student,
+        'profile': profile,
+        'entries': entries,
+        'portfolio_total': entries.count(),
+        'portfolio_pending': entries.filter(status=PortfolioEntry.Status.PENDING).count(),
+        'portfolio_approved': entries.filter(status=PortfolioEntry.Status.APPROVED).count(),
+        'portfolio_rejected': entries.filter(status=PortfolioEntry.Status.REJECTED).count(),
+        'resume_public_url': resume_public_url,
+    }
+    return render(request, 'curator/student_detail.html', context)
 
 
 @role_required(User.Role.ADMIN)

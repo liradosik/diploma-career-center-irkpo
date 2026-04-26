@@ -4,22 +4,52 @@
 <section class="hero">
   <div class="hero-kicker">Проверка портфолио</div>
   <h1>Очередь записей на модерацию</h1>
-  <p>Проверяйте корректность данных и подтверждайте достижения студентов.</p>
+  <p>Показываются только записи студентов, закреплённых за вами.</p>
 </section>
 
 <section class="section card">
-  <h2>Записи на проверку</h2>
+  <h2>Фильтр</h2>
+  <div class="inline-actions">
+    <a class="btn {% if status_filter == 'all' %}btn-primary{% endif %}" href="{% url 'portfolio:review_queue' %}?status=all">Все</a>
+    <a class="btn {% if status_filter == 'pending' %}btn-primary{% endif %}" href="{% url 'portfolio:review_queue' %}?status=pending">Ожидают проверки</a>
+    <a class="btn {% if status_filter == 'approved' %}btn-primary{% endif %}" href="{% url 'portfolio:review_queue' %}?status=approved">Подтверждено</a>
+    <a class="btn {% if status_filter == 'rejected' %}btn-primary{% endif %}" href="{% url 'portfolio:review_queue' %}?status=rejected">Отклонено</a>
+  </div>
+</section>
+
+<section class="section card">
+  <h2>Записи</h2>
   {% for e in entries %}
-    <div class="list-item">
+    <article class="list-item">
       <h3>{{ e.title }}</h3>
       <p class="muted">{{ e.student.full_name }} • {{ e.type }} • {{ e.date }}</p>
-      <p>{{ e.description|truncatechars:200 }}</p>
-      <div class="inline-actions">
-        <span class="badge badge-pending">На проверке</span>
-      </div>
-    </div>
+      <p>{{ e.description|truncatechars:240 }}</p>
+
+      {% if e.status == 'pending' %}
+        <form method="post" class="section">
+          {% csrf_token %}
+          <input type="hidden" name="entry_id" value="{{ e.id }}">
+          <label for="comment_{{ e.id }}">Комментарий куратора</label>
+          <textarea id="comment_{{ e.id }}" name="curator_comment" placeholder="Добавьте комментарий (необязательно)"></textarea>
+          <div class="inline-actions">
+            <button class="btn btn-primary" name="decision" value="approved" type="submit">Подтвердить</button>
+            <button class="btn" name="decision" value="rejected" type="submit">Отклонить</button>
+          </div>
+        </form>
+      {% else %}
+        <div class="inline-actions">
+          {% if e.status == 'approved' %}<span class="badge badge-approved">Подтверждено</span>{% endif %}
+          {% if e.status == 'rejected' %}<span class="badge badge-rejected">Отклонено</span>{% endif %}
+          {% if e.reviewed_at %}<span class="muted">Проверено: {{ e.reviewed_at|date:'d.m.Y H:i' }}</span>{% endif %}
+        </div>
+      {% endif %}
+
+      {% if e.curator_comment %}
+        <p class="muted">Комментарий куратора: {{ e.curator_comment }}</p>
+      {% endif %}
+    </article>
   {% empty %}
-    <p class="muted">Нет записей, ожидающих модерации.</p>
+    <p class="muted">Записей по выбранному фильтру не найдено.</p>
   {% endfor %}
 </section>
 {% endblock %}

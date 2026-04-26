@@ -1,9 +1,33 @@
 {% extends 'base_dashboard.html' %}
 {% block title %}Мои студенты{% endblock %}
 {% block content %}
-<section class="hero"><div class="hero-kicker">Кабинет куратора</div><h1>Список моих студентов</h1><p>Отслеживайте вовлечённость, заполненность профилей и активность в портфолио.</p></section>
+<section class="hero">
+  <div class="hero-kicker">Кабинет куратора</div>
+  <h1>Мои студенты</h1>
+  <p>Список закреплённых студентов и статус их портфолио.</p>
+</section>
+
 <section class="section card">
-  <h2>Студенты группы сопровождения</h2>
-  <div class="list-item"><p class="muted">Список студентов будет отображаться здесь после подключения представления.</p></div>
+  {% if students %}
+    {% for student in students %}
+      <article class="list-item">
+        <h3>{{ student.full_name }}</h3>
+        <p class="muted">Группа: {{ student.group|default:'—' }} • {{ student.specialty|default:'Специальность не указана' }}</p>
+        <p class="muted">
+          Портфолио: всего {{ student.portfolio_total }} •
+          pending {{ student.portfolio_pending }} •
+          approved {{ student.portfolio_approved }}
+        </p>
+        <div class="inline-actions">
+          <a class="btn btn-link" href="{% url 'accounts:curator_student_detail' student.id %}">Открыть карточку</a>
+        </div>
+      </article>
+    {% endfor %}
+  {% else %}
+    <div class="list-item">
+      <h3>Пока нет закреплённых студентов</h3>
+      <p class="muted">Когда администратор назначит студентов, они появятся в этом разделе.</p>
+    </div>
+  {% endif %}
 </section>
 {% endblock %}

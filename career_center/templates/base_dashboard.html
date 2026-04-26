@@ -22,7 +22,7 @@
           <form method="post" action="{% url 'accounts:logout' %}" class="menu-logout">{% csrf_token %}<button type="submit">Выход</button></form>
         {% elif request.user.role == 'curator' %}
           <a class="{% if request.resolver_match.url_name == 'curator_dashboard' %}active{% endif %}" href="{% url 'accounts:curator_dashboard' %}">Главная</a>
-          <a href="{% url 'accounts:curator_dashboard' %}#students">Мои студенты</a>
+          <a class="{% if request.resolver_match.url_name == 'curator_students' or request.resolver_match.url_name == 'curator_student_detail' %}active{% endif %}" href="{% url 'accounts:curator_students' %}">Мои студенты</a>
           <a class="{% if request.resolver_match.url_name == 'review_queue' %}active{% endif %}" href="{% url 'portfolio:review_queue' %}">Проверка портфолио</a>
           <form method="post" action="{% url 'accounts:logout' %}" class="menu-logout">{% csrf_token %}<button type="submit">Выход</button></form>
         {% else %}
