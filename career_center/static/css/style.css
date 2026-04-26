@@ -257,3 +257,49 @@ textarea { min-height: 110px; }
   .hero { padding: 24px 20px; }
   .grid-4 { grid-template-columns: 1fr; }
 }
+
+.form-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.form-grid .full { grid-column: 1 / -1; }
+
+.filters {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-bottom: 14px;
+}
+
+.row-list { display: grid; gap: 10px; }
+.row-item {
+  display: grid;
+  grid-template-columns: 1.3fr 1.1fr 1fr 1fr auto;
+  gap: 12px;
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: #fff;
+  padding: 12px;
+}
+
+.btn-danger {
+  border: 1px solid #f3c4c4;
+  color: #b72727;
+  background: #fff7f7;
+}
+
+.menu-logout button {
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+@media (max-width: 1024px) {
+  .filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .row-item { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 640px) {
+  .form-grid, .filters { grid-template-columns: 1fr; }
+}

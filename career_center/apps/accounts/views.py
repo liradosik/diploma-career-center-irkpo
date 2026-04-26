@@ -1,7 +1,6 @@
 from datetime import date
 
 from django.contrib import messages
-from django.contrib.auth import login
 from django.contrib.auth.views import LoginView, LogoutView
 from django.db.models import Count, Max, Q
 from django.shortcuts import get_object_or_404, redirect, render
@@ -209,7 +208,51 @@ def admin_students(request):
         .annotate(portfolio_total=Count('portfolio_entries'))
         .order_by('full_name')
     )
-    return render(request, 'adminpanel/students.html', {'students': students, 'form': form})
+
+    q = request.GET.get('q', '').strip()
+    group = request.GET.get('group', '').strip()
+    curator = request.GET.get('curator', '').strip()
+    specialty = request.GET.get('specialty', '').strip()
+
+    if q:
+        students = students.filter(Q(full_name__icontains=q) | Q(email__icontains=q))
+    if group:
+        students = students.filter(group__icontains=group)
+    if curator:
+        students = students.filter(curator_id=curator)
+    if specialty:
+        students = students.filter(specialty__icontains=specialty)
+
+    filter_curators = User.objects.filter(role=User.Role.CURATOR).order_by('full_name')
+
+    return render(
+        request,
+        'adminpanel/students.html',
+        {'students': students, 'form': form, 'filter_curators': filter_curators},
+    )
+
+
+@role_required(User.Role.ADMIN)
+def admin_student_detail(request, student_id):
+    student = get_object_or_404(User, id=student_id, role=User.Role.STUDENT)
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        if action == 'toggle_active':
+            student.is_active = not student.is_active
+            student.save(update_fields=['is_active'])
+            messages.success(request, 'Статус студента обновлён.')
+            return redirect('accounts:admin_student_detail', student_id=student.id)
+        if action == 'reset_password':
+            new_password = request.POST.get('temp_password', '').strip()
+            if new_password:
+                student.set_password(new_password)
+                student.save(update_fields=['password'])
+                messages.success(request, 'Пароль студента сброшен.')
+            else:
+                messages.error(request, 'Введите временный пароль.')
+            return redirect('accounts:admin_student_detail', student_id=student.id)
+
+    return render(request, 'adminpanel/student_detail.html', {'student': student})
 
 
 @role_required(User.Role.ADMIN)
@@ -223,92 +266,166 @@ def admin_curators(request):
             return redirect('accounts:admin_curators')
 
     curators = User.objects.filter(role=User.Role.CURATOR).annotate(students_count=Count('students')).order_by('full_name')
+    q = request.GET.get('q', '').strip()
+    if q:
+        curators = curators.filter(Q(full_name__icontains=q) | Q(email__icontains=q))
+
     return render(request, 'adminpanel/curators.html', {'curators': curators, 'form': form})
+
+
+@role_required(User.Role.ADMIN)
+def admin_curator_detail(request, curator_id):
+    curator = get_object_or_404(User, id=curator_id, role=User.Role.CURATOR)
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        if action == 'toggle_active':
+            curator.is_active = not curator.is_active
+            curator.save(update_fields=['is_active'])
+            messages.success(request, 'Статус куратора обновлён.')
+            return redirect('accounts:admin_curator_detail', curator_id=curator.id)
+        if action == 'reset_password':
+            new_password = request.POST.get('temp_password', '').strip()
+            if new_password:
+                curator.set_password(new_password)
+                curator.save(update_fields=['password'])
+                messages.success(request, 'Пароль куратора сброшен.')
+            else:
+                messages.error(request, 'Введите временный пароль.')
+            return redirect('accounts:admin_curator_detail', curator_id=curator.id)
+
+    students_count = User.objects.filter(role=User.Role.STUDENT, curator=curator).count()
+    return render(request, 'adminpanel/curator_detail.html', {'curator': curator, 'students_count': students_count})
 
 
 @role_required(User.Role.ADMIN)
 def admin_vacancies(request):
     status_filter = request.GET.get('status', 'all')
-    edit_id = request.GET.get('edit')
-    edit_obj = Vacancy.objects.filter(id=edit_id).first() if edit_id else None
-    form = AdminVacancyForm(instance=edit_obj)
+    q = request.GET.get('q', '').strip()
+    format_filter = request.GET.get('format_type', '').strip()
+    employment_filter = request.GET.get('employment_type', '').strip()
+    direction_filter = request.GET.get('direction', '').strip()
+
+    form = AdminVacancyForm()
+    if request.method == 'POST':
+        form = AdminVacancyForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Вакансия создана.')
+            return redirect('accounts:admin_vacancies')
+
+    vacancies = Vacancy.objects.order_by('-created_at')
+    if q:
+        vacancies = vacancies.filter(Q(title__icontains=q) | Q(company__icontains=q))
+    if status_filter in {Vacancy.Status.ACTIVE, Vacancy.Status.HIDDEN, Vacancy.Status.ARCHIVE}:
+        vacancies = vacancies.filter(status=status_filter)
+    else:
+        status_filter = 'all'
+    if format_filter:
+        vacancies = vacancies.filter(format_type__icontains=format_filter)
+    if employment_filter:
+        vacancies = vacancies.filter(employment_type__icontains=employment_filter)
+    if direction_filter:
+        vacancies = vacancies.filter(direction__icontains=direction_filter)
+
+    return render(
+        request,
+        'adminpanel/vacancies.html',
+        {'vacancies': vacancies, 'form': form, 'status_filter': status_filter},
+    )
+
+
+@role_required(User.Role.ADMIN)
+def admin_vacancy_detail(request, vacancy_id):
+    vacancy = get_object_or_404(Vacancy, id=vacancy_id)
+    form = AdminVacancyForm(instance=vacancy)
 
     if request.method == 'POST':
         action = request.POST.get('action')
-        if action in {'create', 'update'}:
-            instance = Vacancy.objects.filter(id=request.POST.get('vacancy_id')).first() if action == 'update' else None
-            form = AdminVacancyForm(request.POST, instance=instance)
+        if action == 'update':
+            form = AdminVacancyForm(request.POST, instance=vacancy)
             if form.is_valid():
                 form.save()
-                messages.success(request, 'Вакансия сохранена.')
-                return redirect('accounts:admin_vacancies')
-        elif action == 'delete':
-            vacancy = get_object_or_404(Vacancy, id=request.POST.get('vacancy_id'))
-            vacancy.delete()
-            messages.success(request, 'Вакансия удалена.')
-            return redirect('accounts:admin_vacancies')
+                messages.success(request, 'Вакансия обновлена.')
+                return redirect('accounts:admin_vacancy_detail', vacancy_id=vacancy.id)
         elif action == 'set_status':
-            vacancy = get_object_or_404(Vacancy, id=request.POST.get('vacancy_id'))
             new_status = request.POST.get('status')
             if new_status in {Vacancy.Status.ACTIVE, Vacancy.Status.HIDDEN, Vacancy.Status.ARCHIVE}:
                 vacancy.status = new_status
                 vacancy.save(update_fields=['status', 'updated_at'])
                 messages.success(request, 'Статус вакансии обновлён.')
+                return redirect('accounts:admin_vacancy_detail', vacancy_id=vacancy.id)
+        elif action == 'delete':
+            vacancy.delete()
+            messages.success(request, 'Вакансия удалена.')
             return redirect('accounts:admin_vacancies')
 
-    vacancies = Vacancy.objects.order_by('-created_at')
-    if status_filter in {Vacancy.Status.ACTIVE, Vacancy.Status.HIDDEN, Vacancy.Status.ARCHIVE}:
-        vacancies = vacancies.filter(status=status_filter)
-    else:
-        status_filter = 'all'
-
-    return render(
-        request,
-        'adminpanel/vacancies.html',
-        {'vacancies': vacancies, 'form': form, 'status_filter': status_filter, 'edit_obj': edit_obj},
-    )
+    return render(request, 'adminpanel/vacancy_detail.html', {'vacancy': vacancy, 'form': form})
 
 
 @role_required(User.Role.ADMIN)
 def admin_courses(request):
     status_filter = request.GET.get('status', 'all')
-    edit_id = request.GET.get('edit')
-    edit_obj = Course.objects.filter(id=edit_id).first() if edit_id else None
-    form = AdminCourseForm(instance=edit_obj)
+    q = request.GET.get('q', '').strip()
+    kind_filter = request.GET.get('kind', '').strip()
+    format_filter = request.GET.get('format_type', '').strip()
+
+    form = AdminCourseForm()
+    if request.method == 'POST':
+        form = AdminCourseForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Курс создан.')
+            return redirect('accounts:admin_courses')
+
+    courses = Course.objects.annotate(registrations_count=Count('registrations')).order_by('-created_at')
+    if q:
+        courses = courses.filter(Q(title__icontains=q) | Q(organization__icontains=q))
+    if status_filter in {Course.Status.ACTIVE, Course.Status.HIDDEN, Course.Status.ARCHIVE}:
+        courses = courses.filter(status=status_filter)
+    else:
+        status_filter = 'all'
+    if kind_filter in {Course.Kind.COURSE, Course.Kind.SEMINAR, Course.Kind.PRACTICE}:
+        courses = courses.filter(kind=kind_filter)
+    if format_filter in {Course.Format.ONLINE, Course.Format.OFFLINE}:
+        courses = courses.filter(format_type=format_filter)
+
+    return render(
+        request,
+        'adminpanel/courses.html',
+        {'courses': courses, 'form': form, 'status_filter': status_filter},
+    )
+
+
+@role_required(User.Role.ADMIN)
+def admin_course_detail(request, course_id):
+    course = get_object_or_404(Course, id=course_id)
+    form = AdminCourseForm(instance=course)
 
     if request.method == 'POST':
         action = request.POST.get('action')
-        if action in {'create', 'update'}:
-            instance = Course.objects.filter(id=request.POST.get('course_id')).first() if action == 'update' else None
-            form = AdminCourseForm(request.POST, instance=instance)
+        if action == 'update':
+            form = AdminCourseForm(request.POST, instance=course)
             if form.is_valid():
                 form.save()
-                messages.success(request, 'Курс сохранён.')
-                return redirect('accounts:admin_courses')
-        elif action == 'delete':
-            course = get_object_or_404(Course, id=request.POST.get('course_id'))
-            course.delete()
-            messages.success(request, 'Курс удалён.')
-            return redirect('accounts:admin_courses')
+                messages.success(request, 'Курс обновлён.')
+                return redirect('accounts:admin_course_detail', course_id=course.id)
         elif action == 'set_status':
-            course = get_object_or_404(Course, id=request.POST.get('course_id'))
             new_status = request.POST.get('status')
             if new_status in {Course.Status.ACTIVE, Course.Status.HIDDEN, Course.Status.ARCHIVE}:
                 course.status = new_status
                 course.save(update_fields=['status', 'updated_at'])
                 messages.success(request, 'Статус курса обновлён.')
+                return redirect('accounts:admin_course_detail', course_id=course.id)
+        elif action == 'delete':
+            course.delete()
+            messages.success(request, 'Курс удалён.')
             return redirect('accounts:admin_courses')
 
-    courses = Course.objects.annotate(registrations_count=Count('registrations')).order_by('-created_at')
-    if status_filter in {Course.Status.ACTIVE, Course.Status.HIDDEN, Course.Status.ARCHIVE}:
-        courses = courses.filter(status=status_filter)
-    else:
-        status_filter = 'all'
-
+    registrations_count = CourseRegistration.objects.filter(course=course).count()
     return render(
         request,
-        'adminpanel/courses.html',
-        {'courses': courses, 'form': form, 'status_filter': status_filter, 'edit_obj': edit_obj},
+        'adminpanel/course_detail.html',
+        {'course': course, 'form': form, 'registrations_count': registrations_count},
     )
 
 

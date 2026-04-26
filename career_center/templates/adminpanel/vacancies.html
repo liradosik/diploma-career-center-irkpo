@@ -1,47 +1,51 @@
 {% extends 'base_dashboard.html' %}
+{% load ui_extras %}
 {% block title %}Вакансии{% endblock %}
 {% block content %}
-<section class="hero">
-  <div class="hero-kicker">Администрирование</div>
-  <h1>Вакансии</h1>
-  <p>Создание, редактирование, удаление и управление статусами вакансий.</p>
-</section>
+<section class="hero"><div class="hero-kicker">Администрирование</div><h1>Вакансии</h1><p>Создание вакансий и управление публикацией.</p></section>
 
 <section class="section card form-card">
-  <h2>{% if edit_obj %}Редактировать вакансию{% else %}Создать вакансию{% endif %}</h2>
-  <form method="post">
+  <h2>Создать вакансию</h2>
+  <form method="post" class="form-grid">
     {% csrf_token %}
-    <input type="hidden" name="action" value="{% if edit_obj %}update{% else %}create{% endif %}">
-    {% if edit_obj %}<input type="hidden" name="vacancy_id" value="{{ edit_obj.id }}">{% endif %}
-    {{ form.as_p }}
-    <div class="inline-actions"><button class="btn btn-primary" type="submit">Сохранить</button></div>
+    <p class="full"><label>{{ form.title.label }}</label>{{ form.title }}</p>
+    <p class="full"><label>{{ form.company.label }}</label>{{ form.company }}</p>
+    <p class="full"><label>{{ form.description.label }}</label>{{ form.description }}</p>
+    <p><label>{{ form.employment_type.label }}</label>{{ form.employment_type }}</p>
+    <p><label>{{ form.format_type.label }}</label>{{ form.format_type }}</p>
+    <p><label>{{ form.direction.label }}</label>{{ form.direction }}</p>
+    <p><label>{{ form.status.label }}</label>{{ form.status }}</p>
+    <p class="full"><label>{{ form.responsibilities.label }}</label>{{ form.responsibilities }}</p>
+    <p class="full"><label>{{ form.requirements.label }}</label>{{ form.requirements }}</p>
+    <p class="full"><label>{{ form.conditions.label }}</label>{{ form.conditions }}</p>
+    <p class="full"><label>{{ form.contacts.label }}</label>{{ form.contacts }}</p>
+    <p class="full"><button class="btn btn-primary" name="action" value="create" type="submit">Создать</button></p>
   </form>
 </section>
 
 <section class="section card">
   <h2>Список вакансий</h2>
-  <div class="inline-actions">
-    <a class="btn {% if status_filter == 'all' %}btn-primary{% endif %}" href="{% url 'accounts:admin_vacancies' %}?status=all">Все</a>
-    <a class="btn {% if status_filter == 'active' %}btn-primary{% endif %}" href="{% url 'accounts:admin_vacancies' %}?status=active">Active</a>
-    <a class="btn {% if status_filter == 'hidden' %}btn-primary{% endif %}" href="{% url 'accounts:admin_vacancies' %}?status=hidden">Hidden</a>
-    <a class="btn {% if status_filter == 'archive' %}btn-primary{% endif %}" href="{% url 'accounts:admin_vacancies' %}?status=archive">Archive</a>
-  </div>
+  <form method="get" class="filters">
+    <input name="q" placeholder="Поиск по названию/компании" value="{{ request.GET.q }}">
+    <select name="status"><option value="">Статус</option><option value="active" {% if request.GET.status == 'active' %}selected{% endif %}>Активно</option><option value="hidden" {% if request.GET.status == 'hidden' %}selected{% endif %}>Скрыто</option><option value="archive" {% if request.GET.status == 'archive' %}selected{% endif %}>Архив</option></select>
+    <input name="format_type" placeholder="Формат" value="{{ request.GET.format_type }}">
+    <input name="employment_type" placeholder="Тип занятости" value="{{ request.GET.employment_type }}">
+    <input name="direction" placeholder="Направление" value="{{ request.GET.direction }}">
+    <button class="btn btn-link" type="submit">Применить</button>
+  </form>
 
-  {% for vacancy in vacancies %}
-    <article class="list-item">
-      <h3>{{ vacancy.title }}</h3>
-      <p class="muted">{{ vacancy.company }} • {{ vacancy.status }}</p>
-      <p>{{ vacancy.description|truncatechars:200 }}</p>
-      <div class="inline-actions">
-        <a class="btn btn-link" href="{% url 'accounts:admin_vacancies' %}?edit={{ vacancy.id }}">Редактировать</a>
-        <form method="post">{% csrf_token %}<input type="hidden" name="action" value="delete"><input type="hidden" name="vacancy_id" value="{{ vacancy.id }}"><button class="btn" type="submit">Удалить</button></form>
-        <form method="post">{% csrf_token %}<input type="hidden" name="action" value="set_status"><input type="hidden" name="vacancy_id" value="{{ vacancy.id }}"><input type="hidden" name="status" value="active"><button class="btn" type="submit">Active</button></form>
-        <form method="post">{% csrf_token %}<input type="hidden" name="action" value="set_status"><input type="hidden" name="vacancy_id" value="{{ vacancy.id }}"><input type="hidden" name="status" value="hidden"><button class="btn" type="submit">Hidden</button></form>
-        <form method="post">{% csrf_token %}<input type="hidden" name="action" value="set_status"><input type="hidden" name="vacancy_id" value="{{ vacancy.id }}"><input type="hidden" name="status" value="archive"><button class="btn" type="submit">Archive</button></form>
+  <div class="row-list">
+    {% for vacancy in vacancies %}
+      <div class="row-item">
+        <div><strong>{{ vacancy.title }}</strong><div class="muted">{{ vacancy.company }}</div></div>
+        <div class="muted">{{ vacancy.format_type }}</div>
+        <div class="muted">{{ vacancy.employment_type }}</div>
+        <div class="muted">{{ STATUS_LABELS|dict_get:vacancy.status }}</div>
+        <a class="btn btn-link" href="{% url 'accounts:admin_vacancy_detail' vacancy.id %}">Открыть</a>
       </div>
-    </article>
-  {% empty %}
-    <p class="muted">Вакансии не найдены.</p>
-  {% endfor %}
+    {% empty %}
+      <p class="muted">Вакансии не найдены.</p>
+    {% endfor %}
+  </div>
 </section>
 {% endblock %}

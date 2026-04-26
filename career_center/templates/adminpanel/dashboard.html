@@ -1,4 +1,5 @@
 {% extends 'base_dashboard.html' %}
+{% load ui_extras %}
 {% block title %}Панель администратора{% endblock %}
 {% block content %}
 <section class="hero">
@@ -21,49 +22,33 @@
   <div class="grid grid-2">
     <div class="list-item">
       <h3>Вакансии</h3>
-      <p class="muted">Active: {{ vacancy_summary.active }} • Hidden: {{ vacancy_summary.hidden }} • Archive: {{ vacancy_summary.archive }}</p>
+      <p class="muted">{{ STATUS_LABELS.active }}: {{ vacancy_summary.active }} • {{ STATUS_LABELS.hidden }}: {{ vacancy_summary.hidden }} • {{ STATUS_LABELS.archive }}: {{ vacancy_summary.archive }}</p>
     </div>
     <div class="list-item">
       <h3>Курсы</h3>
-      <p class="muted">Active: {{ course_summary.active }} • Hidden: {{ course_summary.hidden }} • Archive: {{ course_summary.archive }}</p>
-      <p class="muted">Offline-курсов: {{ offline_courses_count }} • Мест: {{ offline_places_total }}</p>
+      <p class="muted">{{ STATUS_LABELS.active }}: {{ course_summary.active }} • {{ STATUS_LABELS.hidden }}: {{ course_summary.hidden }} • {{ STATUS_LABELS.archive }}: {{ course_summary.archive }}</p>
     </div>
   </div>
 </section>
 
 <section class="section grid grid-3">
   <div class="card">
+    <h2>Последние студенты</h2>
+    {% for student in latest_students %}
+      <div class="list-item"><h3>{{ student.full_name }}</h3><p class="muted">{{ student.group|default:'—' }} • {{ student.date_joined|date:'d.m.Y' }}</p></div>
+    {% empty %}<p class="muted">Студенты пока не добавлены.</p>{% endfor %}
+  </div>
+  <div class="card">
     <h2>Последние вакансии</h2>
     {% for vacancy in latest_vacancies %}
-      <div class="list-item">
-        <h3>{{ vacancy.title }}</h3>
-        <p class="muted">{{ vacancy.company }} • {{ vacancy.created_at|date:'d.m.Y' }}</p>
-      </div>
-    {% empty %}
-      <p class="muted">Вакансий пока нет.</p>
-    {% endfor %}
+      <div class="list-item"><h3>{{ vacancy.title }}</h3><p class="muted">{{ vacancy.company }} • {{ vacancy.created_at|date:'d.m.Y' }}</p></div>
+    {% empty %}<p class="muted">Вакансий пока нет.</p>{% endfor %}
   </div>
   <div class="card">
     <h2>Последние курсы</h2>
     {% for course in latest_courses %}
-      <div class="list-item">
-        <h3>{{ course.title }}</h3>
-        <p class="muted">{{ course.get_kind_display }} • {{ course.created_at|date:'d.m.Y' }}</p>
-      </div>
-    {% empty %}
-      <p class="muted">Курсов пока нет.</p>
-    {% endfor %}
-  </div>
-  <div class="card">
-    <h2>Последние студенты</h2>
-    {% for student in latest_students %}
-      <div class="list-item">
-        <h3>{{ student.full_name }}</h3>
-        <p class="muted">{{ student.group|default:'—' }} • {{ student.date_joined|date:'d.m.Y' }}</p>
-      </div>
-    {% empty %}
-      <p class="muted">Студенты пока не добавлены.</p>
-    {% endfor %}
+      <div class="list-item"><h3>{{ course.title }}</h3><p class="muted">{{ KIND_LABELS|dict_get:course.kind }} • {{ course.created_at|date:'d.m.Y' }}</p></div>
+    {% empty %}<p class="muted">Курсов пока нет.</p>{% endfor %}
   </div>
 </section>
 {% endblock %}
