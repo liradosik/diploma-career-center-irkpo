@@ -1,4 +1,31 @@
 {% extends 'base_dashboard.html' %}
-{% block content %}<div class='hero'><h4 style='color:#2566de'>РАЗДЕЛ ЗАНЯТОСТИ</h4><h1>Вакансии и стажировки</h1>
-<form method='get'><input name='q' placeholder='Поиск по вакансиям'><button class='btn btn-primary' style='margin-top:10px'>Найти</button></form></div>
-<div class='card' style='margin-top:20px'>{% for v in vacancies %}<div class='list-item'><h3>{{ v.title }}</h3><div class='muted'>{{ v.company }} · {{ v.format_type }}</div><p>{{ v.description|truncatechars:150 }}</p><a class='btn btn-primary' href='{% url "vacancies:detail" v.pk %}'>Подробнее</a></div>{% empty %}<p>Нет активных вакансий.</p>{% endfor %}</div>{% endblock %}
+{% block title %}Вакансии{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="hero-kicker">Раздел занятости</div>
+  <h1>Вакансии и стажировки</h1>
+  <p>Найдите предложение, подходящее по формату занятости и карьерному треку.</p>
+  <form method="get" class="section">
+    <label for="q">Поиск вакансий</label>
+    <input id="q" type="text" name="q" value="{{ request.GET.q }}" placeholder="Например: junior python, аналитик, практика">
+    <div class="inline-actions"><button class="btn btn-primary" type="submit">Найти</button></div>
+  </form>
+</section>
+
+<section class="section card">
+  <h2>Актуальные предложения</h2>
+  {% for v in vacancies %}
+    <article class="list-item">
+      <h3>{{ v.title }}</h3>
+      <p class="muted">{{ v.company }} • {{ v.format_type }}</p>
+      <p>{{ v.description|truncatechars:170 }}</p>
+      <div class="inline-actions">
+        <span class="badge badge-active">Активно</span>
+        <a class="btn btn-link" href="{% url 'vacancies:detail' v.pk %}">Подробнее</a>
+      </div>
+    </article>
+  {% empty %}
+    <p class="muted">Активных вакансий пока нет.</p>
+  {% endfor %}
+</section>
+{% endblock %}
