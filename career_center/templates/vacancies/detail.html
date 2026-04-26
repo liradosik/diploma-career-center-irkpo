@@ -1,4 +1,23 @@
 {% extends 'base_dashboard.html' %}
-{% block content %}<div class='card'><h1>{{ vacancy.title }}</h1><p class='muted'>{{ vacancy.company }} · {{ vacancy.employment_type }} · {{ vacancy.format_type }}</p><p>{{ vacancy.description }}</p>
-<form method='post' action='{% url "vacancies:respond" vacancy.pk %}'>{% csrf_token %}<button class='btn btn-primary'>Откликнуться</button></form></div>
-<div class='card' style='margin-top:20px'><h3>Обязанности</h3><p>{{ vacancy.responsibilities }}</p><h3>Требования</h3><p>{{ vacancy.requirements }}</p><h3>Условия</h3><p>{{ vacancy.conditions }}</p><h3>Контакты</h3><p>{{ vacancy.contacts }}</p></div>{% endblock %}
+{% block title %}{{ vacancy.title }}{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="hero-kicker">Карточка вакансии</div>
+  <h1>{{ vacancy.title }}</h1>
+  <p>{{ vacancy.company }} • {{ vacancy.employment_type }} • {{ vacancy.format_type }}</p>
+  <div class="hero-actions">
+    <form method="post" action="{% url 'vacancies:respond' vacancy.pk %}">{% csrf_token %}<button class="btn btn-primary" type="submit">Откликнуться</button></form>
+    {% if resume_link %}<a class="btn" href="{{ resume_link }}">Открыть публичное резюме</a>{% endif %}
+  </div>
+</section>
+
+<section class="section card">
+  <h2>Описание и требования</h2>
+  <div class="list-item"><h3>Описание</h3><p>{{ vacancy.description }}</p></div>
+  <div class="list-item"><h3>Обязанности</h3><p>{{ vacancy.responsibilities }}</p></div>
+  <div class="list-item"><h3>Требования</h3><p>{{ vacancy.requirements }}</p></div>
+  <div class="list-item"><h3>Условия</h3><p>{{ vacancy.conditions }}</p></div>
+  <div class="list-item"><h3>Контакты</h3><p>{{ vacancy.contacts }}</p></div>
+  {% if response %}<div class="list-item"><span class="badge badge-approved">Отклик уже сохранён</span><p class="muted">При отправке работодателю используйте ссылку на публичное резюме.</p></div>{% endif %}
+</section>
+{% endblock %}

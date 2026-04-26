@@ -8,6 +8,16 @@ from .forms import ResumeSettingsForm
 from .models import ResumeSettings
 
 
+def _group_entries(entries):
+    grouped = {
+        'skills': [e for e in entries if e.type == 'skill'],
+        'projects': [e for e in entries if e.type == 'project'],
+        'achievements': [e for e in entries if e.type in {'academic', 'creative', 'sport', 'social'}],
+        'recommendations': [e for e in entries if e.type == 'recommendation'],
+    }
+    return grouped
+
+
 @role_required(User.Role.STUDENT)
 def builder(request):
     settings_obj, _ = ResumeSettings.objects.get_or_create(student=request.user)
@@ -17,12 +27,20 @@ def builder(request):
             form.save()
     else:
         form = ResumeSettingsForm(instance=settings_obj)
-    entries = PortfolioEntry.objects.filter(student=request.user, status=PortfolioEntry.Status.APPROVED)
-    return render(request, 'resumes/builder.html', {'form': form, 'entries': entries, 'resume': settings_obj})
+    entries = list(PortfolioEntry.objects.filter(student=request.user, status=PortfolioEntry.Status.APPROVED))
+    return render(
+        request,
+        'resumes/builder.html',
+        {'form': form, 'entries': entries, 'resume': settings_obj, 'grouped_entries': _group_entries(entries)},
+    )
 
 
 def public_resume(request, token):
     profile = get_object_or_404(StudentProfile, public_resume_token=token)
     resume = getattr(profile.user, 'resume_settings', None)
-    entries = PortfolioEntry.objects.filter(student=profile.user, status=PortfolioEntry.Status.APPROVED)
-    return render(request, 'resumes/public.html', {'student': profile.user, 'profile': profile, 'resume': resume, 'entries': entries})
+    entries = list(PortfolioEntry.objects.filter(student=profile.user, status=PortfolioEntry.Status.APPROVED))
+    return render(
+        request,
+        'resumes/public.html',
+        {'student': profile.user, 'profile': profile, 'resume': resume, 'entries': entries, 'grouped_entries': _group_entries(entries)},
+    )

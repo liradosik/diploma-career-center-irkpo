@@ -1,0 +1,28 @@
+{% extends 'base_dashboard.html' %}
+{% block title %}Карточка студента{% endblock %}
+{% block content %}
+<section class="hero"><div class="hero-kicker">Студент</div><h1>{{ student.full_name }}</h1><p>{{ student.email }}</p></section>
+<section class="section grid grid-2">
+  <div class="card">
+    <h2>Основные данные</h2>
+    <form method="post" class="form-grid">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="update_profile">
+      {{ form.as_p }}
+      <div class="inline-actions"><button class="btn btn-primary" type="submit">Сохранить</button></div>
+    </form>
+    <form method="post" class="inline-actions">{% csrf_token %}<input type="hidden" name="action" value="toggle_active"><button class="btn" type="submit">{% if student.is_active %}Деактивировать{% else %}Активировать{% endif %}</button></form>
+  </div>
+  <div class="card">
+    <h2>Сброс пароля</h2>
+    <form method="post">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="reset_password">
+      <label>Новый временный пароль</label>
+      <input name="temp_password" type="text" required>
+      <p class="muted">После сброса администратор передаёт временный пароль пользователю.</p>
+      <button class="btn btn-primary" type="submit">Сбросить пароль</button>
+    </form>
+  </div>
+</section>
+{% endblock %}
