@@ -21,6 +21,7 @@ def create_entry(request):
         if form.is_valid():
             entry = form.save(commit=False)
             entry.student = request.user
+            entry.status = PortfolioEntry.Status.PENDING
             entry.save()
             return redirect('portfolio:list')
     else:

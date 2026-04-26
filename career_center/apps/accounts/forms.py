@@ -23,22 +23,6 @@ RUS_FORMAT_CHOICES = [
 ]
 
 
-RUS_STATUS_CHOICES = [
-    ('active', 'Активно'),
-    ('hidden', 'Скрыто'),
-    ('archive', 'Архив'),
-]
-RUS_KIND_CHOICES = [
-    ('course', 'Курс'),
-    ('seminar', 'Семинар'),
-    ('practice', 'Практика'),
-]
-RUS_FORMAT_CHOICES = [
-    ('online', 'Онлайн'),
-    ('offline', 'Очно'),
-]
-
-
 class EmailAuthenticationForm(AuthenticationForm):
     username = forms.EmailField(label='Email')
 

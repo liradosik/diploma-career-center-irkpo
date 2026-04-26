@@ -15,10 +15,18 @@
   </div>
   <div class="card">
     <h2>Предпросмотр</h2>
-    <div class="list-item"><h3>{{ request.user.full_name }}</h3><p class="muted">{{ resume.title|default:'Студент ИРКПО' }}</p><p>{{ resume.about|default:request.user.student_profile.about|default:'О себе пока не заполнено.' }}</p></div>
-    {% for e in entries %}
-      <div class="list-item"><h3>{{ e.title }}</h3><p class="muted">{{ PORTFOLIO_TYPE_LABELS|dict_get:e.type }}</p><p>{{ e.description|truncatechars:120 }}</p></div>
-    {% empty %}<p class="muted">Нет подтверждённых записей для публикации.</p>{% endfor %}
+    {% if has_resume_data %}
+      <div class="list-item">
+        <h3>{{ request.user.full_name|default:'Имя не заполнено' }}</h3>
+        {% if resume.title %}<p class="muted">{{ resume.title }}</p>{% endif %}
+        {% if about_text %}<p>{{ about_text }}</p>{% else %}<p class="muted">Раздел «О себе» пока пуст.</p>{% endif %}
+      </div>
+      {% for e in entries %}
+        <div class="list-item"><h3>{{ e.title }}</h3><p class="muted">{{ PORTFOLIO_TYPE_LABELS|dict_get:e.type }}</p><p>{{ e.description|truncatechars:120 }}</p></div>
+      {% empty %}<p class="muted">Нет подтверждённых записей для публикации.</p>{% endfor %}
+    {% else %}
+      <p class="muted">Пока нет данных для резюме. Заполните профиль и добавьте записи портфолио.</p>
+    {% endif %}
   </div>
 </section>
 {% endblock %}

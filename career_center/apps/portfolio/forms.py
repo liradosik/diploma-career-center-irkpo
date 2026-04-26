@@ -17,6 +17,10 @@ class PortfolioEntryForm(forms.ModelForm):
     class Meta:
         model = PortfolioEntry
         fields = ('type', 'title', 'description', 'date', 'link', 'file')
+        extra_kwargs = {
+            'link': {'required': False},
+            'file': {'required': False},
+        }
         widgets = {
             'date': forms.DateInput(attrs={'type': 'date'}),
             'title': forms.TextInput(attrs={'placeholder': 'Название достижения или проекта'}),

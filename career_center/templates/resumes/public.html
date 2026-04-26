@@ -4,9 +4,10 @@
 <section class="hero">
   <div class="hero-kicker">Публичное резюме</div>
   <h1>{{ student.full_name }}</h1>
-  <p>{{ resume.title|default:'Студент ИРКПО' }}</p>
+  {% if resume and resume.title %}<p>{{ resume.title }}</p>{% endif %}
 </section>
 
+{% if has_resume_data %}
 <section class="section grid grid-2">
   <article class="card">
     <h2>Контакты</h2>
@@ -17,7 +18,7 @@
   </article>
   <article class="card">
     <h2>О себе</h2>
-    <p>{{ resume.about|default:profile.about|default:'Описание не заполнено.' }}</p>
+    {% if about_text %}<p>{{ about_text }}</p>{% else %}<p class="muted">Описание не заполнено.</p>{% endif %}
   </article>
 </section>
 
@@ -25,4 +26,10 @@
 {% if grouped_entries.projects %}<section class="section card"><h2>Проекты и работы</h2>{% for e in grouped_entries.projects %}<div class="list-item"><h3>{{ e.title }}</h3><p>{{ e.description }}</p></div>{% endfor %}</section>{% endif %}
 {% if grouped_entries.achievements %}<section class="section card"><h2>Достижения</h2>{% for e in grouped_entries.achievements %}<div class="list-item"><h3>{{ e.title }}</h3><p>{{ e.description }}</p></div>{% endfor %}</section>{% endif %}
 {% if grouped_entries.recommendations %}<section class="section card"><h2>Рекомендации</h2>{% for e in grouped_entries.recommendations %}<div class="list-item"><h3>{{ e.title }}</h3><p>{{ e.description }}</p></div>{% endfor %}</section>{% endif %}
+{% else %}
+<section class="section card">
+  <h2>Резюме пока пустое</h2>
+  <p class="muted">Студент ещё не заполнил профиль и не добавил подтверждённые записи портфолио.</p>
+</section>
+{% endif %}
 {% endblock %}

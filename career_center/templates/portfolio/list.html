@@ -14,8 +14,10 @@
   {% for entry in entries %}
     <article class="list-item">
       <h3>{{ entry.title }}</h3>
-      <p class="muted">{{ PORTFOLIO_TYPE_LABELS|dict_get:entry.type }} • {{ entry.date }}</p>
-      <p>{{ entry.description|truncatechars:220 }}</p>
+      <p class="muted">Тип: {{ PORTFOLIO_TYPE_LABELS|dict_get:entry.type }}</p>
+      <p class="muted">Дата/год: {{ entry.date }}</p>
+      <p>{{ entry.description }}</p>
+      <p class="muted">Статус: {{ STATUS_LABELS|dict_get:entry.status }}</p>
       {% if entry.link %}<p class="muted">Ссылка: <a style="color:#1E66D0;" href="{{ entry.link }}">{{ entry.link }}</a></p>{% endif %}
       {% if entry.file %}<p class="muted">Файл: <a style="color:#1E66D0;" href="{{ entry.file.url }}">Скачать</a></p>{% endif %}
       {% if entry.curator_comment %}<p class="muted">Комментарий куратора: {{ entry.curator_comment }}</p>{% endif %}
