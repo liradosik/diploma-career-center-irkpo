@@ -1,0 +1,49 @@
+{% extends 'base_dashboard.html' %}
+{% block title %}Курсы и семинары{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="hero-kicker">Администрирование</div>
+  <h1>Курсы и семинары</h1>
+  <p>Создание, редактирование, удаление и управление статусами курсов.</p>
+</section>
+
+<section class="section card form-card">
+  <h2>{% if edit_obj %}Редактировать курс{% else %}Создать курс{% endif %}</h2>
+  <form method="post">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="{% if edit_obj %}update{% else %}create{% endif %}">
+    {% if edit_obj %}<input type="hidden" name="course_id" value="{{ edit_obj.id }}">{% endif %}
+    {{ form.as_p }}
+    <div class="inline-actions"><button class="btn btn-primary" type="submit">Сохранить</button></div>
+  </form>
+</section>
+
+<section class="section card">
+  <h2>Список курсов</h2>
+  <div class="inline-actions">
+    <a class="btn {% if status_filter == 'all' %}btn-primary{% endif %}" href="{% url 'accounts:admin_courses' %}?status=all">Все</a>
+    <a class="btn {% if status_filter == 'active' %}btn-primary{% endif %}" href="{% url 'accounts:admin_courses' %}?status=active">Active</a>
+    <a class="btn {% if status_filter == 'hidden' %}btn-primary{% endif %}" href="{% url 'accounts:admin_courses' %}?status=hidden">Hidden</a>
+    <a class="btn {% if status_filter == 'archive' %}btn-primary{% endif %}" href="{% url 'accounts:admin_courses' %}?status=archive">Archive</a>
+  </div>
+
+  {% for course in courses %}
+    <article class="list-item">
+      <h3>{{ course.title }}</h3>
+      <p class="muted">{{ course.get_kind_display }} • {{ course.get_format_type_display }} • {{ course.status }}</p>
+      {% if course.format_type == 'offline' %}
+        <p class="muted">Мест: {{ course.places }} • Записались: {{ course.registrations_count }}</p>
+      {% endif %}
+      <div class="inline-actions">
+        <a class="btn btn-link" href="{% url 'accounts:admin_courses' %}?edit={{ course.id }}">Редактировать</a>
+        <form method="post">{% csrf_token %}<input type="hidden" name="action" value="delete"><input type="hidden" name="course_id" value="{{ course.id }}"><button class="btn" type="submit">Удалить</button></form>
+        <form method="post">{% csrf_token %}<input type="hidden" name="action" value="set_status"><input type="hidden" name="course_id" value="{{ course.id }}"><input type="hidden" name="status" value="active"><button class="btn" type="submit">Active</button></form>
+        <form method="post">{% csrf_token %}<input type="hidden" name="action" value="set_status"><input type="hidden" name="course_id" value="{{ course.id }}"><input type="hidden" name="status" value="hidden"><button class="btn" type="submit">Hidden</button></form>
+        <form method="post">{% csrf_token %}<input type="hidden" name="action" value="set_status"><input type="hidden" name="course_id" value="{{ course.id }}"><input type="hidden" name="status" value="archive"><button class="btn" type="submit">Archive</button></form>
+      </div>
+    </article>
+  {% empty %}
+    <p class="muted">Курсы не найдены.</p>
+  {% endfor %}
+</section>
+{% endblock %}

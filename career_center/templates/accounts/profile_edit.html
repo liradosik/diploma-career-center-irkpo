@@ -1,3 +1,17 @@
 {% extends 'base_dashboard.html' %}
-{% block content %}<div class='card'><h1>Профиль студента</h1><form method='post' enctype='multipart/form-data'>{% csrf_token %}
-{{ user_form.as_p }}{{ profile_form.as_p }}<button class='btn btn-primary'>Сохранить</button></form></div>{% endblock %}
+{% block title %}Профиль студента{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="hero-kicker">Профиль</div>
+  <h1>Редактирование профиля студента</h1>
+  <p>Заполните персональные данные для корректного отображения в резюме и портфолио.</p>
+</section>
+<section class="section card form-card">
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ user_form.as_p }}
+    {{ profile_form.as_p }}
+    <div class="inline-actions"><button class="btn btn-primary" type="submit">Сохранить</button></div>
+  </form>
+</section>
+{% endblock %}

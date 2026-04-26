@@ -1,3 +1,34 @@
 {% extends 'base_public.html' %}
-{% block content %}<div class='card'><h1>{{ student.full_name }}</h1><p style='color:#2566de'>{{ resume.title }}</p><p>{{ resume.about|default:profile.about }}</p></div>
-<div class='card' style='margin-top:20px'><h2>Достижения</h2>{% for e in entries %}<div class='list-item'><h3>{{ e.title }}</h3><p>{{ e.description }}</p></div>{% empty %}<p>Нет данных.</p>{% endfor %}</div>{% endblock %}
+{% block title %}Публичное резюме{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="hero-kicker">Публичное резюме</div>
+  <h1>{{ student.full_name }}</h1>
+  <p>{{ resume.title|default:'Студент ИРКПО' }}</p>
+</section>
+
+<section class="section grid grid-2">
+  <article class="card">
+    <h2>О кандидате</h2>
+    <p>{{ resume.about|default:profile.about|default:'Описание пока не заполнено.' }}</p>
+  </article>
+  <article class="card">
+    <h2>Контакты</h2>
+    <p class="muted">Специальность: {{ student.specialty|default:'—' }}</p>
+    <p class="muted">Группа: {{ student.group|default:'—' }}</p>
+  </article>
+</section>
+
+<section class="section card">
+  <h2>Подтверждённые достижения</h2>
+  {% for e in entries %}
+    <div class="list-item">
+      <h3>{{ e.title }}</h3>
+      <p class="muted">{{ e.type }} • {{ e.date }}</p>
+      <p>{{ e.description }}</p>
+    </div>
+  {% empty %}
+    <p class="muted">Пока нет подтверждённых достижений.</p>
+  {% endfor %}
+</section>
+{% endblock %}
