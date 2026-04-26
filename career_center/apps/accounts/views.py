@@ -72,7 +72,7 @@ def student_dashboard(request):
         'resume': resume,
         'resume_is_public': bool(resume and resume.is_public and profile),
         'resume_public_url': resume_public_url,
-        'resume_updated_at': resume.updated_at if resume else None,
+        'resume_updated_at': getattr(resume, "updated_at", None) if resume else None,
         'registrations': registrations,
         'current_course': current_course,
     }
