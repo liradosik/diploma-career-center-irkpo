@@ -4,33 +4,43 @@
 <section class="hero">
   <div class="hero-kicker">Панель администратора</div>
   <h1>Управление карьерным центром</h1>
-  <p>Единая точка контроля пользователей, вакансий, курсов, откликов и записей на обучение.</p>
+  <p>Контролируйте пользователей, публикации, отклики и записи на обучающие события из единого интерфейса.</p>
   <div class="hero-actions">
-    <a class="btn btn-primary" href="#">Добавить вакансию</a>
-    <a class="btn" href="#">Создать курс</a>
+    <a class="btn btn-primary" href="#vacancies">Добавить вакансию</a>
+    <a class="btn" href="#courses">Создать курс</a>
   </div>
 </section>
 
 <section class="section grid grid-4">
-  <article class="stat-card"><div class="label">Студенты</div><div class="value">—</div><div class="muted">в системе</div></article>
-  <article class="stat-card"><div class="label">Кураторы</div><div class="value">—</div><div class="muted">активные</div></article>
-  <article class="stat-card"><div class="label">Вакансии</div><div class="value">—</div><div class="muted">опубликовано</div></article>
-  <article class="stat-card"><div class="label">Записи на курсы</div><div class="value">—</div><div class="muted">за период</div></article>
+  <article class="stat-card"><div class="label">Студенты</div><div class="value">—</div><div class="muted">данные появятся из БД</div></article>
+  <article class="stat-card"><div class="label">Кураторы</div><div class="value">—</div><div class="muted">данные появятся из БД</div></article>
+  <article class="stat-card"><div class="label">Активные вакансии</div><div class="value">—</div><div class="muted">данные появятся из БД</div></article>
+  <article class="stat-card"><div class="label">Записи на курсы</div><div class="value">—</div><div class="muted">данные появятся из БД</div></article>
 </section>
 
 <section class="section grid grid-2">
   <div class="card">
     <h2>Последние действия</h2>
-    <div class="list-item"><p>Новые отклики студентов будут отображаться здесь.</p></div>
-    <div class="list-item"><p>Изменения по вакансиям и курсам будут отображаться здесь.</p></div>
+    <div class="list-item"><p class="muted">Здесь будет отображаться журнал последних операций администратора.</p></div>
+    <div class="list-item"><p class="muted">Публикации вакансий, создание курсов и назначения кураторов.</p></div>
   </div>
   <div class="card">
-    <h2>Разделы управления</h2>
+    <h2>Быстрые действия</h2>
     <div class="inline-actions">
-      <a class="btn btn-link" href="{% url 'accounts:admin_dashboard' %}">Панель</a>
-      <a class="btn btn-link" href="{% url 'accounts:admin_dashboard' %}">Студенты</a>
-      <a class="btn btn-link" href="{% url 'accounts:admin_dashboard' %}">Кураторы</a>
+      <a class="btn btn-link" href="#students">Студенты</a>
+      <a class="btn btn-link" href="#curators">Кураторы</a>
+      <a class="btn btn-link" href="#vacancies">Вакансии</a>
+      <a class="btn btn-link" href="#courses">Курсы/семинары</a>
+      <a class="btn btn-link" href="#responses">Отклики</a>
+      <a class="btn btn-link" href="#registrations">Записи на курсы</a>
     </div>
   </div>
 </section>
+
+<section class="section card" id="students"><h2>Студенты</h2><p class="muted">Управление профилями студентов, проверка заполненности и активности.</p></section>
+<section class="section card" id="curators"><h2>Кураторы</h2><p class="muted">Распределение групп и контроль нагрузки кураторов.</p></section>
+<section class="section card" id="vacancies"><h2>Вакансии</h2><p class="muted">Публикация и контроль актуальности предложений работодателей.</p></section>
+<section class="section card" id="courses"><h2>Курсы/семинары</h2><p class="muted">Создание обучающих событий и управление расписанием.</p></section>
+<section class="section card" id="responses"><h2>Отклики</h2><p class="muted">Мониторинг откликов студентов по вакансиям.</p></section>
+<section class="section card" id="registrations"><h2>Записи на курсы</h2><p class="muted">Просмотр регистраций студентов на курсы и семинары.</p></section>
 {% endblock %}

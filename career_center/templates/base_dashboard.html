@@ -22,17 +22,17 @@
           <a href="{% url 'accounts:logout' %}">Выход</a>
         {% elif request.user.role == 'curator' %}
           <a class="{% if request.resolver_match.url_name == 'curator_dashboard' %}active{% endif %}" href="{% url 'accounts:curator_dashboard' %}">Главная</a>
-          <a class="{% if request.resolver_match.url_name == 'curator_students' %}active{% endif %}" href="{% url 'accounts:curator_dashboard' %}">Мои студенты</a>
+          <a href="{% url 'accounts:curator_dashboard' %}#students">Мои студенты</a>
           <a class="{% if request.resolver_match.url_name == 'review_queue' %}active{% endif %}" href="{% url 'portfolio:review_queue' %}">Проверка портфолио</a>
           <a href="{% url 'accounts:logout' %}">Выход</a>
         {% else %}
           <a class="{% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}" href="{% url 'accounts:admin_dashboard' %}">Панель</a>
-          <a href="#">Студенты</a>
-          <a href="#">Кураторы</a>
-          <a href="#">Вакансии</a>
-          <a href="#">Курсы/семинары</a>
-          <a href="#">Отклики</a>
-          <a href="#">Записи на курсы</a>
+          <a href="{% url 'accounts:admin_dashboard' %}#students">Студенты</a>
+          <a href="{% url 'accounts:admin_dashboard' %}#curators">Кураторы</a>
+          <a href="{% url 'accounts:admin_dashboard' %}#vacancies">Вакансии</a>
+          <a href="{% url 'accounts:admin_dashboard' %}#courses">Курсы/семинары</a>
+          <a href="{% url 'accounts:admin_dashboard' %}#responses">Отклики</a>
+          <a href="{% url 'accounts:admin_dashboard' %}#registrations">Записи на курсы</a>
           <a href="{% url 'accounts:logout' %}">Выход</a>
         {% endif %}
       </nav>
