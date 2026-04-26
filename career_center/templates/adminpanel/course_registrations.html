@@ -1,0 +1,15 @@
+{% extends 'base_dashboard.html' %}
+{% block title %}Записи на курсы{% endblock %}
+{% block content %}
+<section class="hero"><div class="hero-kicker">Администрирование</div><h1>Записи на курсы</h1><p>Список регистраций студентов на курсы и семинары.</p></section>
+<section class="section card">
+  {% for reg in registrations %}
+    <article class="list-item">
+      <h3>{{ reg.student.full_name }} → {{ reg.course.title }}</h3>
+      <p class="muted">Формат: {{ reg.course.get_format_type_display }} • Запись: {{ reg.created_at|date:'d.m.Y H:i' }}</p>
+    </article>
+  {% empty %}
+    <p class="muted">Записей пока нет.</p>
+  {% endfor %}
+</section>
+{% endblock %}
