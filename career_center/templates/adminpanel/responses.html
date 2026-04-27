@@ -7,6 +7,9 @@
     <input name="q" placeholder="Поиск по студенту" value="{{ request.GET.q }}">
     <input name="vacancy" placeholder="Вакансия" value="{{ request.GET.vacancy }}">
     <input name="group" placeholder="Группа" value="{{ request.GET.group }}">
+    <input name="specialty" placeholder="Специальность" value="{{ request.GET.specialty }}">
+    <input name="date_from" type="date" value="{{ request.GET.date_from }}">
+    <input name="date_to" type="date" value="{{ request.GET.date_to }}">
     <button class="btn btn-link" type="submit">Применить</button>
   </form>
 

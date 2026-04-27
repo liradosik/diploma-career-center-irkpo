@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from .models import StudentProfile, User
+from .models import Specialty, StudentProfile, StudyGroup, User
 
 
 @admin.register(User)
@@ -25,3 +25,17 @@ class CustomUserAdmin(UserAdmin):
 class StudentProfileAdmin(admin.ModelAdmin):
     list_display = ('user', 'phone', 'city', 'updated_at')
     search_fields = ('user__full_name', 'user__email')
+
+
+@admin.register(Specialty)
+class SpecialtyAdmin(admin.ModelAdmin):
+    list_display = ('code', 'name', 'letter_code', 'is_active')
+    list_filter = ('is_active',)
+    search_fields = ('code', 'name', 'letter_code')
+
+
+@admin.register(StudyGroup)
+class StudyGroupAdmin(admin.ModelAdmin):
+    list_display = ('name', 'specialty_ref', 'admission_year', 'curator')
+    list_filter = ('admission_year', 'specialty_ref')
+    search_fields = ('name', 'specialty', 'specialty_ref__name', 'specialty_ref__code')

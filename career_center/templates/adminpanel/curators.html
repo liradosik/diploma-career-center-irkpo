@@ -25,9 +25,9 @@
     {% for curator in curators %}
       <div class="row-item">
         <div><strong>{{ curator.full_name }}</strong><div class="muted">{{ curator.email }}</div></div>
-        <div class="muted">Роль: Куратор</div>
-        <div class="muted">Закреплено студентов: {{ curator.students_count }}</div>
-        <div></div>
+        <div class="muted">Групп: {{ curator.groups_count }}</div>
+        <div class="muted">Студентов: {{ curator.students_count }}</div>
+        <div class="muted">{% if curator.is_active %}Активен{% else %}Неактивен{% endif %}</div>
         <a class="btn btn-link" href="{% url 'accounts:admin_curator_detail' curator.id %}">Открыть</a>
       </div>
     {% empty %}

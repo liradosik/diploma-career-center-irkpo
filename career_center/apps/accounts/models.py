@@ -4,11 +4,41 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 
+class Specialty(models.Model):
+    code = models.CharField(max_length=32)
+    name = models.CharField(max_length=255)
+    letter_code = models.CharField(max_length=4)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ('code', 'name')
+        constraints = [
+            models.UniqueConstraint(fields=('code', 'letter_code'), name='accounts_specialty_code_letter_uniq')
+        ]
+
+    def __str__(self):
+        return f'{self.code} — {self.name}'
+
+
 class StudyGroup(models.Model):
     name = models.CharField(max_length=64, unique=True)
     specialty = models.CharField(max_length=255)
+    specialty_ref = models.ForeignKey(
+        Specialty, null=True, blank=True, on_delete=models.SET_NULL, related_name='study_groups'
+    )
     admission_year = models.PositiveIntegerField()
+    course_number = models.PositiveSmallIntegerField(default=1)
+    last_promoted_year = models.PositiveIntegerField(null=True, blank=True)
     curator = models.ForeignKey('User', null=True, blank=True, on_delete=models.SET_NULL, related_name='managed_study_groups')
+    is_active = models.BooleanField(default=True)
+
+    @property
+    def specialty_name(self):
+        return self.specialty_ref.name if self.specialty_ref else self.specialty
+
+    @property
+    def specialty_letter(self):
+        return self.specialty_ref.letter_code if self.specialty_ref else ''
 
     def __str__(self):
         return self.name
@@ -20,6 +50,11 @@ class User(AbstractUser):
         CURATOR = 'curator', 'Куратор'
         ADMIN = 'admin', 'Администратор'
 
+    class AcademicStatus(models.TextChoices):
+        STUDYING = 'studying', 'Обучается'
+        GRADUATE = 'graduate', 'Выпускник'
+        INACTIVE = 'inactive', 'Неактивен'
+
     username = None
     email = models.EmailField(unique=True)
     full_name = models.CharField(max_length=255)
@@ -27,6 +62,7 @@ class User(AbstractUser):
     group = models.CharField(max_length=64, blank=True)
     specialty = models.CharField(max_length=255, blank=True)
     admission_year = models.PositiveIntegerField(null=True, blank=True)
+    academic_status = models.CharField(max_length=16, choices=AcademicStatus.choices, default=AcademicStatus.STUDYING)
     curator = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL, related_name='students')
     study_group = models.ForeignKey(StudyGroup, null=True, blank=True, on_delete=models.SET_NULL, related_name='students')
 
