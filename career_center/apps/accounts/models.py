@@ -5,13 +5,16 @@ from django.db import models
 
 
 class Specialty(models.Model):
-    code = models.CharField(max_length=32, unique=True)
-    name = models.CharField(max_length=255, unique=True)
-    letter_code = models.CharField(max_length=4, unique=True)
+    code = models.CharField(max_length=32)
+    name = models.CharField(max_length=255)
+    letter_code = models.CharField(max_length=4)
     is_active = models.BooleanField(default=True)
 
     class Meta:
         ordering = ('code', 'name')
+        constraints = [
+            models.UniqueConstraint(fields=('code', 'letter_code'), name='accounts_specialty_code_letter_uniq')
+        ]
 
     def __str__(self):
         return f'{self.code} — {self.name}'

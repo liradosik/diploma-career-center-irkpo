@@ -23,11 +23,14 @@ def seed_specialties_and_link_groups(apps, schema_editor):
     StudyGroup = apps.get_model('accounts', 'StudyGroup')
 
     for code, name, letter in SPECIALTIES:
-        Specialty.objects.get_or_create(
+        specialty, created = Specialty.objects.get_or_create(
             code=code,
             letter_code=letter,
             defaults={'name': name, 'is_active': True},
         )
+        if not created and specialty.name != name:
+            specialty.name = name
+            specialty.save(update_fields=['name'])
 
     for group in StudyGroup.objects.filter(specialty_ref__isnull=True):
         specialty = Specialty.objects.filter(name=group.specialty).first()
@@ -47,13 +50,14 @@ class Migration(migrations.Migration):
             name='Specialty',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('code', models.CharField(max_length=32, unique=True)),
-                ('name', models.CharField(max_length=255, unique=True)),
-                ('letter_code', models.CharField(max_length=4, unique=True)),
+                ('code', models.CharField(max_length=32)),
+                ('name', models.CharField(max_length=255)),
+                ('letter_code', models.CharField(max_length=4)),
                 ('is_active', models.BooleanField(default=True)),
             ],
             options={
                 'ordering': ('code', 'name'),
+                'constraints': [models.UniqueConstraint(fields=('code', 'letter_code'), name='accounts_specialty_code_letter_uniq')],
             },
         ),
         migrations.AddField(
