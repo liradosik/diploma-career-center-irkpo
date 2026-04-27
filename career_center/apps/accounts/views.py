@@ -1,7 +1,6 @@
 from datetime import date
 import csv
 import io
-import json
 
 from django.contrib import messages
 from django.contrib.auth.views import LoginView, LogoutView
@@ -242,23 +241,23 @@ def admin_dashboard(request):
             'hidden': course_summary.get(Course.Status.HIDDEN, 0),
             'archive': course_summary.get(Course.Status.ARCHIVE, 0),
         },
-        'student_status_chart_json': json.dumps([
+        'student_status_chart': [
             students_qs.filter(academic_status=User.AcademicStatus.STUDYING).count(),
             students_qs.filter(academic_status=User.AcademicStatus.GRADUATE).count(),
             students_qs.filter(academic_status=User.AcademicStatus.INACTIVE).count(),
-        ]),
-        'vacancy_status_chart_json': json.dumps([
+        ],
+        'vacancy_status_chart': [
             vacancy_summary.get(Vacancy.Status.ACTIVE, 0),
             vacancy_summary.get(Vacancy.Status.HIDDEN, 0),
             vacancy_summary.get(Vacancy.Status.ARCHIVE, 0),
-        ]),
-        'course_status_chart_json': json.dumps([
+        ],
+        'course_status_chart': [
             course_summary.get(Course.Status.ACTIVE, 0),
             course_summary.get(Course.Status.HIDDEN, 0),
             course_summary.get(Course.Status.ARCHIVE, 0),
-        ]),
-        'specialty_chart_labels_json': json.dumps(specialty_labels),
-        'specialty_chart_values_json': json.dumps(specialty_values),
+        ],
+        'specialty_chart_labels': specialty_labels,
+        'specialty_chart_values': specialty_values,
         'latest_vacancies': Vacancy.objects.order_by('-created_at')[:5],
         'latest_courses': Course.objects.order_by('-created_at')[:5],
         'latest_students': students_qs.order_by('-date_joined')[:5],

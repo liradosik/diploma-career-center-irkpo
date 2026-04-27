@@ -27,12 +27,16 @@
           <form method="post" action="{% url 'accounts:logout' %}" class="menu-logout">{% csrf_token %}<button class="logout-button" type="submit">Выход</button></form>
         {% else %}
           <a class="{% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}" href="{% url 'accounts:admin_dashboard' %}">Панель</a>
+          <div class="menu-group-title">Пользователи</div>
           <a class="{% if request.resolver_match.url_name == 'admin_students' or request.resolver_match.url_name == 'admin_student_detail' or request.resolver_match.url_name == 'admin_student_import' %}active{% endif %}" href="{% url 'accounts:admin_students' %}">Студенты</a>
           <a class="{% if request.resolver_match.url_name == 'admin_curators' or request.resolver_match.url_name == 'admin_curator_detail' %}active{% endif %}" href="{% url 'accounts:admin_curators' %}">Кураторы</a>
+          <div class="menu-group-title">Учебная часть</div>
           <a class="{% if request.resolver_match.url_name == 'admin_groups' or request.resolver_match.url_name == 'admin_group_detail' %}active{% endif %}" href="{% url 'accounts:admin_groups' %}">Группы</a>
           <a class="{% if request.resolver_match.url_name == 'admin_specialties' %}active{% endif %}" href="{% url 'accounts:admin_specialties' %}">Специальности</a>
+          <div class="menu-group-title">Карьерные материалы</div>
           <a class="{% if request.resolver_match.url_name == 'admin_vacancies' or request.resolver_match.url_name == 'admin_vacancy_detail' %}active{% endif %}" href="{% url 'accounts:admin_vacancies' %}">Вакансии</a>
           <a class="{% if request.resolver_match.url_name == 'admin_courses' or request.resolver_match.url_name == 'admin_course_detail' %}active{% endif %}" href="{% url 'accounts:admin_courses' %}">Курсы/семинары</a>
+          <div class="menu-group-title">Активность</div>
           <a class="{% if request.resolver_match.url_name == 'admin_responses' %}active{% endif %}" href="{% url 'accounts:admin_responses' %}">Отклики</a>
           <a class="{% if request.resolver_match.url_name == 'admin_course_registrations' %}active{% endif %}" href="{% url 'accounts:admin_course_registrations' %}">Записи на курсы</a>
           <form method="post" action="{% url 'accounts:logout' %}" class="menu-logout">{% csrf_token %}<button class="logout-button" type="submit">Выход</button></form>
