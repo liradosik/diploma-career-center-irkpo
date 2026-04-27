@@ -1,0 +1,44 @@
+{% extends 'base_dashboard.html' %}
+{% block title %}Учебная структура{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="hero-kicker">Учебная структура</div>
+  <h1>Специальность → Группа → Студент</h1>
+  <p>Здесь сосредоточено управление справочником специальностей и учебными группами.</p>
+  <div class="hero-actions">
+    <a class="btn btn-link" href="{% url 'accounts:admin_specialties' %}">Открыть специальности</a>
+    <a class="btn btn-link" href="{% url 'accounts:admin_groups' %}">Открыть группы</a>
+  </div>
+</section>
+
+<section class="section grid grid-2">
+  <div class="card">
+    <h2>Специальности</h2>
+    <div class="row-list">
+      {% for specialty in specialties %}
+        <div class="list-item">
+          <h3>{{ specialty.code }} • {{ specialty.letter_code }}</h3>
+          <p class="muted">{{ specialty.name }}</p>
+        </div>
+      {% empty %}
+        <p class="muted">Справочник пуст.</p>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Учебные группы</h2>
+    <div class="row-list">
+      {% for group in groups %}
+        <div class="list-item">
+          <h3>{{ group.name }}</h3>
+          <p class="muted">{{ group.specialty_ref.name|default:group.specialty }}</p>
+          <p class="muted">Курс {{ group.course_number }} • {{ group.admission_year }} • Студентов: {{ group.students_count }}</p>
+        </div>
+      {% empty %}
+        <p class="muted">Группы не созданы.</p>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

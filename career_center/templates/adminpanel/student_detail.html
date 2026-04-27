@@ -17,6 +17,7 @@
       <p><strong>Год поступления:</strong> {{ student.admission_year|default:'—' }}</p>
       <p><strong>Куратор:</strong> {{ student.curator.full_name|default:'не назначен' }}</p>
     {% endif %}
+    <p><strong>Учебный статус:</strong> {{ student.get_academic_status_display }}</p>
   </div>
   <div class="card">
     <h2>Основные данные</h2>
@@ -27,7 +28,6 @@
       <p class="muted">Основное поле учебной структуры — «Учебная группа». Остальные данные синхронизируются автоматически.</p>
       <div class="inline-actions"><button class="btn btn-primary" type="submit">Сохранить</button></div>
     </form>
-    <form method="post" class="inline-actions">{% csrf_token %}<input type="hidden" name="action" value="toggle_active"><button class="btn" type="submit">{% if student.is_active %}Деактивировать{% else %}Активировать{% endif %}</button></form>
   </div>
   <div class="card">
     <h2>Сброс пароля</h2>
@@ -38,6 +38,17 @@
       <input name="temp_password" type="text" required>
       <p class="muted">После сброса администратор передаёт временный пароль пользователю.</p>
       <button class="btn btn-primary" type="submit">Сбросить пароль</button>
+    </form>
+  </div>
+  <div class="card">
+    <h2>Опасные действия</h2>
+    <form method="post" class="inline-actions">{% csrf_token %}<input type="hidden" name="action" value="toggle_active"><button class="btn" type="submit">{% if student.is_active %}Деактивировать{% else %}Активировать{% endif %}</button></form>
+    <form method="post">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="delete">
+      <label>Для удаления введите email студента</label>
+      <input name="confirm_email" type="text" placeholder="{{ student.email }}" required>
+      <button class="btn btn-danger" type="submit">Подтвердить удаление</button>
     </form>
   </div>
 </section>

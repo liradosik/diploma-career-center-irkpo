@@ -9,6 +9,8 @@
     <input name="course" placeholder="Курс" value="{{ request.GET.course }}">
     <input name="group" placeholder="Группа" value="{{ request.GET.group }}">
     <select name="format_type"><option value="">Формат</option><option value="online" {% if request.GET.format_type == 'online' %}selected{% endif %}>Онлайн</option><option value="offline" {% if request.GET.format_type == 'offline' %}selected{% endif %}>Очно</option></select>
+    <input name="date_from" type="date" value="{{ request.GET.date_from }}">
+    <input name="date_to" type="date" value="{{ request.GET.date_to }}">
     <button class="btn btn-link" type="submit">Применить</button>
   </form>
 

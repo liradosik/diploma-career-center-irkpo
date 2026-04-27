@@ -11,7 +11,7 @@
     <p class="full"><label>{{ form.email.label }}</label>{{ form.email }}</p>
     <p><label>{{ form.password.label }}</label>{{ form.password }}</p>
     <p class="full"><label>{{ form.study_group.label }}</label>{{ form.study_group }}</p>
-    <p class="full muted">Специальность, год поступления и куратор будут определены по выбранной группе.</p>
+    <p class="full muted">Специальность, год поступления и куратор будут определены автоматически по выбранной учебной группе.</p>
     <p class="full"><button class="btn btn-primary" type="submit">Создать</button></p>
   </form>
   <div class="inline-actions">
@@ -41,6 +41,12 @@
       <option value="1" {% if is_active_filter == '1' %}selected{% endif %}>Активен</option>
       <option value="0" {% if is_active_filter == '0' %}selected{% endif %}>Деактивирован</option>
     </select>
+    <select name="academic_status">
+      <option value="">Учебный статус</option>
+      <option value="studying" {% if academic_status_filter == 'studying' %}selected{% endif %}>Обучаются</option>
+      <option value="graduate" {% if academic_status_filter == 'graduate' %}selected{% endif %}>Выпускники</option>
+      <option value="inactive" {% if academic_status_filter == 'inactive' %}selected{% endif %}>Неактивные</option>
+    </select>
     <button class="btn btn-link" type="submit">Применить</button>
   </form>
 
@@ -50,7 +56,7 @@
         <div><strong>{{ student.full_name }}</strong><div class="muted">{{ student.email }}</div></div>
         <div class="muted">{{ student.study_group.name|default:student.group|default:'—' }}<br>{{ student.study_group.specialty_ref.name|default:student.specialty|default:'—' }}</div>
         <div class="muted">{{ student.study_group.curator.full_name|default:student.curator.full_name|default:'не назначен' }}</div>
-        <div class="muted">{% if student.is_active %}Активен{% else %}Деактивирован{% endif %}</div>
+        <div class="muted">{% if student.is_active %}Активен{% else %}Неактивен{% endif %}<br>{{ student.get_academic_status_display }}</div>
         <a class="btn btn-link" href="{% url 'accounts:admin_student_detail' student.id %}">Открыть</a>
       </div>
     {% empty %}

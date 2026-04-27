@@ -28,16 +28,9 @@ class StudyGroup(models.Model):
     )
     admission_year = models.PositiveIntegerField()
     course_number = models.PositiveSmallIntegerField(default=1)
+    last_promoted_year = models.PositiveIntegerField(null=True, blank=True)
     curator = models.ForeignKey('User', null=True, blank=True, on_delete=models.SET_NULL, related_name='managed_study_groups')
     is_active = models.BooleanField(default=True)
-
-    @property
-    def specialty_name(self):
-        return self.specialty_ref.name if self.specialty_ref else self.specialty
-
-    @property
-    def specialty_letter(self):
-        return self.specialty_ref.letter_code if self.specialty_ref else ''
 
     @property
     def specialty_name(self):
@@ -57,6 +50,11 @@ class User(AbstractUser):
         CURATOR = 'curator', 'Куратор'
         ADMIN = 'admin', 'Администратор'
 
+    class AcademicStatus(models.TextChoices):
+        STUDYING = 'studying', 'Обучается'
+        GRADUATE = 'graduate', 'Выпускник'
+        INACTIVE = 'inactive', 'Неактивен'
+
     username = None
     email = models.EmailField(unique=True)
     full_name = models.CharField(max_length=255)
@@ -64,6 +62,7 @@ class User(AbstractUser):
     group = models.CharField(max_length=64, blank=True)
     specialty = models.CharField(max_length=255, blank=True)
     admission_year = models.PositiveIntegerField(null=True, blank=True)
+    academic_status = models.CharField(max_length=16, choices=AcademicStatus.choices, default=AcademicStatus.STUDYING)
     curator = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL, related_name='students')
     study_group = models.ForeignKey(StudyGroup, null=True, blank=True, on_delete=models.SET_NULL, related_name='students')
 

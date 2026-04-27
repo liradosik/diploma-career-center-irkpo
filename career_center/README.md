@@ -7,7 +7,9 @@
 - `StudyGroup` — конкретная учебная группа/подгруппа (например, `Н121/1`), связана со специальностью и куратором.
 - `User(role=student)` — закреплён за конкретной `study_group`.
 - Куратор видит студентов только тех групп, где он назначен куратором.
+- Для студента действует учебный статус: `Обучается` / `Выпускник` / `Неактивен`.
 - В `adminpanel` доступны страницы:
+  - `accounts/admin/academic-structure/` — общая страница учебной структуры;
   - `accounts/admin/specialties/` — управление специальностями;
   - `accounts/admin/groups/` — управление группами;
   - `accounts/admin/students/import/` — массовый CSV-импорт студентов (`full_name,email,password,group`).
@@ -49,6 +51,13 @@ docker compose run --rm web python manage.py createsuperuser
 ## Seed-данные
 ```bash
 docker compose run --rm web python manage.py seed_demo_data
+docker compose run --rm web python manage.py seed_demo_data --clear
+```
+
+## Перевод групп на новый учебный год
+```bash
+docker compose run --rm web python manage.py promote_groups --dry-run
+docker compose run --rm web python manage.py promote_groups --apply
 ```
 
 ## Тестовые аккаунты

@@ -74,10 +74,13 @@ class AdminStudentCreateForm(forms.ModelForm):
             StudyGroup.objects.filter(is_active=True).select_related('curator', 'specialty_ref').order_by('name')
         )
         self.fields['study_group'].required = True
+        self.fields['study_group'].empty_label = 'Выберите группу студента'
+        self.fields['study_group'].widget.attrs['data-placeholder'] = 'Выберите группу студента'
 
     def save(self, commit=True):
         user = super().save(commit=False)
         user.role = User.Role.STUDENT
+        user.academic_status = User.AcademicStatus.STUDYING
         user.set_password(self.cleaned_data['password'])
         sync_student_with_group(user, self.cleaned_data.get('study_group'))
         if commit:
@@ -88,11 +91,12 @@ class AdminStudentCreateForm(forms.ModelForm):
 class AdminStudentUpdateForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ('full_name', 'email', 'study_group', 'is_active')
+        fields = ('full_name', 'email', 'study_group', 'academic_status', 'is_active')
         labels = {
             'full_name': 'ФИО',
             'email': 'Email',
             'study_group': 'Учебная группа',
+            'academic_status': 'Учебный статус',
             'is_active': 'Активен',
         }
 
@@ -101,6 +105,8 @@ class AdminStudentUpdateForm(forms.ModelForm):
         self.fields['study_group'].queryset = (
             StudyGroup.objects.filter(is_active=True).select_related('curator', 'specialty_ref').order_by('name')
         )
+        self.fields['study_group'].empty_label = 'Выберите группу студента'
+        self.fields['study_group'].widget.attrs['data-placeholder'] = 'Выберите группу студента'
 
     def save(self, commit=True):
         user = super().save(commit=False)
@@ -213,6 +219,11 @@ class AdminSpecialtyForm(forms.ModelForm):
             'letter_code': 'Буквенный код группы',
             'is_active': 'Активна',
         }
+        widgets = {
+            'code': forms.TextInput(attrs={'placeholder': 'Например, 44.02.02'}),
+            'name': forms.TextInput(attrs={'placeholder': 'Например, Преподавание в начальных классах'}),
+            'letter_code': forms.TextInput(attrs={'placeholder': 'Например, Н'}),
+        }
 
     def clean_letter_code(self):
         return self.cleaned_data['letter_code'].strip().upper()
@@ -242,11 +253,17 @@ class AdminStudyGroupForm(forms.ModelForm):
             'curator': 'Куратор',
             'is_active': 'Активна',
         }
+        widgets = {
+            'name': forms.TextInput(attrs={'placeholder': 'Например, Н-121/1 или И-422'}),
+            'admission_year': forms.NumberInput(attrs={'placeholder': 'Например, 2024'}),
+            'course_number': forms.NumberInput(attrs={'placeholder': '1, 2, 3 или 4', 'min': 1, 'max': 4}),
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['specialty_ref'].queryset = Specialty.objects.filter(is_active=True).order_by('code', 'name')
         self.fields['curator'].queryset = User.objects.filter(role=User.Role.CURATOR, is_active=True).order_by('full_name')
+        self.fields['curator'].empty_label = 'Выберите куратора группы'
         self.fields['name'].required = False
 
     def clean_name(self):

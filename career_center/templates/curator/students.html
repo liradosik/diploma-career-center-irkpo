@@ -8,6 +8,13 @@
 </section>
 
 <section class="section card">
+  <form method="get" class="filters">
+    <select name="include_graduates">
+      <option value="0" {% if not include_graduates %}selected{% endif %}>Только активные группы</option>
+      <option value="1" {% if include_graduates %}selected{% endif %}>Включая выпускников</option>
+    </select>
+    <button class="btn btn-link" type="submit">Применить</button>
+  </form>
   {% if students %}
     {% for student in students %}
       <article class="list-item">

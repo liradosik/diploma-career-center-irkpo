@@ -5,7 +5,7 @@ import io
 from django.contrib import messages
 from django.contrib.auth.views import LoginView, LogoutView
 from django.db import transaction
-from django.db.models import Count, Max, Q
+from django.db.models import Count, F, Max, Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.views.decorators.http import require_GET
@@ -57,6 +57,16 @@ def sync_group_students(group):
         student.save(update_fields=['study_group', 'group', 'specialty', 'admission_year', 'curator'])
 
 
+def curator_students_queryset(curator, include_graduates=False):
+    qs = User.objects.filter(role=User.Role.STUDENT).filter(
+        Q(study_group__curator=curator, study_group__is_active=True) |
+        Q(study_group__isnull=True, curator=curator)
+    )
+    if not include_graduates:
+        qs = qs.exclude(academic_status=User.AcademicStatus.GRADUATE)
+    return qs.distinct()
+
+
 @require_GET
 def home(request):
     return render(request, 'public/index.html')
@@ -106,9 +116,7 @@ def student_dashboard(request):
 
 @role_required(User.Role.CURATOR)
 def curator_dashboard(request):
-    students = User.objects.filter(role=User.Role.STUDENT).filter(
-        Q(study_group__curator=request.user) | Q(curator=request.user)
-    ).distinct()
+    students = curator_students_queryset(request.user)
     student_ids = students.values_list('id', flat=True)
 
     pending_entries_qs = (
@@ -140,10 +148,9 @@ def curator_dashboard(request):
 
 @role_required(User.Role.CURATOR)
 def curator_students(request):
+    include_graduates = request.GET.get('include_graduates') == '1'
     students = (
-        User.objects.filter(role=User.Role.STUDENT)
-        .filter(Q(study_group__curator=request.user) | Q(curator=request.user))
-        .distinct()
+        curator_students_queryset(request.user, include_graduates=include_graduates)
         .annotate(
             portfolio_total=Count('portfolio_entries'),
             portfolio_pending=Count('portfolio_entries', filter=Q(portfolio_entries__status=PortfolioEntry.Status.PENDING)),
@@ -152,15 +159,13 @@ def curator_students(request):
         )
         .order_by('full_name')
     )
-    return render(request, 'curator/students.html', {'students': students})
+    return render(request, 'curator/students.html', {'students': students, 'include_graduates': include_graduates})
 
 
 @role_required(User.Role.CURATOR)
 def curator_student_detail(request, student_id):
     student = get_object_or_404(
-        User.objects.filter(role=User.Role.STUDENT).filter(
-            Q(study_group__curator=request.user) | Q(curator=request.user)
-        ).distinct(),
+        curator_students_queryset(request.user, include_graduates=True),
         id=student_id,
     )
     entries = PortfolioEntry.objects.filter(student=student).order_by('-created_at')
@@ -196,6 +201,10 @@ def admin_dashboard(request):
 
     context = {
         'students_total': students_total,
+        'students_active': User.objects.filter(role=User.Role.STUDENT, is_active=True).count(),
+        'students_studying': User.objects.filter(role=User.Role.STUDENT, academic_status=User.AcademicStatus.STUDYING).count(),
+        'students_graduate': User.objects.filter(role=User.Role.STUDENT, academic_status=User.AcademicStatus.GRADUATE).count(),
+        'inactive_users_total': User.objects.filter(is_active=False).count(),
         'curators_total': curators_total,
         'groups_active': StudyGroup.objects.filter(is_active=True).count(),
         'specialties_total': Specialty.objects.count(),
@@ -205,6 +214,10 @@ def admin_dashboard(request):
         'courses_active': course_summary.get(Course.Status.ACTIVE, 0),
         'registrations_total': CourseRegistration.objects.count(),
         'responses_total': VacancyResponse.objects.count(),
+        'portfolio_pending_total': PortfolioEntry.objects.filter(status=PortfolioEntry.Status.PENDING).count(),
+        'offline_full_courses': Course.objects.filter(format_type=Course.Format.OFFLINE).annotate(
+            reg_total=Count('registrations')
+        ).filter(reg_total__gte=F('places')).count(),
         'vacancy_summary': {
             'active': vacancy_summary.get(Vacancy.Status.ACTIVE, 0),
             'hidden': vacancy_summary.get(Vacancy.Status.HIDDEN, 0),
@@ -244,17 +257,20 @@ def admin_students(request):
     curator = request.GET.get('curator', '').strip()
     specialty = request.GET.get('specialty', '').strip()
     is_active = request.GET.get('is_active', '').strip()
+    academic_status = request.GET.get('academic_status', '').strip()
 
     if q:
         students = students.filter(Q(full_name__icontains=q) | Q(email__icontains=q))
     if group:
-        students = students.filter(group__icontains=group)
+        students = students.filter(Q(study_group__name=group) | Q(group__icontains=group))
     if curator:
         students = students.filter(curator_id=curator)
     if specialty:
         students = students.filter(specialty__icontains=specialty)
     if is_active in {'1', '0'}:
         students = students.filter(is_active=(is_active == '1'))
+    if academic_status in {User.AcademicStatus.STUDYING, User.AcademicStatus.GRADUATE, User.AcademicStatus.INACTIVE}:
+        students = students.filter(academic_status=academic_status)
 
     filter_curators = User.objects.filter(role=User.Role.CURATOR).order_by('full_name')
     filter_groups = StudyGroup.objects.order_by('name')
@@ -270,6 +286,7 @@ def admin_students(request):
             'filter_groups': filter_groups,
             'filter_specialties': filter_specialties,
             'is_active_filter': is_active,
+            'academic_status_filter': academic_status,
         },
     )
 
@@ -289,7 +306,11 @@ def admin_student_detail(request, student_id):
                 return redirect('accounts:admin_student_detail', student_id=student.id)
         elif action == 'toggle_active':
             student.is_active = not student.is_active
-            student.save(update_fields=['is_active'])
+            if not student.is_active:
+                student.academic_status = User.AcademicStatus.INACTIVE
+            elif student.academic_status == User.AcademicStatus.INACTIVE:
+                student.academic_status = User.AcademicStatus.STUDYING
+            student.save(update_fields=['is_active', 'academic_status'])
             messages.success(request, 'Статус студента обновлён.')
             return redirect('accounts:admin_student_detail', student_id=student.id)
         elif action == 'reset_password':
@@ -300,6 +321,14 @@ def admin_student_detail(request, student_id):
                 messages.success(request, 'Пароль студента сброшен.')
             else:
                 messages.error(request, 'Введите временный пароль.')
+            return redirect('accounts:admin_student_detail', student_id=student.id)
+        elif action == 'delete':
+            confirm_email = request.POST.get('confirm_email', '').strip().lower()
+            if confirm_email and confirm_email == (student.email or '').lower():
+                student.delete()
+                messages.success(request, 'Студент удалён.')
+                return redirect('accounts:admin_students')
+            messages.error(request, 'Email подтверждения не совпадает.')
             return redirect('accounts:admin_student_detail', student_id=student.id)
 
     group_profile = None
@@ -358,7 +387,12 @@ def admin_student_import(request):
                     continue
 
                 with transaction.atomic():
-                    student = User(full_name=full_name, email=email, role=User.Role.STUDENT)
+                    student = User(
+                        full_name=full_name,
+                        email=email,
+                        role=User.Role.STUDENT,
+                        academic_status=User.AcademicStatus.STUDYING,
+                    )
                     student.set_password(password)
                     sync_student_with_group(student, study_group)
                     student.save()
@@ -406,6 +440,19 @@ def admin_specialties(request):
         request,
         'adminpanel/specialties.html',
         {'specialties': specialties, 'form': form, 'edit_specialty': edit_specialty},
+    )
+
+
+@role_required(User.Role.ADMIN)
+def admin_academic_structure(request):
+    specialties = Specialty.objects.order_by('code', 'name')[:20]
+    groups = StudyGroup.objects.select_related('specialty_ref', 'curator').annotate(
+        students_count=Count('students')
+    ).order_by('name')[:20]
+    return render(
+        request,
+        'adminpanel/academic_structure.html',
+        {'specialties': specialties, 'groups': groups},
     )
 
 
@@ -487,6 +534,10 @@ def admin_group_detail(request, group_id):
             group.save(update_fields=['is_active'])
             messages.success(request, 'Статус группы обновлён.')
             return redirect('accounts:admin_group_detail', group_id=group.id)
+        elif action == 'sync_students':
+            sync_group_students(group)
+            messages.success(request, 'Данные студентов группы синхронизированы.')
+            return redirect('accounts:admin_group_detail', group_id=group.id)
 
     students = User.objects.filter(role=User.Role.STUDENT, study_group=group).order_by('full_name')
     return render(
@@ -508,7 +559,10 @@ def admin_curators(request):
 
     curators = (
         User.objects.filter(role=User.Role.CURATOR)
-        .annotate(students_count=Count('managed_study_groups__students', distinct=True))
+        .annotate(
+            students_count=Count('managed_study_groups__students', distinct=True),
+            groups_count=Count('managed_study_groups', distinct=True),
+        )
         .order_by('full_name')
     )
     q = request.GET.get('q', '').strip()
@@ -544,14 +598,27 @@ def admin_curator_detail(request, curator_id):
             else:
                 messages.error(request, 'Введите временный пароль.')
             return redirect('accounts:admin_curator_detail', curator_id=curator.id)
+        elif action == 'delete':
+            confirm_email = request.POST.get('confirm_email', '').strip().lower()
+            if confirm_email and confirm_email == (curator.email or '').lower():
+                curator.delete()
+                messages.success(request, 'Куратор удалён.')
+                return redirect('accounts:admin_curators')
+            messages.error(request, 'Email подтверждения не совпадает.')
+            return redirect('accounts:admin_curator_detail', curator_id=curator.id)
 
+    groups = StudyGroup.objects.filter(curator=curator).order_by('name')
     students = (
         User.objects.filter(role=User.Role.STUDENT)
         .filter(Q(study_group__curator=curator) | Q(curator=curator))
         .distinct()
         .order_by('full_name')
     )
-    return render(request, 'adminpanel/curator_detail.html', {'curator': curator, 'form': form, 'students': students})
+    return render(
+        request,
+        'adminpanel/curator_detail.html',
+        {'curator': curator, 'form': form, 'students': students, 'groups': groups},
+    )
 
 
 @role_required(User.Role.ADMIN)
@@ -612,9 +679,13 @@ def admin_vacancy_detail(request, vacancy_id):
                 messages.success(request, 'Статус вакансии обновлён.')
                 return redirect('accounts:admin_vacancy_detail', vacancy_id=vacancy.id)
         elif action == 'delete':
-            vacancy.delete()
-            messages.success(request, 'Вакансия удалена.')
-            return redirect('accounts:admin_vacancies')
+            confirm_title = request.POST.get('confirm_title', '').strip()
+            if confirm_title == vacancy.title:
+                vacancy.delete()
+                messages.success(request, 'Вакансия удалена.')
+                return redirect('accounts:admin_vacancies')
+            messages.error(request, 'Название вакансии для подтверждения введено неверно.')
+            return redirect('accounts:admin_vacancy_detail', vacancy_id=vacancy.id)
 
     return render(request, 'adminpanel/vacancy_detail.html', {'vacancy': vacancy, 'form': form})
 
@@ -674,9 +745,13 @@ def admin_course_detail(request, course_id):
                 messages.success(request, 'Статус курса обновлён.')
                 return redirect('accounts:admin_course_detail', course_id=course.id)
         elif action == 'delete':
-            course.delete()
-            messages.success(request, 'Курс удалён.')
-            return redirect('accounts:admin_courses')
+            confirm_title = request.POST.get('confirm_title', '').strip()
+            if confirm_title == course.title:
+                course.delete()
+                messages.success(request, 'Курс удалён.')
+                return redirect('accounts:admin_courses')
+            messages.error(request, 'Название курса для подтверждения введено неверно.')
+            return redirect('accounts:admin_course_detail', course_id=course.id)
 
     registrations_count = CourseRegistration.objects.filter(course=course).count()
     return render(
@@ -692,12 +767,21 @@ def admin_responses(request):
     q = request.GET.get('q', '').strip()
     vacancy = request.GET.get('vacancy', '').strip()
     group = request.GET.get('group', '').strip()
+    specialty = request.GET.get('specialty', '').strip()
+    date_from = request.GET.get('date_from', '').strip()
+    date_to = request.GET.get('date_to', '').strip()
     if q:
         responses = responses.filter(student__full_name__icontains=q)
     if vacancy:
         responses = responses.filter(vacancy__title__icontains=vacancy)
     if group:
         responses = responses.filter(student__group__icontains=group)
+    if specialty:
+        responses = responses.filter(student__specialty__icontains=specialty)
+    if date_from:
+        responses = responses.filter(created_at__date__gte=date_from)
+    if date_to:
+        responses = responses.filter(created_at__date__lte=date_to)
     return render(request, 'adminpanel/responses.html', {'responses': responses})
 
 
@@ -708,6 +792,8 @@ def admin_course_registrations(request):
     course = request.GET.get('course', '').strip()
     group = request.GET.get('group', '').strip()
     format_type = request.GET.get('format_type', '').strip()
+    date_from = request.GET.get('date_from', '').strip()
+    date_to = request.GET.get('date_to', '').strip()
     if q:
         registrations = registrations.filter(student__full_name__icontains=q)
     if course:
@@ -716,6 +802,10 @@ def admin_course_registrations(request):
         registrations = registrations.filter(student__group__icontains=group)
     if format_type in {Course.Format.ONLINE, Course.Format.OFFLINE}:
         registrations = registrations.filter(course__format_type=format_type)
+    if date_from:
+        registrations = registrations.filter(created_at__date__gte=date_from)
+    if date_to:
+        registrations = registrations.filter(created_at__date__lte=date_to)
     return render(request, 'adminpanel/course_registrations.html', {'registrations': registrations})
 
 
