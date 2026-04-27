@@ -4,11 +4,35 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 
+class Specialty(models.Model):
+    code = models.CharField(max_length=32, unique=True)
+    name = models.CharField(max_length=255, unique=True)
+    letter_code = models.CharField(max_length=4, unique=True)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ('code', 'name')
+
+    def __str__(self):
+        return f'{self.code} — {self.name}'
+
+
 class StudyGroup(models.Model):
     name = models.CharField(max_length=64, unique=True)
     specialty = models.CharField(max_length=255)
+    specialty_ref = models.ForeignKey(
+        Specialty, null=True, blank=True, on_delete=models.SET_NULL, related_name='study_groups'
+    )
     admission_year = models.PositiveIntegerField()
     curator = models.ForeignKey('User', null=True, blank=True, on_delete=models.SET_NULL, related_name='managed_study_groups')
+
+    @property
+    def specialty_name(self):
+        return self.specialty_ref.name if self.specialty_ref else self.specialty
+
+    @property
+    def specialty_letter(self):
+        return self.specialty_ref.letter_code if self.specialty_ref else ''
 
     def __str__(self):
         return self.name

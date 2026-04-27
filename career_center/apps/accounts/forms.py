@@ -61,7 +61,7 @@ class AdminStudentCreateForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['study_group'].queryset = StudyGroup.objects.select_related('curator').order_by('name')
+        self.fields['study_group'].queryset = StudyGroup.objects.select_related('curator', 'specialty_ref').order_by('name')
 
     def save(self, commit=True):
         user = super().save(commit=False)
@@ -70,7 +70,7 @@ class AdminStudentCreateForm(forms.ModelForm):
         group = self.cleaned_data.get('study_group')
         if group:
             user.group = group.name
-            user.specialty = group.specialty
+            user.specialty = group.specialty_name
             user.admission_year = group.admission_year
             user.curator = group.curator
         if commit:
@@ -91,14 +91,14 @@ class AdminStudentUpdateForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['study_group'].queryset = StudyGroup.objects.select_related('curator').order_by('name')
+        self.fields['study_group'].queryset = StudyGroup.objects.select_related('curator', 'specialty_ref').order_by('name')
 
     def save(self, commit=True):
         user = super().save(commit=False)
         group = self.cleaned_data.get('study_group')
         if group:
             user.group = group.name
-            user.specialty = group.specialty
+            user.specialty = group.specialty_name
             user.admission_year = group.admission_year
             user.curator = group.curator
         if commit:
