@@ -2,7 +2,7 @@ from datetime import date, timedelta
 
 from django.core.management.base import BaseCommand
 
-from apps.accounts.models import StudentProfile, User
+from apps.accounts.models import Specialty, StudentProfile, StudyGroup, User
 from apps.courses.models import Course, CourseRegistration
 from apps.portfolio.models import PortfolioEntry
 from apps.resumes.models import ResumeSettings
@@ -13,6 +13,27 @@ class Command(BaseCommand):
     help = 'Создает демо-данные для дипломного проекта.'
 
     def handle(self, *args, **options):
+        specialties = [
+            ('09.02.07', 'Информационные системы и программирование', 'И'),
+            ('44.02.01', 'Дошкольное образование', 'Д'),
+            ('44.02.02', 'Преподавание в начальных классах', 'Н'),
+            ('44.02.03', 'Педагогика дополнительного образования (ИЗО и ДПИ)', 'Х'),
+            ('44.02.03', 'Педагогика дополнительного образования (Хореография)', 'Б'),
+            ('44.02.03', 'Педагогика дополнительного образования (Сценическая деятельность)', 'А'),
+            ('44.02.03', 'Педагогика дополнительного образования (Техническая направленность)', 'Т'),
+            ('44.02.03', 'Педагогика дополнительного образования (Социально-гуманитарная направленность)', 'О'),
+            ('44.02.04', 'Специальное дошкольное образование', 'С'),
+            ('49.02.01', 'Физическая культура', 'Ф'),
+            ('53.02.01', 'Музыкальное образование', 'М'),
+            ('53.02.02', 'Музыкальное искусство эстрады', 'В'),
+        ]
+        for code, name, letter in specialties:
+            Specialty.objects.update_or_create(
+                code=code,
+                letter_code=letter,
+                defaults={'name': name, 'is_active': True},
+            )
+
         admin, _ = User.objects.get_or_create(
             email='admin@irkpo.local',
             defaults={'full_name': 'Администратор ИРКПО', 'role': User.Role.ADMIN, 'is_staff': True, 'is_superuser': True},
@@ -26,6 +47,19 @@ class Command(BaseCommand):
         curator.set_password('Curator12345!')
         curator.save()
 
+        default_specialty = Specialty.objects.filter(letter_code='И').first()
+        study_group, _ = StudyGroup.objects.get_or_create(
+            name='И-422',
+            defaults={
+                'specialty': default_specialty.name if default_specialty else 'Информационные системы и программирование',
+                'specialty_ref': default_specialty,
+                'admission_year': 2022,
+                'course_number': 4,
+                'curator': curator,
+                'is_active': True,
+            },
+        )
+
         students = []
         for i in range(1, 6):
             student, _ = User.objects.get_or_create(
@@ -37,6 +71,7 @@ class Command(BaseCommand):
                     'specialty': 'Информационные системы и программирование',
                     'admission_year': 2022,
                     'curator': curator,
+                    'study_group': study_group,
                 },
             )
             student.set_password('Student12345!')

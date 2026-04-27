@@ -7,6 +7,10 @@
 - `StudyGroup` — конкретная учебная группа/подгруппа (например, `Н121/1`), связана со специальностью и куратором.
 - `User(role=student)` — закреплён за конкретной `study_group`.
 - Куратор видит студентов только тех групп, где он назначен куратором.
+- В `adminpanel` доступны страницы:
+  - `accounts/admin/specialties/` — управление специальностями;
+  - `accounts/admin/groups/` — управление группами;
+  - `accounts/admin/students/import/` — массовый CSV-импорт студентов (`full_name,email,password,group`).
 
 ## Стек
 - Python 3.12
@@ -35,6 +39,7 @@ docker compose up --build
 docker compose run --rm web python manage.py makemigrations
 docker compose run --rm web python manage.py migrate
 ```
+После `git pull` обязательно выполнить `python manage.py migrate`.
 
 ## Суперпользователь
 ```bash

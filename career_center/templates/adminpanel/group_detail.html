@@ -1,0 +1,37 @@
+{% extends 'base_dashboard.html' %}
+{% block title %}Карточка группы{% endblock %}
+{% block content %}
+<section class="hero"><div class="hero-kicker">Группа</div><h1>{{ group.name }}</h1><p>{{ group.specialty_ref.name|default:group.specialty }}</p></section>
+
+<section class="section grid grid-2">
+  <div class="card">
+    <h2>Данные группы</h2>
+    <form method="post" class="form-grid">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="update">
+      {{ form.as_p }}
+      <div class="inline-actions"><button class="btn btn-primary" type="submit">Сохранить</button></div>
+    </form>
+    <form method="post" class="inline-actions">{% csrf_token %}<input type="hidden" name="action" value="toggle_active"><button class="btn" type="submit">{% if group.is_active %}Деактивировать{% else %}Активировать{% endif %}</button></form>
+  </div>
+
+  <div class="card">
+    <h2>Состав группы</h2>
+    <p class="muted">Куратор: {{ group.curator.full_name|default:'не назначен' }}</p>
+    <p class="muted">Код специальности: {{ group.specialty_ref.code|default:'—' }}</p>
+    <p class="muted">Буквенный код: {{ group.specialty_ref.letter_code|default:'—' }}</p>
+    <p class="muted">Студентов: {{ students_count }}</p>
+    <div class="row-list section">
+      {% for student in students %}
+        <div class="row-item">
+          <div><strong>{{ student.full_name }}</strong><div class="muted">{{ student.email }}</div></div>
+          <div class="muted">{{ student.specialty|default:'—' }}</div>
+          <a class="btn btn-link" href="{% url 'accounts:admin_student_detail' student.id %}">Открыть</a>
+        </div>
+      {% empty %}
+        <p class="muted">В группе пока нет студентов.</p>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

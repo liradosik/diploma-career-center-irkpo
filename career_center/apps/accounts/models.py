@@ -27,7 +27,17 @@ class StudyGroup(models.Model):
         Specialty, null=True, blank=True, on_delete=models.SET_NULL, related_name='study_groups'
     )
     admission_year = models.PositiveIntegerField()
+    course_number = models.PositiveSmallIntegerField(default=1)
     curator = models.ForeignKey('User', null=True, blank=True, on_delete=models.SET_NULL, related_name='managed_study_groups')
+    is_active = models.BooleanField(default=True)
+
+    @property
+    def specialty_name(self):
+        return self.specialty_ref.name if self.specialty_ref else self.specialty
+
+    @property
+    def specialty_letter(self):
+        return self.specialty_ref.letter_code if self.specialty_ref else ''
 
     @property
     def specialty_name(self):
