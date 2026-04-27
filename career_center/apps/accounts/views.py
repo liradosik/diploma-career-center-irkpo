@@ -1,6 +1,7 @@
 from datetime import date
 import csv
 import io
+import json
 
 from django.contrib import messages
 from django.contrib.auth.views import LoginView, LogoutView
@@ -190,7 +191,8 @@ def curator_student_detail(request, student_id):
 
 @role_required(User.Role.ADMIN)
 def admin_dashboard(request):
-    students_total = User.objects.filter(role=User.Role.STUDENT).count()
+    students_qs = User.objects.filter(role=User.Role.STUDENT)
+    students_total = students_qs.count()
     curators_total = User.objects.filter(role=User.Role.CURATOR).count()
 
     vacancies = Vacancy.objects.values('status').annotate(total=Count('id'))
@@ -199,17 +201,29 @@ def admin_dashboard(request):
     courses = Course.objects.values('status').annotate(total=Count('id'))
     course_summary = {item['status']: item['total'] for item in courses}
 
+    specialty_counter = {}
+    for student in students_qs.select_related('study_group__specialty_ref'):
+        label = (
+            getattr(getattr(student.study_group, 'specialty_ref', None), 'name', '')
+            or student.specialty
+            or 'Без специальности'
+        )
+        specialty_counter[label] = specialty_counter.get(label, 0) + 1
+    specialty_labels = list(specialty_counter.keys())
+    specialty_values = list(specialty_counter.values())
+
     context = {
         'students_total': students_total,
-        'students_active': User.objects.filter(role=User.Role.STUDENT, is_active=True).count(),
-        'students_studying': User.objects.filter(role=User.Role.STUDENT, academic_status=User.AcademicStatus.STUDYING).count(),
-        'students_graduate': User.objects.filter(role=User.Role.STUDENT, academic_status=User.AcademicStatus.GRADUATE).count(),
+        'students_active': students_qs.filter(is_active=True).count(),
+        'students_studying': students_qs.filter(academic_status=User.AcademicStatus.STUDYING).count(),
+        'students_graduate': students_qs.filter(academic_status=User.AcademicStatus.GRADUATE).count(),
+        'students_inactive_status': students_qs.filter(academic_status=User.AcademicStatus.INACTIVE).count(),
         'inactive_users_total': User.objects.filter(is_active=False).count(),
         'curators_total': curators_total,
         'groups_active': StudyGroup.objects.filter(is_active=True).count(),
         'specialties_total': Specialty.objects.count(),
         'groups_without_curator': StudyGroup.objects.filter(is_active=True, curator__isnull=True).count(),
-        'students_without_group': User.objects.filter(role=User.Role.STUDENT, study_group__isnull=True).count(),
+        'students_without_group': students_qs.filter(study_group__isnull=True).count(),
         'vacancies_active': vacancy_summary.get(Vacancy.Status.ACTIVE, 0),
         'courses_active': course_summary.get(Course.Status.ACTIVE, 0),
         'registrations_total': CourseRegistration.objects.count(),
@@ -228,9 +242,26 @@ def admin_dashboard(request):
             'hidden': course_summary.get(Course.Status.HIDDEN, 0),
             'archive': course_summary.get(Course.Status.ARCHIVE, 0),
         },
+        'student_status_chart_json': json.dumps([
+            students_qs.filter(academic_status=User.AcademicStatus.STUDYING).count(),
+            students_qs.filter(academic_status=User.AcademicStatus.GRADUATE).count(),
+            students_qs.filter(academic_status=User.AcademicStatus.INACTIVE).count(),
+        ]),
+        'vacancy_status_chart_json': json.dumps([
+            vacancy_summary.get(Vacancy.Status.ACTIVE, 0),
+            vacancy_summary.get(Vacancy.Status.HIDDEN, 0),
+            vacancy_summary.get(Vacancy.Status.ARCHIVE, 0),
+        ]),
+        'course_status_chart_json': json.dumps([
+            course_summary.get(Course.Status.ACTIVE, 0),
+            course_summary.get(Course.Status.HIDDEN, 0),
+            course_summary.get(Course.Status.ARCHIVE, 0),
+        ]),
+        'specialty_chart_labels_json': json.dumps(specialty_labels),
+        'specialty_chart_values_json': json.dumps(specialty_values),
         'latest_vacancies': Vacancy.objects.order_by('-created_at')[:5],
         'latest_courses': Course.objects.order_by('-created_at')[:5],
-        'latest_students': User.objects.filter(role=User.Role.STUDENT).order_by('-date_joined')[:5],
+        'latest_students': students_qs.order_by('-date_joined')[:5],
     }
     return render(request, 'adminpanel/dashboard.html', context)
 
