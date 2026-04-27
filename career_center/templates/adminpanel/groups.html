@@ -1,0 +1,63 @@
+{% extends 'base_dashboard.html' %}
+{% block title %}Группы{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="hero-kicker">Администрирование</div>
+  <h1>Группы</h1>
+  <p>Управление учебными группами и назначением кураторов.</p>
+</section>
+
+<section class="section card form-card">
+  <h2>Создать группу</h2>
+  <form method="post" class="form-grid">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="create">
+    <p><label>{{ form.name.label }}</label>{{ form.name }}</p>
+    <p><label>{{ form.specialty_ref.label }}</label>{{ form.specialty_ref }}</p>
+    <p><label>{{ form.admission_year.label }}</label>{{ form.admission_year }}</p>
+    <p><label>{{ form.course_number.label }}</label>{{ form.course_number }}</p>
+    <p><label>{{ form.curator.label }}</label>{{ form.curator }}</p>
+    <p><label>{{ form.is_active.label }}</label>{{ form.is_active }}</p>
+    <p class="full muted">Если оставить название пустым, система предложит формат по буквенному коду, курсу и году.</p>
+    <p class="full"><button class="btn btn-primary" type="submit">Сохранить</button></p>
+  </form>
+</section>
+
+<section class="section card">
+  <h2>Список групп</h2>
+  <form method="get" class="filters">
+    <input name="q" placeholder="Поиск по названию" value="{{ request.GET.q }}">
+    <select name="specialty">
+      <option value="">Специальность</option>
+      {% for specialty in specialties %}
+        <option value="{{ specialty.id }}" {% if request.GET.specialty == specialty.id|stringformat:'s' %}selected{% endif %}>{{ specialty.code }} • {{ specialty.name }}</option>
+      {% endfor %}
+    </select>
+    <select name="curator">
+      <option value="">Куратор</option>
+      {% for curator in curators %}
+        <option value="{{ curator.id }}" {% if request.GET.curator == curator.id|stringformat:'s' %}selected{% endif %}>{{ curator.full_name }}</option>
+      {% endfor %}
+    </select>
+    <input name="course_number" type="number" min="1" placeholder="Курс" value="{{ request.GET.course_number }}">
+    <input name="admission_year" type="number" min="2000" placeholder="Год поступления" value="{{ request.GET.admission_year }}">
+    <button class="btn btn-link" type="submit">Применить</button>
+  </form>
+
+  <div class="row-list">
+    {% for group in groups %}
+      <div class="row-item">
+        <div><strong>{{ group.name }}</strong><div class="muted">{{ group.specialty_ref.name|default:group.specialty }}</div></div>
+        <div class="muted">{{ group.specialty_ref.code|default:'—' }} • {{ group.specialty_ref.letter_code|default:'—' }}</div>
+        <div class="muted">Курс {{ group.course_number }} • {{ group.admission_year }}</div>
+        <div class="muted">{{ group.curator.full_name|default:'без куратора' }}<br>Студентов: {{ group.students_count }}</div>
+        <div class="muted">{% if group.is_active %}Активна{% else %}Деактивирована{% endif %}</div>
+        <a class="btn btn-link" href="{% url 'accounts:admin_group_detail' group.id %}">Открыть</a>
+        <form method="post">{% csrf_token %}<input type="hidden" name="action" value="toggle_active"><input type="hidden" name="group_id" value="{{ group.id }}"><button class="btn" type="submit">{% if group.is_active %}Деактивировать{% else %}Активировать{% endif %}</button></form>
+      </div>
+    {% empty %}
+      <p class="muted">Группы не найдены.</p>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

@@ -4,11 +4,27 @@
 <section class="hero"><div class="hero-kicker">Студент</div><h1>{{ student.full_name }}</h1><p>{{ student.email }}</p></section>
 <section class="section grid grid-2">
   <div class="card">
+    <h2>Учебная структура</h2>
+    {% if group_profile %}
+      <p><strong>Учебная группа:</strong> {{ group_profile.group_name }}</p>
+      <p><strong>Специальность:</strong> {{ group_profile.specialty|default:'—' }}</p>
+      <p><strong>Год поступления:</strong> {{ group_profile.admission_year|default:'—' }}</p>
+      <p><strong>Куратор:</strong> {{ group_profile.curator.full_name|default:'не назначен' }}</p>
+    {% else %}
+      <p class="muted">Группа не выбрана. Показаны fallback-данные из профиля пользователя.</p>
+      <p><strong>Группа:</strong> {{ student.group|default:'—' }}</p>
+      <p><strong>Специальность:</strong> {{ student.specialty|default:'—' }}</p>
+      <p><strong>Год поступления:</strong> {{ student.admission_year|default:'—' }}</p>
+      <p><strong>Куратор:</strong> {{ student.curator.full_name|default:'не назначен' }}</p>
+    {% endif %}
+  </div>
+  <div class="card">
     <h2>Основные данные</h2>
     <form method="post" class="form-grid">
       {% csrf_token %}
       <input type="hidden" name="action" value="update_profile">
       {{ form.as_p }}
+      <p class="muted">Основное поле учебной структуры — «Учебная группа». Остальные данные синхронизируются автоматически.</p>
       <div class="inline-actions"><button class="btn btn-primary" type="submit">Сохранить</button></div>
     </form>
     <form method="post" class="inline-actions">{% csrf_token %}<input type="hidden" name="action" value="toggle_active"><button class="btn" type="submit">{% if student.is_active %}Деактивировать{% else %}Активировать{% endif %}</button></form>
