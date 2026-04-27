@@ -92,7 +92,9 @@ def student_dashboard(request):
 
 @role_required(User.Role.CURATOR)
 def curator_dashboard(request):
-    students = User.objects.filter(role=User.Role.STUDENT, curator=request.user)
+    students = User.objects.filter(role=User.Role.STUDENT).filter(
+        Q(study_group__curator=request.user) | Q(curator=request.user)
+    ).distinct()
     student_ids = students.values_list('id', flat=True)
 
     pending_entries_qs = (
@@ -125,7 +127,9 @@ def curator_dashboard(request):
 @role_required(User.Role.CURATOR)
 def curator_students(request):
     students = (
-        User.objects.filter(role=User.Role.STUDENT, curator=request.user)
+        User.objects.filter(role=User.Role.STUDENT)
+        .filter(Q(study_group__curator=request.user) | Q(curator=request.user))
+        .distinct()
         .annotate(
             portfolio_total=Count('portfolio_entries'),
             portfolio_pending=Count('portfolio_entries', filter=Q(portfolio_entries__status=PortfolioEntry.Status.PENDING)),
@@ -139,7 +143,12 @@ def curator_students(request):
 
 @role_required(User.Role.CURATOR)
 def curator_student_detail(request, student_id):
-    student = get_object_or_404(User, id=student_id, role=User.Role.STUDENT, curator=request.user)
+    student = get_object_or_404(
+        User.objects.filter(role=User.Role.STUDENT).filter(
+            Q(study_group__curator=request.user) | Q(curator=request.user)
+        ).distinct(),
+        id=student_id,
+    )
     entries = PortfolioEntry.objects.filter(student=student).order_by('-created_at')
     resume = getattr(student, 'resume_settings', None)
     profile = getattr(student, 'student_profile', None)
@@ -276,7 +285,11 @@ def admin_curators(request):
             messages.success(request, 'Куратор создан.')
             return redirect('accounts:admin_curators')
 
-    curators = User.objects.filter(role=User.Role.CURATOR).annotate(students_count=Count('students')).order_by('full_name')
+    curators = (
+        User.objects.filter(role=User.Role.CURATOR)
+        .annotate(students_count=Count('managed_study_groups__students', distinct=True))
+        .order_by('full_name')
+    )
     q = request.GET.get('q', '').strip()
     if q:
         curators = curators.filter(Q(full_name__icontains=q) | Q(email__icontains=q))
@@ -311,7 +324,12 @@ def admin_curator_detail(request, curator_id):
                 messages.error(request, 'Введите временный пароль.')
             return redirect('accounts:admin_curator_detail', curator_id=curator.id)
 
-    students = User.objects.filter(role=User.Role.STUDENT, curator=curator).order_by('full_name')
+    students = (
+        User.objects.filter(role=User.Role.STUDENT)
+        .filter(Q(study_group__curator=curator) | Q(curator=curator))
+        .distinct()
+        .order_by('full_name')
+    )
     return render(request, 'adminpanel/curator_detail.html', {'curator': curator, 'form': form, 'students': students})
 
 
