@@ -39,6 +39,14 @@ class StudyGroup(models.Model):
     def specialty_letter(self):
         return self.specialty_ref.letter_code if self.specialty_ref else ''
 
+    @property
+    def specialty_name(self):
+        return self.specialty_ref.name if self.specialty_ref else self.specialty
+
+    @property
+    def specialty_letter(self):
+        return self.specialty_ref.letter_code if self.specialty_ref else ''
+
     def __str__(self):
         return self.name
 
