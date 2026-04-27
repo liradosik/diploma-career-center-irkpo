@@ -14,7 +14,13 @@
     <form method="post" class="inline-actions">{% csrf_token %}<input type="hidden" name="action" value="set_status"><input type="hidden" name="status" value="active"><button class="btn" type="submit">Сделать активной</button></form>
     <form method="post" class="inline-actions">{% csrf_token %}<input type="hidden" name="action" value="set_status"><input type="hidden" name="status" value="hidden"><button class="btn" type="submit">Скрыть</button></form>
     <form method="post" class="inline-actions">{% csrf_token %}<input type="hidden" name="action" value="set_status"><input type="hidden" name="status" value="archive"><button class="btn" type="submit">Перенести в архив</button></form>
-    <form method="post" class="inline-actions" onsubmit="return confirm('Удалить вакансию?');">{% csrf_token %}<input type="hidden" name="action" value="delete"><button class="btn btn-danger" type="submit">Удалить</button></form>
+    <form method="post" class="section">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="delete">
+      <label>Для удаления введите название вакансии</label>
+      <input name="confirm_title" type="text" placeholder="{{ vacancy.title }}" required>
+      <button class="btn btn-danger" type="submit">Подтвердить удаление</button>
+    </form>
   </div>
 </section>
 {% endblock %}

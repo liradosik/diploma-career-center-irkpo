@@ -5,29 +5,52 @@
 <section class="hero">
   <div class="hero-kicker">Панель администратора</div>
   <h1>Панель администратора</h1>
-  <p>Сводная статистика по пользователям, вакансиям, курсам, откликам и регистрациям.</p>
-</section>
-
-<section class="section grid grid-3">
-  <article class="stat-card"><div class="label">Студентов всего</div><div class="value">{{ students_total }}</div></article>
-  <article class="stat-card"><div class="label">Кураторов всего</div><div class="value">{{ curators_total }}</div></article>
-  <article class="stat-card"><div class="label">Активных вакансий</div><div class="value">{{ vacancies_active }}</div></article>
-  <article class="stat-card"><div class="label">Активных курсов</div><div class="value">{{ courses_active }}</div></article>
-  <article class="stat-card"><div class="label">Записей на курсы</div><div class="value">{{ registrations_total }}</div></article>
-  <article class="stat-card"><div class="label">Откликов</div><div class="value">{{ responses_total }}</div></article>
+  <p>Сводка по студентам, группам, кураторам, вакансиям и обучающим событиям.</p>
 </section>
 
 <section class="section card">
-  <h2>Сводка по материалам</h2>
-  <div class="grid grid-2">
-    <div class="list-item">
-      <h3>Вакансии</h3>
-      <p class="muted">{{ STATUS_LABELS.active }}: {{ vacancy_summary.active }} • {{ STATUS_LABELS.hidden }}: {{ vacancy_summary.hidden }} • {{ STATUS_LABELS.archive }}: {{ vacancy_summary.archive }}</p>
+  <h2>Общее состояние системы</h2>
+  <div class="grid grid-3">
+    <article class="stat-card"><div class="label">Студентов всего</div><div class="value">{{ students_total }}</div></article>
+    <article class="stat-card"><div class="label">Активных студентов</div><div class="value">{{ students_active }}</div></article>
+    <article class="stat-card"><div class="label">Студентов без группы</div><div class="value">{{ students_without_group }}</div></article>
+    <article class="stat-card"><div class="label">Кураторов</div><div class="value">{{ curators_total }}</div></article>
+    <article class="stat-card"><div class="label">Активных групп</div><div class="value">{{ groups_active }}</div></article>
+    <article class="stat-card"><div class="label">Групп без куратора</div><div class="value">{{ groups_without_curator }}</div></article>
+    <article class="stat-card"><div class="label">Обучающихся студентов</div><div class="value">{{ students_studying }}</div></article>
+    <article class="stat-card"><div class="label">Выпускников</div><div class="value">{{ students_graduate }}</div></article>
+    <article class="stat-card"><div class="label">Неактивных пользователей</div><div class="value">{{ inactive_users_total }}</div></article>
+  </div>
+</section>
+
+<section class="section card">
+  <h2>Карьерные материалы</h2>
+  <div class="grid grid-3">
+    <article class="stat-card"><div class="label">Активных вакансий</div><div class="value">{{ vacancy_summary.active }}</div></article>
+    <article class="stat-card"><div class="label">Скрытых вакансий</div><div class="value">{{ vacancy_summary.hidden }}</div></article>
+    <article class="stat-card"><div class="label">Архивных вакансий</div><div class="value">{{ vacancy_summary.archive }}</div></article>
+    <article class="stat-card"><div class="label">Активных курсов</div><div class="value">{{ course_summary.active }}</div></article>
+    <article class="stat-card"><div class="label">Записей на курсы</div><div class="value">{{ registrations_total }}</div></article>
+    <article class="stat-card"><div class="label">Откликов на вакансии</div><div class="value">{{ responses_total }}</div></article>
+  </div>
+</section>
+
+<section class="section grid grid-3">
+  <div class="card">
+    <h2>Что требует внимания</h2>
+    <div class="row-list">
+      {% if students_without_group > 0 %}<div class="list-item"><h3>Студенты без группы</h3><p class="muted">{{ students_without_group }}</p></div>{% endif %}
+      {% if groups_without_curator > 0 %}<div class="list-item"><h3>Группы без куратора</h3><p class="muted">{{ groups_without_curator }}</p></div>{% endif %}
+      {% if portfolio_pending_total > 0 %}<div class="list-item"><h3>Портфолио на проверке</h3><p class="muted">{{ portfolio_pending_total }}</p></div>{% endif %}
+      {% if offline_full_courses > 0 %}<div class="list-item"><h3>Офлайн-курсы без мест</h3><p class="muted">{{ offline_full_courses }}</p></div>{% endif %}
+      {% if students_without_group == 0 and groups_without_curator == 0 and portfolio_pending_total == 0 and offline_full_courses == 0 %}
+        <p class="muted">Критических задач нет.</p>
+      {% endif %}
     </div>
-    <div class="list-item">
-      <h3>Курсы</h3>
-      <p class="muted">{{ STATUS_LABELS.active }}: {{ course_summary.active }} • {{ STATUS_LABELS.hidden }}: {{ course_summary.hidden }} • {{ STATUS_LABELS.archive }}: {{ course_summary.archive }}</p>
-    </div>
+  </div>
+  <div class="card">
+    <h2>Справочник</h2>
+    <div class="list-item"><h3>Специальностей</h3><p class="muted">{{ specialties_total }}</p></div>
   </div>
 </section>
 

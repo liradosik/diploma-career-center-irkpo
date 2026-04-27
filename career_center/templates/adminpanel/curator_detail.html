@@ -11,7 +11,6 @@
       {{ form.as_p }}
       <div class="inline-actions"><button class="btn btn-primary" type="submit">Сохранить</button></div>
     </form>
-    <form method="post" class="inline-actions">{% csrf_token %}<input type="hidden" name="action" value="toggle_active"><button class="btn" type="submit">{% if curator.is_active %}Деактивировать{% else %}Активировать{% endif %}</button></form>
   </div>
   <div class="card">
     <h2>Сброс пароля</h2>
@@ -23,6 +22,29 @@
       <p class="muted">После сброса администратор передаёт временный пароль пользователю.</p>
       <button class="btn btn-primary" type="submit">Сбросить пароль</button>
     </form>
+  </div>
+  <div class="card">
+    <h2>Опасные действия</h2>
+    <form method="post" class="inline-actions">{% csrf_token %}<input type="hidden" name="action" value="toggle_active"><button class="btn" type="submit">{% if curator.is_active %}Деактивировать{% else %}Активировать{% endif %}</button></form>
+    <form method="post">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="delete">
+      <label>Для удаления введите email куратора</label>
+      <input name="confirm_email" type="text" placeholder="{{ curator.email }}" required>
+      <button class="btn btn-danger" type="submit">Подтвердить удаление</button>
+    </form>
+  </div>
+</section>
+<section class="section card">
+  <h2>Закреплённые группы</h2>
+  <div class="row-list">
+    {% for group in groups %}
+      <div class="row-item">
+        <div><strong>{{ group.name }}</strong><div class="muted">{{ group.specialty_ref.name|default:group.specialty }}</div></div>
+        <div class="muted">Курс {{ group.course_number }} • {{ group.admission_year }}</div>
+        <div></div><div></div><div></div>
+      </div>
+    {% empty %}<p class="muted">Нет закреплённых групп.</p>{% endfor %}
   </div>
 </section>
 <section class="section card">

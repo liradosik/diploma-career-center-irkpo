@@ -1,0 +1,44 @@
+{% extends 'base_dashboard.html' %}
+{% block title %}Специальности{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="hero-kicker">Администрирование</div>
+  <h1>Специальности</h1>
+  <p>Справочник специальностей и профилей с буквенными кодами групп.</p>
+</section>
+
+<section class="section card form-card">
+  <h2>{% if edit_specialty %}Редактировать специальность{% else %}Создать специальность{% endif %}</h2>
+  <form method="post" class="form-grid">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="{% if edit_specialty %}update{% else %}create{% endif %}">
+    <p><label>{{ form.code.label }}</label>{{ form.code }}</p>
+    <p><label>{{ form.letter_code.label }}</label>{{ form.letter_code }}</p>
+    <p class="full"><label>{{ form.name.label }}</label>{{ form.name }}</p>
+    <p class="full"><label>{{ form.is_active.label }}</label>{{ form.is_active }}</p>
+    <p class="full"><button class="btn btn-primary" type="submit">Сохранить</button></p>
+  </form>
+</section>
+
+<section class="section card">
+  <h2>Список специальностей</h2>
+  <form method="get" class="filters">
+    <input name="q" placeholder="Поиск по коду / названию / буквенному коду" value="{{ request.GET.q }}">
+    <button class="btn btn-link" type="submit">Найти</button>
+  </form>
+
+  <div class="row-list">
+    {% for specialty in specialties %}
+      <div class="row-item">
+        <div><strong>{{ specialty.code }}</strong><div class="muted">{{ specialty.name }}</div></div>
+        <div class="muted">Буквенный код: {{ specialty.letter_code }}</div>
+        <div class="muted">Статус: {% if specialty.is_active %}Активна{% else %}Деактивирована{% endif %}</div>
+        <a class="btn btn-link" href="{% url 'accounts:admin_specialties' %}?edit={{ specialty.id }}">Открыть</a>
+        <form method="post">{% csrf_token %}<input type="hidden" name="action" value="toggle_active"><input type="hidden" name="specialty_id" value="{{ specialty.id }}"><button class="btn" type="submit">{% if specialty.is_active %}Деактивировать{% else %}Активировать{% endif %}</button></form>
+      </div>
+    {% empty %}
+      <p class="muted">Специальности не найдены.</p>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

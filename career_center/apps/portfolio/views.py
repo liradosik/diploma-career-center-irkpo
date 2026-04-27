@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
+from django.db.models import Q
 
 from apps.accounts.decorators import role_required
 from apps.accounts.models import User
@@ -44,7 +45,10 @@ def edit_entry(request, pk):
 
 @role_required(User.Role.CURATOR)
 def review_queue(request):
-    students = User.objects.filter(role=User.Role.STUDENT, curator=request.user)
+    students = User.objects.filter(role=User.Role.STUDENT).filter(
+        Q(study_group__curator=request.user, study_group__is_active=True) |
+        Q(study_group__isnull=True, curator=request.user)
+    ).exclude(academic_status=User.AcademicStatus.GRADUATE).distinct()
     entries_qs = PortfolioEntry.objects.filter(student__in=students).select_related('student').order_by('-created_at')
 
     if request.method == 'POST':

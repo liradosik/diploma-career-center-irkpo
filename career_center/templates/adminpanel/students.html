@@ -11,17 +11,42 @@
     <p class="full"><label>{{ form.email.label }}</label>{{ form.email }}</p>
     <p><label>{{ form.password.label }}</label>{{ form.password }}</p>
     <p class="full"><label>{{ form.study_group.label }}</label>{{ form.study_group }}</p>
+    <p class="full muted">Специальность, год поступления и куратор будут определены автоматически по выбранной учебной группе.</p>
     <p class="full"><button class="btn btn-primary" type="submit">Создать</button></p>
   </form>
+  <div class="inline-actions">
+    <a class="btn btn-link" href="{% url 'accounts:admin_student_import' %}">Массовый импорт CSV</a>
+  </div>
 </section>
 
 <section class="section card">
   <h2>Список студентов</h2>
   <form method="get" class="filters">
     <input name="q" placeholder="Поиск по ФИО/email" value="{{ request.GET.q }}">
-    <input name="group" placeholder="Группа" value="{{ request.GET.group }}">
+    <select name="group">
+      <option value="">Группа</option>
+      {% for g in filter_groups %}
+        <option value="{{ g.name }}" {% if request.GET.group == g.name %}selected{% endif %}>{{ g.name }}</option>
+      {% endfor %}
+    </select>
     <select name="curator"><option value="">Куратор</option>{% for c in filter_curators %}<option value="{{ c.id }}" {% if request.GET.curator == c.id|stringformat:'s' %}selected{% endif %}>{{ c.full_name }}</option>{% endfor %}</select>
-    <input name="specialty" placeholder="Специальность" value="{{ request.GET.specialty }}">
+    <select name="specialty">
+      <option value="">Специальность</option>
+      {% for s in filter_specialties %}
+        <option value="{{ s.name }}" {% if request.GET.specialty == s.name %}selected{% endif %}>{{ s.code }} • {{ s.name }}</option>
+      {% endfor %}
+    </select>
+    <select name="is_active">
+      <option value="">Статус</option>
+      <option value="1" {% if is_active_filter == '1' %}selected{% endif %}>Активен</option>
+      <option value="0" {% if is_active_filter == '0' %}selected{% endif %}>Деактивирован</option>
+    </select>
+    <select name="academic_status">
+      <option value="">Учебный статус</option>
+      <option value="studying" {% if academic_status_filter == 'studying' %}selected{% endif %}>Обучаются</option>
+      <option value="graduate" {% if academic_status_filter == 'graduate' %}selected{% endif %}>Выпускники</option>
+      <option value="inactive" {% if academic_status_filter == 'inactive' %}selected{% endif %}>Неактивные</option>
+    </select>
     <button class="btn btn-link" type="submit">Применить</button>
   </form>
 
@@ -29,9 +54,9 @@
     {% for student in students %}
       <div class="row-item">
         <div><strong>{{ student.full_name }}</strong><div class="muted">{{ student.email }}</div></div>
-        <div class="muted">{{ student.group|default:'—' }}<br>{{ student.specialty|default:'—' }}</div>
-        <div class="muted">{{ student.curator.full_name|default:'не назначен' }}</div>
-        <div class="muted">Портфолио: {{ student.portfolio_total }}</div>
+        <div class="muted">{{ student.study_group.name|default:student.group|default:'—' }}<br>{{ student.study_group.specialty_ref.name|default:student.specialty|default:'—' }}</div>
+        <div class="muted">{{ student.study_group.curator.full_name|default:student.curator.full_name|default:'не назначен' }}</div>
+        <div class="muted">{% if student.is_active %}Активен{% else %}Неактивен{% endif %}<br>{{ student.get_academic_status_display }}</div>
         <a class="btn btn-link" href="{% url 'accounts:admin_student_detail' student.id %}">Открыть</a>
       </div>
     {% empty %}
