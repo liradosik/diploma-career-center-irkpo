@@ -5,29 +5,95 @@
 <section class="hero">
   <div class="hero-kicker">Панель администратора</div>
   <h1>Панель администратора</h1>
-  <p>Сводная статистика по пользователям, вакансиям, курсам, откликам и регистрациям.</p>
-</section>
-
-<section class="section grid grid-3">
-  <article class="stat-card"><div class="label">Студентов всего</div><div class="value">{{ students_total }}</div></article>
-  <article class="stat-card"><div class="label">Кураторов всего</div><div class="value">{{ curators_total }}</div></article>
-  <article class="stat-card"><div class="label">Активных вакансий</div><div class="value">{{ vacancies_active }}</div></article>
-  <article class="stat-card"><div class="label">Активных курсов</div><div class="value">{{ courses_active }}</div></article>
-  <article class="stat-card"><div class="label">Записей на курсы</div><div class="value">{{ registrations_total }}</div></article>
-  <article class="stat-card"><div class="label">Откликов</div><div class="value">{{ responses_total }}</div></article>
+  <p>Сводная информация по пользователям, учебной структуре, карьерным материалам и активности.</p>
 </section>
 
 <section class="section card">
-  <h2>Сводка по материалам</h2>
+  <h2>Разделы системы</h2>
+  <div class="grid grid-2">
+    <article class="list-item">
+      <h3>Пользователи</h3>
+      <div class="inline-actions">
+        <a class="btn btn-link" href="{% url 'accounts:admin_students' %}">Студенты</a>
+        <a class="btn btn-link" href="{% url 'accounts:admin_curators' %}">Кураторы</a>
+      </div>
+    </article>
+    <article class="list-item">
+      <h3>Учебная часть</h3>
+      <div class="inline-actions">
+        <a class="btn btn-link" href="{% url 'accounts:admin_groups' %}">Группы</a>
+        <a class="btn btn-link" href="{% url 'accounts:admin_specialties' %}">Специальности</a>
+      </div>
+    </article>
+    <article class="list-item">
+      <h3>Карьерные материалы</h3>
+      <div class="inline-actions">
+        <a class="btn btn-link" href="{% url 'accounts:admin_vacancies' %}">Вакансии</a>
+        <a class="btn btn-link" href="{% url 'accounts:admin_courses' %}">Курсы/семинары</a>
+      </div>
+    </article>
+    <article class="list-item">
+      <h3>Активность</h3>
+      <div class="inline-actions">
+        <a class="btn btn-link" href="{% url 'accounts:admin_responses' %}">Отклики</a>
+        <a class="btn btn-link" href="{% url 'accounts:admin_course_registrations' %}">Записи на курсы</a>
+      </div>
+    </article>
+  </div>
+</section>
+
+<section class="section card">
+  <h2>Ключевые показатели</h2>
+  <div class="grid grid-3">
+    <article class="stat-card"><div class="label">Студентов всего</div><div class="value">{{ students_total }}</div></article>
+    <article class="stat-card"><div class="label">Активных студентов</div><div class="value">{{ students_active }}</div></article>
+    <article class="stat-card"><div class="label">Кураторов</div><div class="value">{{ curators_total }}</div></article>
+    <article class="stat-card"><div class="label">Активных групп</div><div class="value">{{ groups_active }}</div></article>
+    <article class="stat-card"><div class="label">Специальностей</div><div class="value">{{ specialties_total }}</div></article>
+    <article class="stat-card"><div class="label">Активных вакансий</div><div class="value">{{ vacancies_active }}</div></article>
+    <article class="stat-card"><div class="label">Активных курсов</div><div class="value">{{ courses_active }}</div></article>
+    <article class="stat-card"><div class="label">Откликов</div><div class="value">{{ responses_total }}</div></article>
+    <article class="stat-card"><div class="label">Записей на курсы</div><div class="value">{{ registrations_total }}</div></article>
+  </div>
+</section>
+
+<section class="section card">
+  <h2>Аналитика</h2>
   <div class="grid grid-2">
     <div class="list-item">
-      <h3>Вакансии</h3>
-      <p class="muted">{{ STATUS_LABELS.active }}: {{ vacancy_summary.active }} • {{ STATUS_LABELS.hidden }}: {{ vacancy_summary.hidden }} • {{ STATUS_LABELS.archive }}: {{ vacancy_summary.archive }}</p>
+      <h3>Студенты по статусам</h3>
+      <canvas id="studentsStatusChart" height="220"></canvas>
+      <p id="studentsStatusEmpty" class="muted" style="display:none;">Недостаточно данных для отображения.</p>
     </div>
     <div class="list-item">
-      <h3>Курсы</h3>
-      <p class="muted">{{ STATUS_LABELS.active }}: {{ course_summary.active }} • {{ STATUS_LABELS.hidden }}: {{ course_summary.hidden }} • {{ STATUS_LABELS.archive }}: {{ course_summary.archive }}</p>
+      <h3>Вакансии по статусам</h3>
+      <canvas id="vacancyStatusChart" height="220"></canvas>
+      <p id="vacancyStatusEmpty" class="muted" style="display:none;">Недостаточно данных для отображения.</p>
     </div>
+    <div class="list-item">
+      <h3>Курсы по статусам</h3>
+      <canvas id="courseStatusChart" height="220"></canvas>
+      <p id="courseStatusEmpty" class="muted" style="display:none;">Недостаточно данных для отображения.</p>
+    </div>
+    <div class="list-item">
+      <h3>Студенты по специальностям</h3>
+      <canvas id="specialtyStudentsChart" height="220"></canvas>
+      <p id="specialtyStudentsEmpty" class="muted" style="display:none;">Недостаточно данных для отображения.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section card">
+  <h2>Требует внимания</h2>
+  <div class="row-list">
+    {% if students_without_group > 0 %}<div class="list-item"><h3>Студенты без группы</h3><p class="muted">{{ students_without_group }}</p></div>{% endif %}
+    {% if groups_without_curator > 0 %}<div class="list-item"><h3>Группы без куратора</h3><p class="muted">{{ groups_without_curator }}</p></div>{% endif %}
+    {% if portfolio_pending_total > 0 %}<div class="list-item"><h3>Записи портфолио на проверке</h3><p class="muted">{{ portfolio_pending_total }}</p></div>{% endif %}
+    {% if offline_full_courses > 0 %}<div class="list-item"><h3>Курсы без свободных мест</h3><p class="muted">{{ offline_full_courses }}</p></div>{% endif %}
+    {% if inactive_users_total > 0 %}<div class="list-item"><h3>Неактивные пользователи</h3><p class="muted">{{ inactive_users_total }}</p></div>{% endif %}
+    {% if students_without_group == 0 and groups_without_curator == 0 and portfolio_pending_total == 0 and offline_full_courses == 0 and inactive_users_total == 0 %}
+      <p class="muted">Критических задач сейчас нет.</p>
+    {% endif %}
   </div>
 </section>
 
@@ -36,19 +102,81 @@
     <h2>Последние студенты</h2>
     {% for student in latest_students %}
       <div class="list-item"><h3>{{ student.full_name }}</h3><p class="muted">{{ student.group|default:'—' }} • {{ student.date_joined|date:'d.m.Y' }}</p></div>
-    {% empty %}<p class="muted">Студенты пока не добавлены.</p>{% endfor %}
+    {% empty %}<p class="muted">Данных пока нет.</p>{% endfor %}
   </div>
   <div class="card">
     <h2>Последние вакансии</h2>
     {% for vacancy in latest_vacancies %}
       <div class="list-item"><h3>{{ vacancy.title }}</h3><p class="muted">{{ vacancy.company }} • {{ vacancy.created_at|date:'d.m.Y' }}</p></div>
-    {% empty %}<p class="muted">Вакансий пока нет.</p>{% endfor %}
+    {% empty %}<p class="muted">Данных пока нет.</p>{% endfor %}
   </div>
   <div class="card">
     <h2>Последние курсы</h2>
     {% for course in latest_courses %}
       <div class="list-item"><h3>{{ course.title }}</h3><p class="muted">{{ KIND_LABELS|dict_get:course.kind }} • {{ course.created_at|date:'d.m.Y' }}</p></div>
-    {% empty %}<p class="muted">Курсов пока нет.</p>{% endfor %}
+    {% empty %}<p class="muted">Данных пока нет.</p>{% endfor %}
   </div>
 </section>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+(function () {
+  function renderDoughnut(canvasId, emptyId, labels, values, colors) {
+    const sum = values.reduce((a, b) => a + b, 0);
+    if (!sum) {
+      document.getElementById(canvasId).style.display = 'none';
+      document.getElementById(emptyId).style.display = 'block';
+      return;
+    }
+    new Chart(document.getElementById(canvasId), {
+      type: 'doughnut',
+      data: { labels: labels, datasets: [{ data: values, backgroundColor: colors, borderWidth: 1 }] },
+      options: { plugins: { legend: { position: 'bottom' } }, responsive: true, maintainAspectRatio: false }
+    });
+  }
+
+  renderDoughnut('studentsStatusChart', 'studentsStatusEmpty',
+    ['Обучаются', 'Выпускники', 'Неактивные'],
+    {{ student_status_chart_json|safe }},
+    ['#3d8bff', '#7bb6ff', '#c7d8ef']
+  );
+
+  renderDoughnut('vacancyStatusChart', 'vacancyStatusEmpty',
+    ['Активно', 'Скрыто', 'Архив'],
+    {{ vacancy_status_chart_json|safe }},
+    ['#1e66d0', '#8fb3e8', '#d7e5f8']
+  );
+
+  renderDoughnut('courseStatusChart', 'courseStatusEmpty',
+    ['Активно', 'Скрыто', 'Архив'],
+    {{ course_status_chart_json|safe }},
+    ['#2c7be5', '#9cc4ff', '#dceaff']
+  );
+
+  const specialtyValues = {{ specialty_chart_values_json|safe }};
+  if (!specialtyValues.length || specialtyValues.reduce((a,b)=>a+b,0) === 0) {
+    document.getElementById('specialtyStudentsChart').style.display = 'none';
+    document.getElementById('specialtyStudentsEmpty').style.display = 'block';
+  } else {
+    new Chart(document.getElementById('specialtyStudentsChart'), {
+      type: 'bar',
+      data: {
+        labels: {{ specialty_chart_labels_json|safe }},
+        datasets: [{
+          label: 'Студенты',
+          data: specialtyValues,
+          backgroundColor: '#3d8bff',
+          borderRadius: 8,
+        }],
+      },
+      options: {
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },
+        responsive: true,
+        maintainAspectRatio: false,
+      },
+    });
+  }
+})();
+</script>
 {% endblock %}

@@ -2,6 +2,18 @@
 
 Продуктовая версия дипломного проекта «Центр карьеры ИРКПО» с ролями student/curator/admin, электронным портфолио, резюме, вакансиями и курсами.
 
+## Учебная структура (актуально)
+- `Specialty` — код специальности, название и буквенный код (например, `44.02.02` + `Н`).
+- `StudyGroup` — конкретная учебная группа/подгруппа (например, `Н121/1`), связана со специальностью и куратором.
+- `User(role=student)` — закреплён за конкретной `study_group`.
+- Куратор видит студентов только тех групп, где он назначен куратором.
+- Для студента действует учебный статус: `Обучается` / `Выпускник` / `Неактивен`.
+- В `adminpanel` доступны страницы:
+  - `accounts/admin/academic-structure/` — общая страница учебной структуры;
+  - `accounts/admin/specialties/` — управление специальностями;
+  - `accounts/admin/groups/` — управление группами;
+  - `accounts/admin/students/import/` — массовый CSV-импорт студентов (`full_name,email,password,group`).
+
 ## Стек
 - Python 3.12
 - Django 5
@@ -29,6 +41,7 @@ docker compose up --build
 docker compose run --rm web python manage.py makemigrations
 docker compose run --rm web python manage.py migrate
 ```
+После `git pull` обязательно выполнить `python manage.py migrate`.
 
 ## Суперпользователь
 ```bash
@@ -38,6 +51,13 @@ docker compose run --rm web python manage.py createsuperuser
 ## Seed-данные
 ```bash
 docker compose run --rm web python manage.py seed_demo_data
+docker compose run --rm web python manage.py seed_demo_data --clear
+```
+
+## Перевод групп на новый учебный год
+```bash
+docker compose run --rm web python manage.py promote_groups --dry-run
+docker compose run --rm web python manage.py promote_groups --apply
 ```
 
 ## Тестовые аккаунты

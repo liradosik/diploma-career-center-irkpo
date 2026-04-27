@@ -4,7 +4,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from apps.courses.models import Course
 from apps.vacancies.models import Vacancy
 
-from .models import StudentProfile, StudyGroup, User
+from .models import Specialty, StudentProfile, StudyGroup, User
 
 
 RUS_STATUS_CHOICES = [
@@ -39,6 +39,15 @@ class UserStudentForm(forms.ModelForm):
         fields = ('full_name', 'group', 'specialty', 'admission_year')
 
 
+def sync_student_with_group(user, study_group):
+    user.study_group = study_group
+    if study_group:
+        user.group = study_group.name
+        user.specialty = study_group.specialty_name
+        user.admission_year = study_group.admission_year
+        user.curator = study_group.curator
+
+
 class AdminStudentCreateForm(forms.ModelForm):
     password = forms.CharField(
         label='Временный пароль',
@@ -61,18 +70,19 @@ class AdminStudentCreateForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['study_group'].queryset = StudyGroup.objects.select_related('curator').order_by('name')
+        self.fields['study_group'].queryset = (
+            StudyGroup.objects.filter(is_active=True).select_related('curator', 'specialty_ref').order_by('name')
+        )
+        self.fields['study_group'].required = True
+        self.fields['study_group'].empty_label = 'Выберите группу студента'
+        self.fields['study_group'].widget.attrs['data-placeholder'] = 'Выберите группу студента'
 
     def save(self, commit=True):
         user = super().save(commit=False)
         user.role = User.Role.STUDENT
+        user.academic_status = User.AcademicStatus.STUDYING
         user.set_password(self.cleaned_data['password'])
-        group = self.cleaned_data.get('study_group')
-        if group:
-            user.group = group.name
-            user.specialty = group.specialty
-            user.admission_year = group.admission_year
-            user.curator = group.curator
+        sync_student_with_group(user, self.cleaned_data.get('study_group'))
         if commit:
             user.save()
         return user
@@ -81,26 +91,26 @@ class AdminStudentCreateForm(forms.ModelForm):
 class AdminStudentUpdateForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ('full_name', 'email', 'study_group', 'is_active')
+        fields = ('full_name', 'email', 'study_group', 'academic_status', 'is_active')
         labels = {
             'full_name': 'ФИО',
             'email': 'Email',
             'study_group': 'Учебная группа',
+            'academic_status': 'Учебный статус',
             'is_active': 'Активен',
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['study_group'].queryset = StudyGroup.objects.select_related('curator').order_by('name')
+        self.fields['study_group'].queryset = (
+            StudyGroup.objects.filter(is_active=True).select_related('curator', 'specialty_ref').order_by('name')
+        )
+        self.fields['study_group'].empty_label = 'Выберите группу студента'
+        self.fields['study_group'].widget.attrs['data-placeholder'] = 'Выберите группу студента'
 
     def save(self, commit=True):
         user = super().save(commit=False)
-        group = self.cleaned_data.get('study_group')
-        if group:
-            user.group = group.name
-            user.specialty = group.specialty
-            user.admission_year = group.admission_year
-            user.curator = group.curator
+        sync_student_with_group(user, self.cleaned_data.get('study_group'))
         if commit:
             user.save()
         return user
@@ -197,3 +207,77 @@ class AdminCourseForm(forms.ModelForm):
         self.fields['status'].choices = RUS_STATUS_CHOICES
         self.fields['kind'].choices = RUS_KIND_CHOICES
         self.fields['format_type'].choices = RUS_FORMAT_CHOICES
+
+
+class AdminSpecialtyForm(forms.ModelForm):
+    class Meta:
+        model = Specialty
+        fields = ('code', 'name', 'letter_code', 'is_active')
+        labels = {
+            'code': 'Код специальности',
+            'name': 'Название/профиль',
+            'letter_code': 'Буквенный код группы',
+            'is_active': 'Активна',
+        }
+        widgets = {
+            'code': forms.TextInput(attrs={'placeholder': 'Например, 44.02.02'}),
+            'name': forms.TextInput(attrs={'placeholder': 'Например, Преподавание в начальных классах'}),
+            'letter_code': forms.TextInput(attrs={'placeholder': 'Например, Н'}),
+        }
+
+    def clean_letter_code(self):
+        return self.cleaned_data['letter_code'].strip().upper()
+
+    def clean(self):
+        cleaned_data = super().clean()
+        code = cleaned_data.get('code')
+        letter_code = cleaned_data.get('letter_code')
+        if code and letter_code:
+            qs = Specialty.objects.filter(code=code, letter_code=letter_code)
+            if self.instance.pk:
+                qs = qs.exclude(pk=self.instance.pk)
+            if qs.exists():
+                raise forms.ValidationError('Пара «код специальности + буквенный код группы» должна быть уникальной.')
+        return cleaned_data
+
+
+class AdminStudyGroupForm(forms.ModelForm):
+    class Meta:
+        model = StudyGroup
+        fields = ('name', 'specialty_ref', 'admission_year', 'course_number', 'curator', 'is_active')
+        labels = {
+            'name': 'Название группы',
+            'specialty_ref': 'Специальность',
+            'admission_year': 'Год поступления',
+            'course_number': 'Курс',
+            'curator': 'Куратор',
+            'is_active': 'Активна',
+        }
+        widgets = {
+            'name': forms.TextInput(attrs={'placeholder': 'Например, Н-121/1 или И-422'}),
+            'admission_year': forms.NumberInput(attrs={'placeholder': 'Например, 2024'}),
+            'course_number': forms.NumberInput(attrs={'placeholder': '1, 2, 3 или 4', 'min': 1, 'max': 4}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['specialty_ref'].queryset = Specialty.objects.filter(is_active=True).order_by('code', 'name')
+        self.fields['curator'].queryset = User.objects.filter(role=User.Role.CURATOR, is_active=True).order_by('full_name')
+        self.fields['curator'].empty_label = 'Выберите куратора группы'
+        self.fields['name'].required = False
+
+    def clean_name(self):
+        name = (self.cleaned_data.get('name') or '').strip()
+        if name:
+            return name
+
+        specialty = self.cleaned_data.get('specialty_ref')
+        admission_year = self.cleaned_data.get('admission_year')
+        course_number = self.cleaned_data.get('course_number')
+        if specialty and admission_year and course_number:
+            return f'{specialty.letter_code}{course_number}{str(admission_year)[-2:]}'
+        raise forms.ValidationError('Укажите название группы или заполните специальность, курс и год поступления для автозаполнения.')
+
+
+class StudentImportForm(forms.Form):
+    csv_file = forms.FileField(label='CSV файл со студентами')
