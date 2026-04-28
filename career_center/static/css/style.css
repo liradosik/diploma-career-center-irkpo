@@ -1374,3 +1374,913 @@ textarea { min-height: 110px; }
 .admin-student-form .account-access-box label {
   margin: 0;
 }
+/* === Fix student danger card width === */
+
+.admin-danger-card {
+  align-self: stretch;
+}
+
+.admin-danger-grid-single {
+  display: block;
+}
+
+.admin-danger-grid-single .admin-danger-delete,
+.admin-danger-card .admin-danger-delete {
+  width: 100%;
+  max-width: none;
+}
+
+.admin-danger-card .admin-card-form {
+  max-width: 520px;
+}
+
+.admin-danger-card input {
+  width: 100%;
+}
+
+.admin-danger-card .btn-danger {
+  width: 100%;
+  justify-content: center;
+}
+/* === Student list badges === */
+
+.student-access-badge,
+.student-academic-badge {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  min-height: 28px;
+  padding: 6px 11px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.student-access-badge.is-open {
+  color: #0a8f4b;
+  background: #eaf8f1;
+  border: 1px solid #cceedd;
+}
+
+.student-access-badge.is-closed {
+  color: #b42318;
+  background: #fdeeee;
+  border: 1px solid #f5caca;
+}
+
+.student-academic-badge {
+  color: #1e66d0;
+  background: #eef6ff;
+  border: 1px solid #d7e9ff;
+}
+/* === Final fix: student delete card === */
+
+.admin-danger-card .admin-danger-grid.admin-danger-grid-single {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+
+.admin-danger-card .admin-danger-grid.admin-danger-grid-single .admin-danger-delete {
+  width: 100%;
+  max-width: none;
+}
+
+.admin-danger-card .admin-danger-delete .admin-card-form {
+  max-width: 620px;
+}
+
+.admin-danger-card .admin-danger-delete input,
+.admin-danger-card .admin-danger-delete .btn-danger {
+  width: 100%;
+}
+
+.admin-danger-card .admin-danger-delete .btn-danger {
+  justify-content: center;
+}
+/* === Fix horizontal scroll on admin student detail === */
+
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.layout-dashboard,
+.dashboard-content,
+.admin-student-layout,
+.admin-student-left,
+.admin-student-right,
+.admin-info-card,
+.hero.admin-profile-hero {
+  min-width: 0;
+}
+
+.admin-student-layout {
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+}
+
+.admin-info-card,
+.admin-danger-card,
+.admin-danger-delete,
+.account-access-box {
+  max-width: 100%;
+}
+
+.admin-info-card input,
+.admin-info-card select,
+.admin-info-card textarea,
+.admin-danger-card input {
+  min-width: 0;
+  max-width: 100%;
+}
+
+@media (max-width: 1350px) {
+  .admin-student-layout {
+    grid-template-columns: 1fr;
+  }
+}
+/* === Fixed admin sidebar === */
+
+:root {
+  --admin-sidebar-width: 286px;
+}
+
+.layout-dashboard {
+  display: block;
+  min-height: 100vh;
+}
+
+.sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 50;
+  width: var(--admin-sidebar-width);
+  height: 100dvh;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.sidebar-main {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 0;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.sidebar-main::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+
+.sidebar-footer {
+  flex: 0 0 auto;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #e6eef8;
+}
+
+.dashboard-content {
+  width: calc(100% - var(--admin-sidebar-width));
+  max-width: none;
+  margin-left: var(--admin-sidebar-width);
+}
+
+html,
+body {
+  overflow-x: hidden;
+}
+
+@media (max-width: 1024px) {
+  .layout-dashboard {
+    display: block;
+  }
+
+  .sidebar {
+    position: static;
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+  }
+
+  .sidebar-main {
+    overflow: visible;
+  }
+
+  .dashboard-content {
+    width: 100%;
+    margin-left: 0;
+  }
+}
+/* === Admin students full redesign === */
+
+.admin-page-hero {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.admin-hero-action {
+  flex: 0 0 auto;
+}
+
+.admin-students-page {
+  display: grid;
+  gap: 22px;
+}
+
+.admin-create-card,
+.admin-list-card,
+.admin-import-card,
+.admin-import-help,
+.admin-import-report {
+  border-radius: 28px;
+}
+
+.admin-card-head {
+  margin-bottom: 20px;
+}
+
+.admin-card-head h2 {
+  margin-bottom: 6px;
+}
+
+.admin-card-head p {
+  max-width: 760px;
+  line-height: 1.45;
+}
+
+.admin-card-head-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.admin-create-student-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.form-field {
+  display: grid;
+  gap: 8px;
+}
+
+.form-field-wide {
+  grid-column: 1 / -1;
+}
+
+.form-field label {
+  margin: 0;
+  color: #182b42;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.form-note {
+  display: grid;
+  gap: 4px;
+  padding: 16px 18px;
+  border: 1px solid #dceaff;
+  border-radius: 20px;
+  background: #f7fbff;
+}
+
+.form-note strong {
+  color: #18304d;
+}
+
+.form-note span {
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.admin-form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.admin-filter-panel {
+  display: grid;
+  grid-template-columns: 1.25fr repeat(3, minmax(160px, 1fr));
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.admin-filter-panel button {
+  min-height: 46px;
+}
+
+.admin-student-list {
+  display: grid;
+  gap: 12px;
+}
+
+.admin-student-row {
+  display: grid;
+  grid-template-columns: minmax(260px, 1.35fr) minmax(230px, 1fr) minmax(190px, 0.85fr) minmax(150px, 0.7fr) auto;
+  gap: 18px;
+  align-items: center;
+  padding: 16px;
+  border: 1px solid #e1e9f5;
+  border-radius: 22px;
+  background: #fff;
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+
+.admin-student-row:hover {
+  transform: translateY(-1px);
+  border-color: #cfe1fb;
+  box-shadow: 0 14px 34px rgba(30, 70, 130, 0.07);
+}
+
+.admin-student-main {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.admin-student-avatar {
+  display: grid;
+  place-items: center;
+  flex: 0 0 48px;
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  color: #fff;
+  font-size: 19px;
+  font-weight: 900;
+  background: linear-gradient(135deg, var(--primary), var(--primary-2));
+  box-shadow: 0 10px 24px rgba(30, 102, 208, 0.16);
+}
+
+.admin-student-name {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.admin-student-name strong {
+  color: #172536;
+  font-size: 16px;
+  line-height: 1.25;
+}
+
+.admin-student-name span {
+  color: var(--muted);
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.admin-student-cell {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.admin-student-cell .cell-label {
+  color: #8a9bb3;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.admin-student-cell strong {
+  color: #26384e;
+  line-height: 1.3;
+}
+
+.admin-student-cell small {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.3;
+}
+
+.student-status-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 7px;
+}
+
+.student-access-badge,
+.student-academic-badge {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  min-height: 28px;
+  padding: 6px 11px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.student-access-badge.is-open {
+  color: #0a8f4b;
+  background: #eaf8f1;
+  border: 1px solid #cceedd;
+}
+
+.student-access-badge.is-closed {
+  color: #b42318;
+  background: #fdeeee;
+  border: 1px solid #f5caca;
+}
+
+.student-academic-badge {
+  color: #1e66d0;
+  background: #eef6ff;
+  border: 1px solid #d7e9ff;
+}
+
+.admin-row-action {
+  min-width: 112px;
+}
+
+.admin-empty-state {
+  padding: 28px;
+  border: 1px dashed #cfe1fb;
+  border-radius: 22px;
+  background: #f8fbff;
+}
+
+.admin-empty-state strong {
+  display: block;
+  margin-bottom: 6px;
+  color: #18304d;
+  font-size: 18px;
+}
+
+.admin-empty-state p {
+  color: var(--muted);
+}
+
+/* === Admin CSV import redesign === */
+
+.admin-import-layout {
+  display: grid;
+  grid-template-columns: minmax(420px, 0.9fr) minmax(360px, 0.7fr);
+  gap: 22px;
+  align-items: start;
+}
+
+.admin-import-card h2,
+.admin-import-help h2 {
+  margin-bottom: 10px;
+}
+
+.admin-import-form {
+  display: grid;
+  gap: 18px;
+  margin-top: 20px;
+}
+
+.admin-import-form input[type="file"] {
+  padding: 14px;
+  background: #fbfdff;
+}
+
+.csv-format-box,
+.csv-example {
+  display: grid;
+  gap: 8px;
+  margin: 16px 0;
+  padding: 16px;
+  border: 1px solid #dceaff;
+  border-radius: 18px;
+  background: #f7fbff;
+}
+
+.csv-format-box code,
+.csv-example code {
+  display: block;
+  color: #18304d;
+  font-size: 14px;
+  line-height: 1.45;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.import-report-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(160px, 1fr));
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.import-report-item {
+  display: grid;
+  gap: 6px;
+  padding: 18px;
+  border-radius: 20px;
+  border: 1px solid #e1e9f5;
+  background: #fff;
+}
+
+.import-report-item span {
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.import-report-item strong {
+  color: var(--primary);
+  font-size: 34px;
+  line-height: 1;
+}
+
+.import-errors {
+  padding: 18px;
+  border-radius: 20px;
+  border: 1px solid #f3c4c4;
+  background: #fff7f7;
+}
+
+.import-errors h3 {
+  margin-bottom: 10px;
+  color: #9f1f1f;
+}
+
+.import-errors ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.import-errors li {
+  color: #7a2c2c;
+  line-height: 1.45;
+}
+
+@media (max-width: 1280px) {
+  .admin-filter-panel {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-student-row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .admin-row-action {
+    width: 100%;
+  }
+
+  .admin-import-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .admin-page-hero {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .admin-create-student-form,
+  .admin-filter-panel,
+  .admin-student-row,
+  .import-report-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-form-actions .btn,
+  .admin-row-action,
+  .admin-hero-action {
+    width: 100%;
+  }
+}
+/* === Students page clean redesign === */
+
+.admin-students-hero .admin-hero-action {
+  display: none;
+}
+
+.admin-create-student-form {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px 20px;
+}
+
+.admin-create-student-form .form-field-wide {
+  grid-column: 1 / -1;
+}
+
+.admin-create-student-form .form-field label,
+.admin-student-filters label {
+  font-size: 14px;
+  font-weight: 800;
+  color: #172536;
+}
+
+.admin-create-card .admin-card-head {
+  margin-bottom: 18px;
+}
+
+.admin-create-card .admin-card-head p,
+.admin-list-card .admin-card-head p {
+  display: none;
+}
+
+.admin-create-card {
+  max-width: 980px;
+}
+
+.admin-create-card .form-note {
+  padding: 14px 16px;
+  border-radius: 18px;
+}
+
+.admin-create-card .form-note strong {
+  font-size: 14px;
+}
+
+.admin-create-card .form-note span {
+  font-size: 14px;
+}
+
+.admin-form-actions {
+  margin-top: 4px;
+}
+
+.admin-student-filters {
+  grid-template-columns: 1.25fr repeat(3, minmax(150px, 1fr));
+  gap: 10px;
+  padding: 14px;
+  margin-bottom: 20px;
+  border: 1px solid #e1e9f5;
+  border-radius: 22px;
+  background: #f8fbff;
+}
+
+.admin-student-filters input,
+.admin-student-filters select {
+  min-height: 44px;
+  border-radius: 16px;
+  background-color: #fff;
+}
+
+.admin-student-filters button {
+  min-height: 44px;
+  border-radius: 16px;
+}
+
+.admin-student-row {
+  grid-template-columns: minmax(280px, 1.35fr) minmax(230px, 1fr) minmax(190px, 0.85fr) minmax(160px, 0.65fr) auto;
+  padding: 16px 18px;
+  transform: none !important;
+  transition: border-color .15s ease, background-color .15s ease;
+}
+
+.admin-student-row:hover {
+  transform: none !important;
+  box-shadow: none !important;
+  background: #fbfdff;
+  border-color: #cfe1fb;
+}
+
+.admin-student-avatar {
+  border-radius: 18px;
+}
+
+.student-status-plain {
+  display: grid;
+  gap: 8px;
+  align-items: start;
+  justify-items: start;
+}
+
+.student-status-text {
+  color: #5f6f84;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.student-access-badge,
+.student-academic-badge {
+  min-height: 26px;
+  padding: 5px 10px;
+  font-size: 12px;
+}
+
+.student-access-badge.is-open {
+  color: #0a8f4b;
+  background: #eaf8f1;
+  border: 1px solid #cceedd;
+}
+
+.student-access-badge.is-closed {
+  color: #b42318;
+  background: #fdeeee;
+  border: 1px solid #f5caca;
+}
+
+.admin-row-action {
+  min-width: 108px;
+}
+
+/* === CSV import custom file input === */
+
+.custom-file-field input[type="file"] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.custom-file-upload {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  min-height: 46px;
+  padding: 0 22px;
+  border-radius: 16px;
+  border: 1px solid #cfe1fb;
+  background: #f7fbff;
+  color: #0d5ed7;
+  font-weight: 900;
+  cursor: pointer;
+  transition: background-color .15s ease, border-color .15s ease;
+}
+
+.custom-file-upload:hover {
+  background: #eef6ff;
+  border-color: #b8d4fa;
+}
+
+.custom-file-upload span {
+  pointer-events: none;
+}
+
+.admin-import-form input[type="file"] {
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+@media (max-width: 1280px) {
+  .admin-student-filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-student-row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .admin-row-action {
+    width: 100%;
+  }
+}
+
+@media (max-width: 760px) {
+  .admin-create-student-form,
+  .admin-student-filters,
+  .admin-student-row {
+    grid-template-columns: 1fr;
+  }
+}
+/* === Students page final polish === */
+
+.admin-create-card {
+  max-width: none;
+}
+
+.admin-create-student-form {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.admin-create-student-form .form-note {
+  max-width: none;
+}
+.student-status-plain {
+  display: grid;
+  gap: 6px;
+  align-items: start;
+  justify-items: start;
+}
+
+.student-status-text {
+  color: #64748b;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.student-access-badge {
+  min-height: 26px;
+  padding: 5px 11px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 850;
+}
+.custom-file-upload {
+  font-weight: 700;
+}
+
+.custom-file-upload span {
+  font-weight: 700;
+}
+.csv-example code,
+.csv-format-box code {
+  white-space: nowrap;
+  overflow-x: auto;
+}
+/* === CSV import layout balance === */
+
+.admin-import-layout {
+  grid-template-columns: minmax(380px, 0.8fr) minmax(520px, 1.2fr);
+  align-items: stretch;
+}
+
+.admin-import-card,
+.admin-import-help {
+  height: 100%;
+}
+
+.admin-import-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.admin-import-form {
+  max-width: 520px;
+}
+
+.admin-import-form .btn-primary {
+  width: 100%;
+}
+
+.admin-import-help {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.csv-example code,
+.csv-format-box code {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+@media (max-width: 1180px) {
+  .admin-import-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-import-form {
+    max-width: none;
+  }
+}
+/* === Selected CSV file indicator === */
+
+.selected-file-box {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  min-height: 42px;
+  padding: 10px 14px;
+  border-radius: 16px;
+  border: 1px dashed #cfe1fb;
+  background: #f8fbff;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.selected-file-box.has-file {
+  border-style: solid;
+  border-color: #cceedd;
+  background: #f3fbf7;
+}
+
+.selected-file-box strong {
+  color: #18304d;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.selected-file-label {
+  color: #64748b;
+  font-weight: 700;
+}
+
+.selected-file-success {
+  color: #0a8f4b;
+}

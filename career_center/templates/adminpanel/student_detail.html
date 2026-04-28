@@ -14,11 +14,15 @@
 
     <div class="admin-profile-tags">
       <span>{{ student.study_group.name|default:student.group|default:'Группа не выбрана' }}</span>
-      <span>{{ student.get_academic_status_display }}</span>
+
+      <span class="student-academic-badge">
+        {{ student.get_academic_status_display }}
+      </span>
+
       {% if student.is_active %}
-        <span class="admin-status admin-status-active">Доступ открыт</span>
+        <span class="student-access-badge is-open">Доступ открыт</span>
       {% else %}
-        <span class="admin-status admin-status-inactive">Доступ закрыт</span>
+        <span class="student-access-badge is-closed">Доступ закрыт</span>
       {% endif %}
     </div>
   </div>
@@ -100,9 +104,6 @@
 
         <label>Новый временный пароль</label>
         <input name="temp_password" type="text" required>
-
-        <p class="muted">После сброса администратор передаёт временный пароль пользователю.</p>
-
         <button class="btn btn-primary" type="submit">Сбросить пароль</button>
       </form>
     </div>
@@ -110,68 +111,61 @@
 
   <div class="admin-student-right">
     <div class="card admin-info-card">
-  <h2>Основные данные</h2>
+      <h2>Основные данные</h2>
 
-  <form method="post" class="form-grid admin-student-form">
-    {% csrf_token %}
-    <input type="hidden" name="action" value="update_profile">
+      <form method="post" class="form-grid admin-student-form">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="update_profile">
 
-    <p>
-      <label for="{{ form.full_name.id_for_label }}">ФИО:</label>
-      {{ form.full_name }}
-      {{ form.full_name.errors }}
-    </p>
+        <p>
+          <label for="{{ form.full_name.id_for_label }}">ФИО:</label>
+          {{ form.full_name }}
+          {{ form.full_name.errors }}
+        </p>
 
-    <p>
-      <label for="{{ form.email.id_for_label }}">Email:</label>
-      {{ form.email }}
-      {{ form.email.errors }}
-    </p>
+        <p>
+          <label for="{{ form.email.id_for_label }}">Email:</label>
+          {{ form.email }}
+          {{ form.email.errors }}
+        </p>
 
-    <p>
-      <label for="{{ form.study_group.id_for_label }}">Учебная группа:</label>
-      {{ form.study_group }}
-      {{ form.study_group.errors }}
-    </p>
+        <p>
+          <label for="{{ form.study_group.id_for_label }}">Учебная группа:</label>
+          {{ form.study_group }}
+          {{ form.study_group.errors }}
+        </p>
 
-    <p>
-      <label for="{{ form.academic_status.id_for_label }}">Учебный статус:</label>
-      {{ form.academic_status }}
-      {{ form.academic_status.errors }}
-    </p>
+        <p>
+          <label for="{{ form.academic_status.id_for_label }}">Учебный статус:</label>
+          {{ form.academic_status }}
+          {{ form.academic_status.errors }}
+        </p>
 
-    <div class="full account-access-box">
-      <label class="account-access-toggle">
-        {{ form.is_active }}
-        <span class="account-access-switch"></span>
+        <div class="full account-access-box">
+          <label class="account-access-toggle">
+            {{ form.is_active }}
+            <span class="account-access-switch"></span>
 
-        <span class="account-access-text">
-          <strong>Доступ к аккаунту</strong>
-          <small>
-            Если выключить доступ, студент останется в базе, но не сможет войти в личный кабинет.
-          </small>
-        </span>
-      </label>
+            <span class="account-access-text">
+              <p>Доступ к аккаунту</p>
+              <small>Если выключить доступ, студент останется в базе, но не сможет войти в личный кабинет.</small>
+            </span>
+          </label>
 
-      {{ form.is_active.errors }}
+          {{ form.is_active.errors }}
+        </div>
+
+        <div class="full">
+          <button class="btn btn-primary" type="submit">Сохранить</button>
+        </div>
+      </form>
     </div>
-
-    <p class="full muted">
-      Основное поле учебной структуры — «Учебная группа». Остальные данные синхронизируются автоматически.
-    </p>
-
-    <div class="full">
-      <button class="btn btn-primary" type="submit">Сохранить</button>
-    </div>
-  </form>
-</div>
 
     <div class="card admin-info-card admin-danger-card">
-      <h2>Опасные действия</h2>
+      <h2>Удаление аккаунта</h2>
 
-      <div class="admin-danger-grid">
+      <div class="admin-danger-grid admin-danger-grid-single">
         <div class="admin-danger-block admin-danger-delete">
-          <h3>Удаление</h3>
           <p class="muted">Удаление требует подтверждения по email. Используйте только если запись действительно не нужна.</p>
 
           <form method="post" class="admin-card-form">

@@ -1,75 +1,148 @@
 {% extends 'base_dashboard.html' %}
 {% block title %}Студенты{% endblock %}
-{% block content %}
-<section class="hero"><div class="hero-kicker">Администрирование</div><h1>Студенты</h1><p>Управление студентами и контроль наполнения портфолио.</p></section>
 
-<section class="section card form-card">
-  <h2>Создать студента</h2>
-  <form method="post" class="form-grid">
-    {% csrf_token %}
-    <p class="full"><label>{{ form.full_name.label }}</label>{{ form.full_name }}</p>
-    <p class="full"><label>{{ form.email.label }}</label>{{ form.email }}</p>
-    <p><label>{{ form.password.label }}</label>{{ form.password }}</p>
-    <p class="full"><label>{{ form.study_group.label }}</label>{{ form.study_group }}</p>
-    <p class="full muted">Специальность, год поступления и куратор будут определены автоматически по выбранной учебной группе.</p>
-    <p class="full"><button class="btn btn-primary" type="submit">Создать</button></p>
-  </form>
-  <div class="inline-actions">
-    <a class="btn btn-link" href="{% url 'accounts:admin_student_import' %}">Массовый импорт CSV</a>
+{% block content %}
+<section class="hero admin-page-hero admin-students-hero">
+  <div>
+    <div class="hero-kicker">Администрирование</div>
+    <h1>Студенты</h1>
+    <p>Управление студентами и их учебной структурой.</p>
   </div>
 </section>
 
-<section class="section card">
-  <h2>Список студентов</h2>
-  <form method="get" class="filters">
-    <input name="q" placeholder="Поиск по ФИО/email" value="{{ request.GET.q }}">
-    <select name="group">
-      <option value="">Группа</option>
-      {% for g in filter_groups %}
-        <option value="{{ g.name }}" {% if request.GET.group == g.name %}selected{% endif %}>{{ g.name }}</option>
-      {% endfor %}
-    </select>
-    <select name="curator"><option value="">Куратор</option>{% for c in filter_curators %}<option value="{{ c.id }}" {% if request.GET.curator == c.id|stringformat:'s' %}selected{% endif %}>{{ c.full_name }}</option>{% endfor %}</select>
-    <select name="specialty">
-      <option value="">Специальность</option>
-      {% for s in filter_specialties %}
-        <option value="{{ s.name }}" {% if request.GET.specialty == s.name %}selected{% endif %}>{{ s.code }} • {{ s.name }}</option>
-      {% endfor %}
-    </select>
-    <select name="is_active">
-      <option value="">Доступ к аккаунту</option>
-      <option value="1" {% if is_active_filter == '1' %}selected{% endif %}>Доступ открыт</option>
-      <option value="0" {% if is_active_filter == '0' %}selected{% endif %}>Доступ закрыт</option>
-    </select>
-    <select name="academic_status">
-      <option value="">Учебный статус</option>
-      <option value="studying" {% if academic_status_filter == 'studying' %}selected{% endif %}>Обучаются</option>
-      <option value="academic_leave" {% if academic_status_filter == 'academic_leave' %}selected{% endif %}>Академический отпуск</option>
-      <option value="graduate" {% if academic_status_filter == 'graduate' %}selected{% endif %}>Выпускники</option>
-      <option value="inactive" {% if academic_status_filter == 'inactive' %}selected{% endif %}>Отчисленные</option>
-    </select>
-    <button class="btn btn-link" type="submit">Применить</button>
-  </form>
+<section class="section admin-students-page">
+  <div class="card admin-create-card">
+    <div class="admin-card-head">
+      <h2>Создать студента</h2>
+    </div>
 
-  <div class="row-list">
-    {% for student in students %}
-      <div class="row-item">
-        <div><strong>{{ student.full_name }}</strong><div class="muted">{{ student.email }}</div></div>
-        <div class="muted">{{ student.study_group.name|default:student.group|default:'—' }}<br>{{ student.study_group.specialty_ref.name|default:student.specialty|default:'—' }}</div>
-        <div class="muted">{{ student.study_group.curator.full_name|default:student.curator.full_name|default:'не назначен' }}</div>
-        <div class="muted">
-          {% if student.is_active %}
-            <span class="admin-status admin-status-active">Доступ открыт</span>
-          {% else %}
-            <span class="admin-status admin-status-inactive">Доступ закрыт</span>
-          {% endif %}
-          <br>{{ student.get_academic_status_display }}
-        </div>
-        <a class="btn btn-link" href="{% url 'accounts:admin_student_detail' student.id %}">Открыть</a>
+    <form method="post" class="admin-create-student-form">
+      {% csrf_token %}
+
+      <div class="form-field">
+        <label for="{{ form.full_name.id_for_label }}">ФИО</label>
+        {{ form.full_name }}
+        {{ form.full_name.errors }}
       </div>
-    {% empty %}
-      <p class="muted">Студенты не найдены.</p>
-    {% endfor %}
+
+      <div class="form-field">
+        <label for="{{ form.email.id_for_label }}">Email</label>
+        {{ form.email }}
+        {{ form.email.errors }}
+      </div>
+
+      <div class="form-field">
+        <label for="{{ form.password.id_for_label }}">Временный пароль</label>
+        {{ form.password }}
+        {{ form.password.errors }}
+      </div>
+
+      <div class="form-field">
+        <label for="{{ form.study_group.id_for_label }}">Учебная группа</label>
+        {{ form.study_group }}
+        {{ form.study_group.errors }}
+      </div>
+
+      <div class="form-note form-field-wide">
+        <strong>Данные подтянутся автоматически</strong>
+        <span>После выбора группы система определит специальность, год поступления и куратора.</span>
+      </div>
+
+      <div class="form-field-wide admin-form-actions">
+        <button class="btn btn-primary" type="submit">Создать студента</button>
+        <a class="btn btn-link" href="{% url 'accounts:admin_student_import' %}">Импорт CSV</a>
+      </div>
+    </form>
+  </div>
+
+  <div class="card admin-list-card">
+    <div class="admin-card-head">
+      <h2>Список студентов</h2>
+    </div>
+
+    <form method="get" class="admin-filter-panel admin-student-filters">
+      <input name="q" placeholder="ФИО или email" value="{{ request.GET.q }}">
+
+      <select name="group">
+        <option value="">Группа</option>
+        {% for g in filter_groups %}
+          <option value="{{ g.name }}" {% if request.GET.group == g.name %}selected{% endif %}>{{ g.name }}</option>
+        {% endfor %}
+      </select>
+
+      <select name="curator">
+        <option value="">Куратор</option>
+        {% for c in filter_curators %}
+          <option value="{{ c.id }}" {% if request.GET.curator == c.id|stringformat:'s' %}selected{% endif %}>{{ c.full_name }}</option>
+        {% endfor %}
+      </select>
+
+      <select name="specialty">
+        <option value="">Специальность</option>
+        {% for s in filter_specialties %}
+          <option value="{{ s.name }}" {% if request.GET.specialty == s.name %}selected{% endif %}>{{ s.code }} • {{ s.name }}</option>
+        {% endfor %}
+      </select>
+
+      <select name="is_active">
+        <option value="">Доступ</option>
+        <option value="1" {% if is_active_filter == '1' %}selected{% endif %}>Открыт</option>
+        <option value="0" {% if is_active_filter == '0' %}selected{% endif %}>Закрыт</option>
+      </select>
+
+      <select name="academic_status">
+        <option value="">Учебный статус</option>
+        <option value="studying" {% if academic_status_filter == 'studying' %}selected{% endif %}>Обучаются</option>
+        <option value="academic_leave" {% if academic_status_filter == 'academic_leave' %}selected{% endif %}>Академический отпуск</option>
+        <option value="graduate" {% if academic_status_filter == 'graduate' %}selected{% endif %}>Выпускники</option>
+        <option value="inactive" {% if academic_status_filter == 'inactive' %}selected{% endif %}>Отчисленные</option>
+      </select>
+
+      <button class="btn btn-link" type="submit">Применить</button>
+    </form>
+
+    <div class="admin-student-list">
+      {% for student in students %}
+        <article class="admin-student-row">
+          <div class="admin-student-main">
+            <div class="admin-student-avatar">
+              {{ student.full_name|default:student.email|slice:":1"|upper }}
+            </div>
+
+            <div class="admin-student-name">
+              <strong>{{ student.full_name }}</strong>
+              <span>{{ student.email }}</span>
+            </div>
+          </div>
+
+          <div class="admin-student-cell">
+            <span class="cell-label">Группа</span>
+            <strong>{{ student.study_group.name|default:student.group|default:'—' }}</strong>
+            <small>{{ student.study_group.specialty_ref.name|default:student.specialty|default:'—' }}</small>
+          </div>
+
+          <div class="admin-student-cell">
+            <span class="cell-label">Куратор</span>
+            <strong>{{ student.study_group.curator.full_name|default:student.curator.full_name|default:'не назначен' }}</strong>
+          </div>
+
+          <div class="student-status-plain">
+            <span class="student-status-text">
+              {{ student.get_academic_status_display }}
+            </span>
+          </div>
+
+          <a class="btn btn-link admin-row-action" href="{% url 'accounts:admin_student_detail' student.id %}">
+            Открыть
+          </a>
+        </article>
+      {% empty %}
+        <div class="admin-empty-state">
+          <strong>Студенты не найдены</strong>
+          <p>Попробуйте изменить фильтры или создать нового студента.</p>
+        </div>
+      {% endfor %}
+    </div>
   </div>
 </section>
 {% endblock %}
