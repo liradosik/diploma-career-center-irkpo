@@ -2,10 +2,8 @@
 {% block title %}Карточка специальности{% endblock %}
 
 {% block content %}
-<section class="hero admin-profile-hero group-profile-hero">
-  <div class="admin-profile-avatar">
-    {{ specialty.letter_code|default:specialty.code|slice:":1"|upper }}
-  </div>
+<section class="hero admin-profile-hero specialty-profile-hero">
+  
 
   <div class="admin-profile-info">
     <div class="hero-kicker">Специальность</div>
@@ -21,15 +19,15 @@
   </div>
 </section>
 
-<section class="section group-detail-stack">
-  <div class="card group-detail-card">
+<section class="section specialty-detail-stack">
+  <div class="card specialty-detail-card">
     <h2>Данные специальности</h2>
 
-    <form method="post" class="group-main-form">
+    <form method="post" class="specialty-detail-form">
       {% csrf_token %}
       <input type="hidden" name="action" value="update">
 
-      <div class="group-detail-fields">
+      <div class="specialty-detail-fields">
         <div class="form-field">
           <label for="{{ form.code.id_for_label }}">Код специальности</label>
           {{ form.code }}
@@ -42,13 +40,13 @@
           {{ form.letter_code.errors }}
         </div>
 
-        <div class="form-field">
+        <div class="form-field specialty-detail-name">
           <label for="{{ form.name.id_for_label }}">Название/профиль</label>
           {{ form.name }}
           {{ form.name.errors }}
         </div>
 
-        <div class="group-access-card group-access-card-compact">
+        <div class="group-access-card group-access-card-compact specialty-access-card">
           <label class="admin-switch admin-switch-small">
             {{ form.is_active }}
             <span class="admin-switch-ui"></span>
@@ -67,30 +65,32 @@
     </form>
   </div>
 
-  <div class="card group-detail-card">
+  <div class="card specialty-detail-card">
     <h2>Связанные группы</h2>
 
-    <div class="admin-related-list">
+    <div class="specialty-related-list">
       {% for group in groups %}
-        <article class="admin-related-row curator-group-row">
-          <div>
+        <article class="specialty-related-row">
+          <div class="specialty-related-main">
             <strong>{{ group.name }}</strong>
-            <span>Куратор: {{ group.curator.full_name|default:'Не назначен' }}</span>
+            <span>{{ group.curator.full_name|default:'Куратор не назначен' }}</span>
           </div>
 
-          <div>
-            <span class="cell-label">Курс</span>
-            <strong>{{ group.course_number|default:'—' }}</strong>
-          </div>
+          <div class="specialty-related-meta">
+            <div>
+              <span>Курс</span>
+              <strong>{{ group.course_number|default:'—' }}</strong>
+            </div>
 
-          <div>
-            <span class="cell-label">Год поступления</span>
-            <strong>{{ group.admission_year|default:'—' }}</strong>
-          </div>
+            <div>
+              <span>Год поступления</span>
+              <strong>{{ group.admission_year|default:'—' }}</strong>
+            </div>
 
-          <div>
-            <span class="cell-label">Студентов</span>
-            <strong>{{ group.students_count|default:0 }}</strong>
+            <div>
+              <span>Студентов</span>
+              <strong>{{ group.students_count|default:0 }}</strong>
+            </div>
           </div>
 
           <a class="btn btn-link" href="{% url 'accounts:admin_group_detail' group.id %}">Открыть</a>

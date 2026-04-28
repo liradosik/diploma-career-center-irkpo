@@ -1,50 +1,151 @@
 {% extends 'base_dashboard.html' %}
 {% load ui_extras %}
 {% block title %}Вакансии{% endblock %}
-{% block content %}
-<section class="hero"><div class="hero-kicker">Администрирование</div><h1>Вакансии</h1><p>Создание вакансий и управление публикацией.</p></section>
 
-<section class="section card form-card">
+{% block content %}
+<section class="hero">
+  <div class="hero-kicker">Администрирование</div>
+  <h1>Вакансии</h1>
+  <p>Создание вакансий и управление карьерными публикациями для студентов.</p>
+</section>
+
+<section class="section card admin-create-card vacancy-create-card">
   <h2>Создать вакансию</h2>
-  <form method="post" class="form-grid">
+
+  <form method="post" class="admin-form">
     {% csrf_token %}
-    <p class="full"><label>{{ form.title.label }}</label>{{ form.title }}</p>
-    <p class="full"><label>{{ form.company.label }}</label>{{ form.company }}</p>
-    <p class="full"><label>{{ form.description.label }}</label>{{ form.description }}</p>
-    <p><label>{{ form.employment_type.label }}</label>{{ form.employment_type }}</p>
-    <p><label>{{ form.format_type.label }}</label>{{ form.format_type }}</p>
-    <p><label>{{ form.direction.label }}</label>{{ form.direction }}</p>
-    <p><label>{{ form.status.label }}</label>{{ form.status }}</p>
-    <p class="full"><label>{{ form.responsibilities.label }}</label>{{ form.responsibilities }}</p>
-    <p class="full"><label>{{ form.requirements.label }}</label>{{ form.requirements }}</p>
-    <p class="full"><label>{{ form.conditions.label }}</label>{{ form.conditions }}</p>
-    <p class="full"><label>{{ form.contacts.label }}</label>{{ form.contacts }}</p>
-    <p class="full"><button class="btn btn-primary" name="action" value="create" type="submit">Создать</button></p>
+    <input type="hidden" name="action" value="create">
+
+    <div class="admin-form-grid">
+      <div class="form-field">
+        <label>{{ form.title.label }}</label>
+        {{ form.title }}
+        {{ form.title.errors }}
+      </div>
+
+      <div class="form-field">
+        <label>{{ form.company.label }}</label>
+        {{ form.company }}
+        {{ form.company.errors }}
+      </div>
+
+      <div class="form-field">
+        <label>{{ form.employment_type.label }}</label>
+        {{ form.employment_type }}
+        {{ form.employment_type.errors }}
+      </div>
+
+      <div class="form-field">
+        <label>{{ form.format_type.label }}</label>
+        {{ form.format_type }}
+        {{ form.format_type.errors }}
+      </div>
+
+      <div class="form-field">
+        <label>{{ form.direction.label }}</label>
+        {{ form.direction }}
+        {{ form.direction.errors }}
+      </div>
+
+      <div class="form-field">
+        <label>{{ form.status.label }}</label>
+        {{ form.status }}
+        {{ form.status.errors }}
+      </div>
+
+      <div class="form-field form-field-full">
+        <label>{{ form.description.label }}</label>
+        {{ form.description }}
+        {{ form.description.errors }}
+      </div>
+
+      <div class="form-field form-field-full">
+        <label>{{ form.responsibilities.label }}</label>
+        {{ form.responsibilities }}
+        {{ form.responsibilities.errors }}
+      </div>
+
+      <div class="form-field form-field-full">
+        <label>{{ form.requirements.label }}</label>
+        {{ form.requirements }}
+        {{ form.requirements.errors }}
+      </div>
+
+      <div class="form-field form-field-full">
+        <label>{{ form.conditions.label }}</label>
+        {{ form.conditions }}
+        {{ form.conditions.errors }}
+      </div>
+
+      <div class="form-field form-field-full">
+        <label>{{ form.contacts.label }}</label>
+        {{ form.contacts }}
+        {{ form.contacts.errors }}
+      </div>
+    </div>
+
+    <div class="admin-form-actions">
+      <button class="btn btn-primary" type="submit">Создать вакансию</button>
+    </div>
   </form>
 </section>
 
-<section class="section card">
+<section class="section card admin-list-card vacancy-list-card">
   <h2>Список вакансий</h2>
-  <form method="get" class="filters">
-    <input name="q" placeholder="Поиск по названию/компании" value="{{ request.GET.q }}">
-    <select name="status"><option value="">Статус</option><option value="active" {% if request.GET.status == 'active' %}selected{% endif %}>Активно</option><option value="hidden" {% if request.GET.status == 'hidden' %}selected{% endif %}>Скрыто</option><option value="archive" {% if request.GET.status == 'archive' %}selected{% endif %}>Архив</option></select>
+
+  <form method="get" class="admin-filters vacancy-filters">
+    <input name="q" placeholder="Название или компания" value="{{ request.GET.q }}">
+
+    <select name="status">
+      <option value="">Статус</option>
+      <option value="active" {% if request.GET.status == 'active' %}selected{% endif %}>Активно</option>
+      <option value="hidden" {% if request.GET.status == 'hidden' %}selected{% endif %}>Скрыто</option>
+      <option value="archive" {% if request.GET.status == 'archive' %}selected{% endif %}>Архив</option>
+    </select>
+
     <input name="format_type" placeholder="Формат" value="{{ request.GET.format_type }}">
     <input name="employment_type" placeholder="Тип занятости" value="{{ request.GET.employment_type }}">
     <input name="direction" placeholder="Направление" value="{{ request.GET.direction }}">
+
     <button class="btn btn-link" type="submit">Применить</button>
   </form>
 
-  <div class="row-list">
+  <div class="admin-row-list vacancy-row-list">
     {% for vacancy in vacancies %}
-      <div class="row-item">
-        <div><strong>{{ vacancy.title }}</strong><div class="muted">{{ vacancy.company }}</div></div>
-        <div class="muted">{{ vacancy.format_type }}</div>
-        <div class="muted">{{ vacancy.employment_type }}</div>
-        <div class="muted">{{ STATUS_LABELS|dict_get:vacancy.status }}</div>
-        <a class="btn btn-link" href="{% url 'accounts:admin_vacancy_detail' vacancy.id %}">Открыть</a>
-      </div>
+      <article class="admin-row vacancy-row vacancy-row-no-avatar">
+        <div class="vacancy-main">
+          <strong>{{ vacancy.title }}</strong>
+          <span>{{ vacancy.company }}</span>
+        </div>
+
+        <div class="vacancy-meta">
+          <span class="admin-row-label">Формат</span>
+          <strong>{{ vacancy.format_type|default:"—" }}</strong>
+        </div>
+
+        <div class="vacancy-meta">
+          <span class="admin-row-label">Занятость</span>
+          <strong>{{ vacancy.employment_type|default:"—" }}</strong>
+        </div>
+
+        <div class="vacancy-meta">
+          <span class="admin-row-label">Направление</span>
+          <strong>{{ vacancy.direction|default:"—" }}</strong>
+        </div>
+
+        <div class="vacancy-status vacancy-status-{{ vacancy.status }}">
+          {{ STATUS_LABELS|dict_get:vacancy.status }}
+        </div>
+
+        <a class="btn btn-link" href="{% url 'accounts:admin_vacancy_detail' vacancy.id %}">
+          Открыть
+        </a>
+      </article>
     {% empty %}
-      <p class="muted">Вакансии не найдены.</p>
+      <div class="admin-empty-state">
+        <strong>Вакансии не найдены</strong>
+        <p>Попробуйте изменить фильтры или создайте новую вакансию.</p>
+      </div>
     {% endfor %}
   </div>
 </section>

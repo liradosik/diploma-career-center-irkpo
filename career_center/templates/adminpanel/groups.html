@@ -88,12 +88,8 @@
 
   <div class="admin-groups-list">
     {% for group in groups %}
-      <article class="admin-group-row admin-group-row-simple">
+      <article class="admin-group-row admin-group-row-simple admin-group-row-no-avatar">
         <div class="admin-group-main">
-          <div class="admin-group-avatar">
-            {{ group.specialty_ref.letter_code|default:group.name|slice:":1"|upper }}
-          </div>
-
           <div>
             <strong>{{ group.name }}</strong>
             <span>{{ group.specialty_ref.name|default:group.specialty|default:'Специальность не указана' }}</span>

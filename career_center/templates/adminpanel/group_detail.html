@@ -3,25 +3,14 @@
 
 {% block content %}
 <section class="hero admin-profile-hero group-profile-hero">
-  <div class="admin-profile-avatar">
-    {{ group.specialty_ref.letter_code|default:group.name|slice:":1"|upper }}
-  </div>
+  
 
   <div class="admin-profile-info">
     <div class="hero-kicker">Группа</div>
     <h1>{{ group.name }}</h1>
     <p>{{ group.specialty_ref.name|default:group.specialty|default:'Специальность не указана' }}</p>
 
-    <div class="admin-profile-badges">
-      <span class="profile-badge">Курс: {{ group.course_number|default:'—' }}</span>
-      <span class="profile-badge">Год: {{ group.admission_year|default:'—' }}</span>
-      <span class="profile-badge">Студентов: {{ students_count }}</span>
-      {% if group.is_active %}
-        <span class="profile-badge">Активна</span>
-      {% else %}
-        <span class="profile-badge">Неактивна</span>
-      {% endif %}
-    </div>
+  
   </div>
 </section>
 

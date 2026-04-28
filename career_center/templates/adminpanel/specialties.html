@@ -1,81 +1,86 @@
 {% extends 'base_dashboard.html' %}
 {% block title %}Специальности{% endblock %}
+
 {% block content %}
 <section class="hero">
   <div class="hero-kicker">Администрирование</div>
   <h1>Специальности</h1>
-  <p>Справочник специальностей и профилей с буквенными кодами групп.</p>
+  <p>Справочник специальностей и профилей для учебных групп.</p>
 </section>
 
-<section class="section card form-card">
+<section class="section card specialty-form-card">
   <h2>{% if edit_specialty %}Редактировать специальность{% else %}Создать специальность{% endif %}</h2>
-  <form method="post" class="form-grid">
+
+  <form method="post" class="specialty-form">
     {% csrf_token %}
     <input type="hidden" name="action" value="{% if edit_specialty %}update{% else %}create{% endif %}">
-    <p><label for="{{ form.code.id_for_label }}">{{ form.code.label }}</label>{{ form.code }}</p>
-    <p><label for="{{ form.letter_code.id_for_label }}">{{ form.letter_code.label }}</label>{{ form.letter_code }}</p>
-    <p class="full"><label for="{{ form.name.id_for_label }}">{{ form.name.label }}</label>{{ form.name }}</p>
-    <div class="group-access-card group-access-card-compact full">
-      <label class="admin-switch admin-switch-small">
-        {{ form.is_active }}
-        <span class="admin-switch-ui"></span>
-      </label>
-      <div>
-        <strong>Специальность активна</strong>
-        <p>Если выключить, специальность останется в базе, но станет неактивной.</p>
+
+    {% if edit_specialty %}
+      {% if edit_specialty.is_active %}
+        <input type="hidden" name="is_active" value="on">
+      {% endif %}
+    {% else %}
+      <input type="hidden" name="is_active" value="on">
+    {% endif %}
+
+    <div class="specialty-form-grid">
+      <div class="form-field">
+        <label for="{{ form.code.id_for_label }}">Код специальности</label>
+        {{ form.code }}
+        {{ form.code.errors }}
+      </div>
+
+      <div class="form-field">
+        <label for="{{ form.letter_code.id_for_label }}">Буквенный код группы</label>
+        {{ form.letter_code }}
+        {{ form.letter_code.errors }}
+      </div>
+
+      <div class="form-field specialty-name-field">
+        <label for="{{ form.name.id_for_label }}">Название/профиль</label>
+        {{ form.name }}
+        {{ form.name.errors }}
       </div>
     </div>
-    <p class="full"><button class="btn btn-primary" type="submit">Сохранить</button></p>
+
+    <div class="specialty-form-bottom specialty-form-bottom-simple">
+      <button class="btn btn-primary" type="submit">Сохранить</button>
+    </div>
   </form>
 </section>
 
-<section class="section card admin-groups-list-card">
+<section class="section card specialty-list-card">
   <h2>Список специальностей</h2>
-  <form method="get" class="filters">
-    <input name="q" placeholder="Поиск по коду / названию / буквенному коду" value="{{ request.GET.q }}">
+
+  <form method="get" class="specialty-filter">
+    <input
+      name="q"
+      placeholder="Поиск по коду, названию или буквенному коду"
+      value="{{ request.GET.q }}"
+    >
     <button class="btn btn-link" type="submit">Найти</button>
   </form>
 
-  <div class="admin-groups-list">
+  <div class="specialty-list">
     {% for specialty in specialties %}
-      <article class="admin-group-row admin-group-row-simple">
-        <div class="admin-group-main">
-          <div class="admin-group-avatar">
-            {{ specialty.letter_code|default:specialty.code|slice:":1"|upper }}
-          </div>
+      <article class="specialty-row specialty-row-simple specialty-row-no-avatar">
+        <div class="specialty-row-main">
           <div>
-            <strong>{{ specialty.code }} • {{ specialty.name }}</strong>
-            <span>Буквенный код: {{ specialty.letter_code|default:'—' }}</span>
+            <strong>{{ specialty.code }}</strong>
+            <span>{{ specialty.name }}</span>
           </div>
         </div>
 
-        <div class="admin-group-cell">
-          <span>Групп</span>
-          <strong>{{ specialty.groups_count|default:0 }}</strong>
+        <div class="specialty-row-actions">
+          <a class="btn btn-link" href="{% url 'accounts:admin_specialty_detail' specialty.id %}">
+            Открыть
+          </a>
         </div>
-
-        <div class="admin-group-cell">
-          <span>Студентов</span>
-          <strong>{{ specialty.students_count|default:0 }}</strong>
-        </div>
-
-        <div class="admin-group-cell">
-          <span>Статус</span>
-          <strong>{% if specialty.is_active %}Активна{% else %}Неактивна{% endif %}</strong>
-        </div>
-
-        <a class="btn btn-link" href="{% url 'accounts:admin_specialty_detail' specialty.id %}">Открыть</a>
-        <form method="post">
-          {% csrf_token %}
-          <input type="hidden" name="action" value="toggle_active">
-          <input type="hidden" name="specialty_id" value="{{ specialty.id }}">
-          <button class="btn" type="submit">{% if specialty.is_active %}Деактивировать{% else %}Активировать{% endif %}</button>
-        </form>
       </article>
     {% empty %}
       <div class="admin-empty-state">
         <strong>Специальности не найдены</strong>
-        <p>Попробуйте изменить фильтры или добавить новую специальность.</p>
+        <p>Попробуйте изменить поиск или добавить новую специальность.</p>
       </div>
     {% endfor %}
   </div>

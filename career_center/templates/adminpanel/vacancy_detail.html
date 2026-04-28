@@ -1,24 +1,166 @@
 {% extends 'base_dashboard.html' %}
 {% load ui_extras %}
 {% block title %}Вакансия{% endblock %}
+
 {% block content %}
-<section class="hero"><div class="hero-kicker">Вакансия</div><h1>{{ vacancy.title }}</h1><p>{{ vacancy.company }}</p></section>
-<section class="section grid grid-2">
-  <div class="card">
-    <h2>Редактировать</h2>
-    <form method="post">{% csrf_token %}<input type="hidden" name="action" value="update">{{ form.as_p }}<button class="btn btn-primary" type="submit">Сохранить изменения</button></form>
+<section class="hero admin-profile-hero">
+  
+
+  <div class="admin-profile-main">
+    <div class="hero-kicker">Вакансия</div>
+    <h1>{{ vacancy.title }}</h1>
+    <p>{{ vacancy.company }}</p>
+
+    <div class="admin-profile-badges">
+      {% if vacancy.format_type %}
+        <span class="admin-soft-badge">{{ vacancy.format_type }}</span>
+      {% endif %}
+
+      {% if vacancy.employment_type %}
+        <span class="admin-soft-badge">{{ vacancy.employment_type }}</span>
+      {% endif %}
+
+      {% if vacancy.direction %}
+        <span class="admin-soft-badge">{{ vacancy.direction }}</span>
+      {% endif %}
+
+      <span class="admin-soft-badge vacancy-status-text vacancy-status-text-{{ vacancy.status }}">
+        {{ STATUS_LABELS|dict_get:vacancy.status }}
+      </span>
+    </div>
   </div>
-  <div class="card">
-    <h2>Статус</h2>
-    <p class="muted">Текущий статус: {{ STATUS_LABELS|dict_get:vacancy.status }}</p>
-    <form method="post" class="inline-actions">{% csrf_token %}<input type="hidden" name="action" value="set_status"><input type="hidden" name="status" value="active"><button class="btn" type="submit">Сделать активной</button></form>
-    <form method="post" class="inline-actions">{% csrf_token %}<input type="hidden" name="action" value="set_status"><input type="hidden" name="status" value="hidden"><button class="btn" type="submit">Скрыть</button></form>
-    <form method="post" class="inline-actions">{% csrf_token %}<input type="hidden" name="action" value="set_status"><input type="hidden" name="status" value="archive"><button class="btn" type="submit">Перенести в архив</button></form>
-    <form method="post" class="section">
+</section>
+
+<section class="section vacancy-detail-layout">
+  <div class="card vacancy-edit-card">
+    <h2>Данные вакансии</h2>
+
+    <form method="post" class="admin-form">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="update">
+
+      <div class="admin-form-grid">
+        <div class="form-field">
+          <label>{{ form.title.label }}</label>
+          {{ form.title }}
+          {{ form.title.errors }}
+        </div>
+
+        <div class="form-field">
+          <label>{{ form.company.label }}</label>
+          {{ form.company }}
+          {{ form.company.errors }}
+        </div>
+
+        <div class="form-field">
+          <label>{{ form.employment_type.label }}</label>
+          {{ form.employment_type }}
+          {{ form.employment_type.errors }}
+        </div>
+
+        <div class="form-field">
+          <label>{{ form.format_type.label }}</label>
+          {{ form.format_type }}
+          {{ form.format_type.errors }}
+        </div>
+
+        <div class="form-field">
+          <label>{{ form.direction.label }}</label>
+          {{ form.direction }}
+          {{ form.direction.errors }}
+        </div>
+
+        <div class="form-field">
+          <label>{{ form.status.label }}</label>
+          {{ form.status }}
+          {{ form.status.errors }}
+        </div>
+
+        <div class="form-field form-field-full">
+          <label>{{ form.description.label }}</label>
+          {{ form.description }}
+          {{ form.description.errors }}
+        </div>
+
+        <div class="form-field form-field-full">
+          <label>{{ form.responsibilities.label }}</label>
+          {{ form.responsibilities }}
+          {{ form.responsibilities.errors }}
+        </div>
+
+        <div class="form-field form-field-full">
+          <label>{{ form.requirements.label }}</label>
+          {{ form.requirements }}
+          {{ form.requirements.errors }}
+        </div>
+
+        <div class="form-field form-field-full">
+          <label>{{ form.conditions.label }}</label>
+          {{ form.conditions }}
+          {{ form.conditions.errors }}
+        </div>
+
+        <div class="form-field form-field-full">
+          <label>{{ form.contacts.label }}</label>
+          {{ form.contacts }}
+          {{ form.contacts.errors }}
+        </div>
+      </div>
+
+      <div class="admin-form-actions">
+        <button class="btn btn-primary" type="submit">Сохранить изменения</button>
+      </div>
+    </form>
+  </div>
+
+  <aside class="card vacancy-side-card">
+    <h2>Управление публикацией</h2>
+
+    <div class="vacancy-current-status">
+      <span>Текущий статус</span>
+      <strong>{{ STATUS_LABELS|dict_get:vacancy.status }}</strong>
+    </div>
+
+    <div class="vacancy-status-actions">
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="set_status">
+        <input type="hidden" name="status" value="active">
+        <button class="btn btn-link" type="submit">Сделать активной</button>
+      </form>
+
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="set_status">
+        <input type="hidden" name="status" value="hidden">
+        <button class="btn btn-link" type="submit">Скрыть</button>
+      </form>
+
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="set_status">
+        <input type="hidden" name="status" value="archive">
+        <button class="btn btn-link" type="submit">Перенести в архив</button>
+      </form>
+    </div>
+  </aside>
+</section>
+
+<section class="section card danger-card vacancy-delete-card">
+  <h2>Удаление вакансии</h2>
+
+  <div class="danger-inner">
+    <p>
+      Удаление требует подтверждения по названию. Используйте только если вакансия действительно больше не нужна.
+    </p>
+
+    <form method="post">
       {% csrf_token %}
       <input type="hidden" name="action" value="delete">
-      <label>Для удаления введите название вакансии</label>
+
+      <label>Введите название вакансии</label>
       <input name="confirm_title" type="text" placeholder="{{ vacancy.title }}" required>
+
       <button class="btn btn-danger" type="submit">Подтвердить удаление</button>
     </form>
   </div>
