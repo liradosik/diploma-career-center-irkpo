@@ -700,7 +700,10 @@ def admin_specialties(request):
             messages.success(request, 'Специальность сохранена.')
             return redirect('accounts:admin_specialties')
 
-    specialties = Specialty.objects.order_by('code', 'name')
+    specialties = Specialty.objects.annotate(
+        groups_count=Count('study_groups', distinct=True),
+        students_count=Count('study_groups__students', distinct=True),
+    ).order_by('code', 'name')
     q = request.GET.get('q', '').strip()
     if q:
         specialties = specialties.filter(Q(code__icontains=q) | Q(name__icontains=q) | Q(letter_code__icontains=q))
@@ -709,6 +712,45 @@ def admin_specialties(request):
         request,
         'adminpanel/specialties.html',
         {'specialties': specialties, 'form': form, 'edit_specialty': edit_specialty},
+    )
+
+
+@role_required(User.Role.ADMIN)
+def admin_specialty_detail(request, specialty_id):
+    specialty = get_object_or_404(
+        Specialty.objects.annotate(
+            groups_count=Count('study_groups', distinct=True),
+            students_count=Count('study_groups__students', distinct=True),
+        ),
+        id=specialty_id,
+    )
+    form = AdminSpecialtyForm(instance=specialty)
+
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        if action == 'toggle_active':
+            specialty.is_active = not specialty.is_active
+            specialty.save(update_fields=['is_active'])
+            messages.success(request, 'Статус специальности обновлён.')
+            return redirect('accounts:admin_specialty_detail', specialty_id=specialty.id)
+
+        form = AdminSpecialtyForm(request.POST, instance=specialty)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Данные специальности обновлены.')
+            return redirect('accounts:admin_specialty_detail', specialty_id=specialty.id)
+
+    groups = (
+        StudyGroup.objects.filter(specialty_ref=specialty)
+        .select_related('curator')
+        .annotate(students_count=Count('students'))
+        .order_by('name')
+    )
+
+    return render(
+        request,
+        'adminpanel/specialty_detail.html',
+        {'specialty': specialty, 'form': form, 'groups': groups},
     )
 
 
