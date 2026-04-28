@@ -1,55 +1,210 @@
 {% extends 'base_dashboard.html' %}
 {% block title %}Карточка студента{% endblock %}
+
 {% block content %}
-<section class="hero"><div class="hero-kicker">Студент</div><h1>{{ student.full_name }}</h1><p>{{ student.email }}</p></section>
-<section class="section grid grid-2">
-  <div class="card">
-    <h2>Учебная структура</h2>
-    {% if group_profile %}
-      <p><strong>Учебная группа:</strong> {{ group_profile.group_name }}</p>
-      <p><strong>Специальность:</strong> {{ group_profile.specialty|default:'—' }}</p>
-      <p><strong>Год поступления:</strong> {{ group_profile.admission_year|default:'—' }}</p>
-      <p><strong>Куратор:</strong> {{ group_profile.curator.full_name|default:'не назначен' }}</p>
-    {% else %}
-      <p class="muted">Группа не выбрана. Показаны fallback-данные из профиля пользователя.</p>
-      <p><strong>Группа:</strong> {{ student.group|default:'—' }}</p>
-      <p><strong>Специальность:</strong> {{ student.specialty|default:'—' }}</p>
-      <p><strong>Год поступления:</strong> {{ student.admission_year|default:'—' }}</p>
-      <p><strong>Куратор:</strong> {{ student.curator.full_name|default:'не назначен' }}</p>
-    {% endif %}
-    <p><strong>Учебный статус:</strong> {{ student.get_academic_status_display }}</p>
+<section class="hero admin-profile-hero">
+  <div class="admin-profile-avatar">
+    {{ student.full_name|default:student.email|slice:":1"|upper }}
   </div>
-  <div class="card">
-    <h2>Основные данные</h2>
-    <form method="post" class="form-grid">
-      {% csrf_token %}
-      <input type="hidden" name="action" value="update_profile">
-      {{ form.as_p }}
-      <p class="muted">Основное поле учебной структуры — «Учебная группа». Остальные данные синхронизируются автоматически.</p>
-      <div class="inline-actions"><button class="btn btn-primary" type="submit">Сохранить</button></div>
-    </form>
+
+  <div class="admin-profile-head">
+    <div class="hero-kicker">Студент</div>
+    <h1>{{ student.full_name }}</h1>
+    <p>{{ student.email }}</p>
+
+    <div class="admin-profile-tags">
+      <span>{{ student.study_group.name|default:student.group|default:'Группа не выбрана' }}</span>
+      <span>{{ student.get_academic_status_display }}</span>
+      {% if student.is_active %}
+        <span class="admin-status admin-status-active">Доступ открыт</span>
+      {% else %}
+        <span class="admin-status admin-status-inactive">Доступ закрыт</span>
+      {% endif %}
+    </div>
   </div>
-  <div class="card">
-    <h2>Сброс пароля</h2>
-    <form method="post">
-      {% csrf_token %}
-      <input type="hidden" name="action" value="reset_password">
-      <label>Новый временный пароль</label>
-      <input name="temp_password" type="text" required>
-      <p class="muted">После сброса администратор передаёт временный пароль пользователю.</p>
-      <button class="btn btn-primary" type="submit">Сбросить пароль</button>
-    </form>
+</section>
+
+<section class="section admin-student-layout">
+  <div class="admin-student-left">
+    <div class="card admin-info-card">
+      <h2>Учебная структура</h2>
+
+      {% if group_profile %}
+        <div class="admin-info-list">
+          <div>
+            <span>Учебная группа</span>
+            <strong>{{ group_profile.group_name }}</strong>
+          </div>
+
+          <div>
+            <span>Специальность</span>
+            <strong>{{ group_profile.specialty|default:'—' }}</strong>
+          </div>
+
+          <div>
+            <span>Год поступления</span>
+            <strong>{{ group_profile.admission_year|default:'—' }}</strong>
+          </div>
+
+          <div>
+            <span>Куратор</span>
+            <strong>{{ group_profile.curator.full_name|default:'не назначен' }}</strong>
+          </div>
+
+          <div>
+            <span>Учебный статус</span>
+            <strong>{{ student.get_academic_status_display }}</strong>
+          </div>
+        </div>
+      {% else %}
+        <div class="admin-empty-note">
+          <strong>Учебная группа не выбрана</strong>
+          <p>Назначьте группу в блоке «Основные данные». После этого специальность, год поступления и куратор определятся автоматически.</p>
+        </div>
+
+        <div class="admin-info-list">
+          <div>
+            <span>Группа</span>
+            <strong>{{ student.group|default:'—' }}</strong>
+          </div>
+
+          <div>
+            <span>Специальность</span>
+            <strong>{{ student.specialty|default:'—' }}</strong>
+          </div>
+
+          <div>
+            <span>Год поступления</span>
+            <strong>{{ student.admission_year|default:'—' }}</strong>
+          </div>
+
+          <div>
+            <span>Куратор</span>
+            <strong>{{ student.curator.full_name|default:'не назначен' }}</strong>
+          </div>
+
+          <div>
+            <span>Учебный статус</span>
+            <strong>{{ student.get_academic_status_display }}</strong>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="card admin-info-card">
+      <h2>Сброс пароля</h2>
+
+      <form method="post" class="admin-card-form">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="reset_password">
+
+        <label>Новый временный пароль</label>
+        <input name="temp_password" type="text" required>
+
+        <p class="muted">После сброса администратор передаёт временный пароль пользователю.</p>
+
+        <button class="btn btn-primary" type="submit">Сбросить пароль</button>
+      </form>
+    </div>
   </div>
-  <div class="card">
-    <h2>Опасные действия</h2>
-    <form method="post" class="inline-actions">{% csrf_token %}<input type="hidden" name="action" value="toggle_active"><button class="btn" type="submit">{% if student.is_active %}Деактивировать{% else %}Активировать{% endif %}</button></form>
-    <form method="post">
-      {% csrf_token %}
-      <input type="hidden" name="action" value="delete">
-      <label>Для удаления введите email студента</label>
-      <input name="confirm_email" type="text" placeholder="{{ student.email }}" required>
-      <button class="btn btn-danger" type="submit">Подтвердить удаление</button>
-    </form>
+
+  <div class="admin-student-right">
+    <div class="card admin-info-card">
+  <h2>Основные данные</h2>
+
+  <form method="post" class="form-grid admin-student-form">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="update_profile">
+
+    <p>
+      <label for="{{ form.full_name.id_for_label }}">ФИО:</label>
+      {{ form.full_name }}
+      {{ form.full_name.errors }}
+    </p>
+
+    <p>
+      <label for="{{ form.email.id_for_label }}">Email:</label>
+      {{ form.email }}
+      {{ form.email.errors }}
+    </p>
+
+    <p>
+      <label for="{{ form.study_group.id_for_label }}">Учебная группа:</label>
+      {{ form.study_group }}
+      {{ form.study_group.errors }}
+    </p>
+
+    <p>
+      <label for="{{ form.academic_status.id_for_label }}">Учебный статус:</label>
+      {{ form.academic_status }}
+      {{ form.academic_status.errors }}
+    </p>
+
+    <div class="full account-access-box">
+      <label class="account-access-toggle">
+        {{ form.is_active }}
+        <span class="account-access-switch"></span>
+
+        <span class="account-access-text">
+          <strong>Доступ к аккаунту</strong>
+          <small>
+            Если выключить доступ, студент останется в базе, но не сможет войти в личный кабинет.
+          </small>
+        </span>
+      </label>
+
+      {{ form.is_active.errors }}
+    </div>
+
+    <p class="full muted">
+      Основное поле учебной структуры — «Учебная группа». Остальные данные синхронизируются автоматически.
+    </p>
+
+    <div class="full">
+      <button class="btn btn-primary" type="submit">Сохранить</button>
+    </div>
+  </form>
+</div>
+
+    <div class="card admin-info-card admin-danger-card">
+      <h2>Опасные действия</h2>
+
+      <div class="admin-danger-grid">
+        <div class="admin-danger-block">
+          <h3>{% if student.is_active %}Деактивация{% else %}Активация{% endif %}</h3>
+          <p class="muted">
+            {% if student.is_active %}
+              Студент останется в базе, но не сможет пользоваться аккаунтом.
+            {% else %}
+              Аккаунт студента снова станет доступен.
+            {% endif %}
+          </p>
+
+          <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="toggle_active">
+            <button class="btn" type="submit">
+              {% if student.is_active %}Деактивировать{% else %}Активировать{% endif %}
+            </button>
+          </form>
+        </div>
+
+        <div class="admin-danger-block admin-danger-delete">
+          <h3>Удаление</h3>
+          <p class="muted">Удаление требует подтверждения по email. Используйте только если запись действительно не нужна.</p>
+
+          <form method="post" class="admin-card-form">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="delete">
+
+            <label>Введите email студента</label>
+            <input name="confirm_email" type="text" placeholder="{{ student.email }}" required>
+
+            <button class="btn btn-danger" type="submit">Подтвердить удаление</button>
+          </form>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 {% endblock %}
