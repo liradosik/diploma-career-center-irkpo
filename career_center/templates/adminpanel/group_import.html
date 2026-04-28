@@ -1,62 +1,46 @@
 {% extends 'base_dashboard.html' %}
-{% block title %}Импорт студентов{% endblock %}
+{% block title %}Импорт групп{% endblock %}
 
 {% block content %}
 <section class="hero admin-page-hero">
   <div>
-    <div class="hero-kicker">Студенты</div>
-    <h1>Массовый импорт студентов</h1>
+    <div class="hero-kicker">Группы</div>
+    <h1>Массовый импорт учебных групп</h1>
     <p>Поддерживаются файлы .csv и .xlsx. Первая строка должна содержать заголовки колонок.</p>
   </div>
 
-  <a class="btn btn-link admin-hero-action" href="{% url 'accounts:admin_students' %}">
-    Вернуться к студентам
-  </a>
+  <a class="btn btn-link admin-hero-action" href="{% url 'accounts:admin_groups' %}">Вернуться к группам</a>
 </section>
 
 <section class="section admin-import-layout">
   <div class="card admin-import-card">
     <h2>Загрузить файл</h2>
     <p class="muted">Скачайте шаблон, заполните его и загрузите обратно в систему.</p>
-
     <form method="post" enctype="multipart/form-data" class="admin-import-form">
       {% csrf_token %}
-
       <div class="form-field custom-file-field">
         <label class="custom-file-upload">
           {{ form.import_file }}
           <span>Выбрать файл</span>
         </label>
-
-        <div class="selected-file-box" id="selected-file-box">
-          <span class="selected-file-label">Файл не выбран</span>
-        </div>
-
+        <div class="selected-file-box" id="selected-file-box"><span class="selected-file-label">Файл не выбран</span></div>
         {{ form.import_file.errors }}
       </div>
-
-      <button class="btn btn-primary" type="submit">Импортировать студентов</button>
+      <button class="btn btn-primary" type="submit">Импортировать группы</button>
     </form>
   </div>
 
   <div class="card admin-import-help">
     <h2>Формат файла</h2>
-
-    <div class="csv-format-box">
-      <code>full_name,email,password,group</code>
-    </div>
-
+    <div class="csv-format-box"><code>name,specialty_letter,admission_year,course_number,curator_email</code></div>
     <div class="csv-example">
       <strong>Пример строки:</strong>
-      <code>Иванова Анна Сергеевна,anna.ivanova@example.com,TempPass123,Н - 121/2</code>
+      <code>Н - 121/2,Н,2021,1,ivanova.curator@example.com</code>
     </div>
-
-    <p class="muted">Название группы должно совпадать с группой в системе.</p>
-
     <h3>Шаблон для заполнения</h3>
     <div class="admin-form-actions">
-      <a class="btn btn-link" href="{% url 'accounts:admin_student_import_template_xlsx' %}">Скачать Excel</a>
-      <a class="btn btn-link" href="{% url 'accounts:admin_student_import_template_csv' %}">Скачать CSV</a>
+      <a class="btn btn-link" href="{% url 'accounts:admin_group_import_template_xlsx' %}">Скачать Excel</a>
+      <a class="btn btn-link" href="{% url 'accounts:admin_group_import_template_csv' %}">Скачать CSV</a>
     </div>
   </div>
 </section>
@@ -64,27 +48,14 @@
 {% if report %}
 <section class="section card admin-import-report">
   <h2>Отчёт об импорте</h2>
-
   <div class="import-report-grid">
-    <div class="import-report-item">
-      <span>Создано</span>
-      <strong>{{ report.created }}</strong>
-    </div>
-
-    <div class="import-report-item">
-      <span>Пропущено</span>
-      <strong>{{ report.skipped }}</strong>
-    </div>
+    <div class="import-report-item"><span>Создано</span><strong>{{ report.created }}</strong></div>
+    <div class="import-report-item"><span>Пропущено</span><strong>{{ report.skipped }}</strong></div>
   </div>
-
   {% if report.errors %}
     <div class="import-errors">
       <h3>Ошибки и предупреждения</h3>
-      <ul>
-        {% for err in report.errors %}
-          <li>{{ err }}</li>
-        {% endfor %}
-      </ul>
+      <ul>{% for err in report.errors %}<li>{{ err }}</li>{% endfor %}</ul>
     </div>
   {% endif %}
 </section>
@@ -94,17 +65,11 @@
   document.addEventListener('DOMContentLoaded', function () {
     const fileInput = document.querySelector('.custom-file-field input[type="file"]');
     const fileBox = document.getElementById('selected-file-box');
-
     if (!fileInput || !fileBox) return;
-
     fileInput.addEventListener('change', function () {
       if (fileInput.files && fileInput.files.length > 0) {
-        const fileName = fileInput.files[0].name;
-
         fileBox.classList.add('has-file');
-        fileBox.innerHTML =
-          '<span class="selected-file-label selected-file-success">Выбран файл:</span>' +
-          '<strong>' + fileName + '</strong>';
+        fileBox.innerHTML = '<span class="selected-file-label selected-file-success">Выбран файл:</span><strong>' + fileInput.files[0].name + '</strong>';
       } else {
         fileBox.classList.remove('has-file');
         fileBox.innerHTML = '<span class="selected-file-label">Файл не выбран</span>';

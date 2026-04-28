@@ -2,10 +2,15 @@ from datetime import date
 import csv
 import io
 
+from openpyxl import Workbook, load_workbook
+from openpyxl.styles import Font
+from openpyxl.utils import get_column_letter
+
 from django.contrib import messages
 from django.contrib.auth.views import LoginView, LogoutView
 from django.db import transaction
 from django.db.models import Count, F, Max, Q
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.views.decorators.http import require_GET
@@ -24,7 +29,9 @@ from .forms import (
     AdminStudyGroupForm,
     AdminStudentUpdateForm,
     AdminVacancyForm,
+    CuratorImportForm,
     EmailAuthenticationForm,
+    GroupImportForm,
     StudentImportForm,
     StudentProfileForm,
     UserStudentForm,
@@ -40,6 +47,98 @@ class CustomLoginView(LoginView):
 
 class CustomLogoutView(LogoutView):
     pass
+
+
+IMPORT_TEMPLATES = {
+    'students': {
+        'sheet_title': 'Студенты',
+        'headers': ['full_name', 'email', 'password', 'group'],
+        'example': ['Иванова Анна Сергеевна', 'anna.ivanova@example.com', 'TempPass123', 'Н - 121/2'],
+        'filename_prefix': 'students_import_template',
+    },
+    'curators': {
+        'sheet_title': 'Кураторы',
+        'headers': ['full_name', 'email', 'password'],
+        'example': ['Иванова Ольга Сергеевна', 'ivanova.curator@example.com', 'TempPass123'],
+        'filename_prefix': 'curators_import_template',
+    },
+    'groups': {
+        'sheet_title': 'Группы',
+        'headers': ['name', 'specialty_letter', 'admission_year', 'course_number', 'curator_email'],
+        'example': ['Н - 121/2', 'Н', '2021', '1', 'ivanova.curator@example.com'],
+        'filename_prefix': 'groups_import_template',
+    },
+}
+
+
+def parse_import_file(uploaded_file, required_columns):
+    file_name = (uploaded_file.name or '').lower()
+    if file_name.endswith('.csv'):
+        content = uploaded_file.read().decode('utf-8-sig')
+        reader = csv.DictReader(io.StringIO(content))
+        rows = list(reader)
+    elif file_name.endswith('.xlsx'):
+        workbook = load_workbook(uploaded_file, read_only=True, data_only=True)
+        sheet = workbook.worksheets[0]
+        all_rows = list(sheet.iter_rows(values_only=True))
+        if not all_rows:
+            fieldnames = []
+            rows = []
+        else:
+            fieldnames = [str(value).strip() if value is not None else '' for value in all_rows[0]]
+            rows = []
+            for raw_row in all_rows[1:]:
+                row_map = {}
+                for idx, key in enumerate(fieldnames):
+                    value = raw_row[idx] if idx < len(raw_row) else ''
+                    row_map[key] = '' if value is None else str(value).strip()
+                rows.append(row_map)
+    else:
+        return [], ['Поддерживаются только CSV и XLSX']
+
+    fieldnames = reader.fieldnames if file_name.endswith('.csv') else fieldnames
+    normalized_headers = {str(header).strip() for header in (fieldnames or []) if header}
+    missing = [col for col in required_columns if col not in normalized_headers]
+    if missing:
+        return [], [f'Отсутствуют обязательные колонки: {", ".join(missing)}.']
+
+    normalized_rows = []
+    for row in rows:
+        normalized_rows.append({col: (row.get(col) or '').strip() for col in normalized_headers})
+    return normalized_rows, []
+
+
+def build_template_csv_response(template_key):
+    template_data = IMPORT_TEMPLATES[template_key]
+    response = HttpResponse(content_type='text/csv; charset=utf-8')
+    response['Content-Disposition'] = f'attachment; filename="{template_data["filename_prefix"]}.csv"'
+    response.write('﻿')
+    writer = csv.writer(response)
+    writer.writerow(template_data['headers'])
+    writer.writerow(template_data['example'])
+    return response
+
+
+def build_template_xlsx_response(template_key):
+    template_data = IMPORT_TEMPLATES[template_key]
+    workbook = Workbook()
+    sheet = workbook.active
+    sheet.title = template_data['sheet_title']
+
+    sheet.append(template_data['headers'])
+    sheet.append(template_data['example'])
+
+    for cell in sheet[1]:
+        cell.font = Font(bold=True)
+
+    for idx, header in enumerate(template_data['headers'], start=1):
+        max_len = max(len(str(header)), len(str(template_data['example'][idx - 1])))
+        sheet.column_dimensions[get_column_letter(idx)].width = max_len + 6
+
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = f'attachment; filename="{template_data["filename_prefix"]}.xlsx"'
+    workbook.save(response)
+    return response
 
 
 def role_redirect(user):
@@ -385,15 +484,12 @@ def admin_student_import(request):
             created = 0
             skipped = 0
             errors = []
-            csv_file = form.cleaned_data['csv_file']
-            content = csv_file.read().decode('utf-8-sig')
-            reader = csv.DictReader(io.StringIO(content))
-            required_headers = {'full_name', 'email', 'password', 'group'}
-            if not reader.fieldnames or not required_headers.issubset(set(reader.fieldnames)):
-                messages.error(request, 'Неверный формат CSV. Обязательные колонки: full_name,email,password,group.')
+            rows, parse_errors = parse_import_file(form.cleaned_data['import_file'], ['full_name', 'email', 'password', 'group'])
+            if parse_errors:
+                messages.error(request, parse_errors[0])
                 return redirect('accounts:admin_student_import')
 
-            for row_idx, row in enumerate(reader, start=2):
+            for row_idx, row in enumerate(rows, start=2):
                 full_name = (row.get('full_name') or '').strip()
                 email = (row.get('email') or '').strip().lower()
                 password = (row.get('password') or '').strip()
@@ -408,7 +504,7 @@ def admin_student_import(request):
                     errors.append(f'Строка {row_idx}: email {email} уже существует.')
                     continue
 
-                study_group = StudyGroup.objects.filter(name=group_name).first()
+                study_group = StudyGroup.objects.select_related('specialty_ref', 'curator').filter(name=group_name).first()
                 if not study_group:
                     skipped += 1
                     errors.append(f'Строка {row_idx}: группа "{group_name}" не найдена.')
@@ -420,6 +516,7 @@ def admin_student_import(request):
                         email=email,
                         role=User.Role.STUDENT,
                         academic_status=User.AcademicStatus.STUDYING,
+                        is_active=True,
                     )
                     student.set_password(password)
                     sync_student_with_group(student, study_group)
@@ -433,6 +530,150 @@ def admin_student_import(request):
                 messages.warning(request, f'Импорт завершён с предупреждениями. Пропущено: {skipped}.')
 
     return render(request, 'adminpanel/student_import.html', {'form': form, 'report': report})
+
+
+@role_required(User.Role.ADMIN)
+def admin_curator_import(request):
+    report = None
+    form = CuratorImportForm()
+    if request.method == 'POST':
+        form = CuratorImportForm(request.POST, request.FILES)
+        if form.is_valid():
+            created = 0
+            skipped = 0
+            errors = []
+            rows, parse_errors = parse_import_file(form.cleaned_data['import_file'], ['full_name', 'email', 'password'])
+            if parse_errors:
+                messages.error(request, parse_errors[0])
+                return redirect('accounts:admin_curator_import')
+
+            for row_idx, row in enumerate(rows, start=2):
+                full_name = (row.get('full_name') or '').strip()
+                email = (row.get('email') or '').strip().lower()
+                password = (row.get('password') or '').strip()
+
+                if not full_name or not email or not password:
+                    skipped += 1
+                    errors.append(f'Строка {row_idx}: пропущены обязательные поля.')
+                    continue
+                if User.objects.filter(email=email).exists():
+                    skipped += 1
+                    errors.append(f'Строка {row_idx}: email {email} уже существует.')
+                    continue
+
+                curator = User(full_name=full_name, email=email, role=User.Role.CURATOR, is_active=True)
+                curator.set_password(password)
+                curator.save()
+                created += 1
+
+            report = {'created': created, 'skipped': skipped, 'errors': errors}
+            if created:
+                messages.success(request, f'Импорт завершён. Создано: {created}.')
+            if skipped:
+                messages.warning(request, f'Импорт завершён с предупреждениями. Пропущено: {skipped}.')
+
+    return render(request, 'adminpanel/curator_import.html', {'form': form, 'report': report})
+
+
+@role_required(User.Role.ADMIN)
+def admin_group_import(request):
+    report = None
+    form = GroupImportForm()
+    if request.method == 'POST':
+        form = GroupImportForm(request.POST, request.FILES)
+        if form.is_valid():
+            created = 0
+            skipped = 0
+            errors = []
+            rows, parse_errors = parse_import_file(
+                form.cleaned_data['import_file'],
+                ['name', 'specialty_letter', 'admission_year', 'course_number', 'curator_email'],
+            )
+            if parse_errors:
+                messages.error(request, parse_errors[0])
+                return redirect('accounts:admin_group_import')
+
+            for row_idx, row in enumerate(rows, start=2):
+                name = (row.get('name') or '').strip()
+                specialty_letter = (row.get('specialty_letter') or '').strip().upper()
+                admission_year = (row.get('admission_year') or '').strip()
+                course_number = (row.get('course_number') or '').strip()
+                curator_email = (row.get('curator_email') or '').strip().lower()
+
+                if not name or not specialty_letter or not admission_year or not course_number:
+                    skipped += 1
+                    errors.append(f'Строка {row_idx}: пропущены обязательные поля.')
+                    continue
+
+                if StudyGroup.objects.filter(name=name).exists():
+                    skipped += 1
+                    errors.append(f'Строка {row_idx}: группа "{name}" уже существует.')
+                    continue
+
+                specialty = Specialty.objects.filter(letter_code__iexact=specialty_letter).first()
+                if not specialty:
+                    skipped += 1
+                    errors.append(f'Строка {row_idx}: специальность с кодом "{specialty_letter}" не найдена.')
+                    continue
+
+                try:
+                    admission_year_int = int(admission_year)
+                    course_number_int = int(course_number)
+                except ValueError:
+                    skipped += 1
+                    errors.append(f'Строка {row_idx}: admission_year и course_number должны быть числами.')
+                    continue
+
+                curator = None
+                if not curator_email:
+                    errors.append(f'Строка {row_idx}: куратор не указан, группа создана без куратора.')
+                else:
+                    curator_candidate = User.objects.filter(email=curator_email).first()
+                    if not curator_candidate:
+                        errors.append(f'Строка {row_idx}: куратор {curator_email} не найден, группа создана без куратора.')
+                    elif curator_candidate.role != User.Role.CURATOR:
+                        errors.append(
+                            f'Строка {row_idx}: пользователь {curator_email} не является куратором, группа создана без куратора.'
+                        )
+                    else:
+                        curator = curator_candidate
+
+                group = StudyGroup(
+                    name=name,
+                    specialty_ref=specialty,
+                    specialty=specialty.name,
+                    admission_year=admission_year_int,
+                    course_number=course_number_int,
+                    curator=curator,
+                    is_active=True,
+                    last_promoted_year=None,
+                )
+                group.save()
+                created += 1
+
+            report = {'created': created, 'skipped': skipped, 'errors': errors}
+            if created:
+                messages.success(request, f'Импорт завершён. Создано: {created}.')
+            if skipped:
+                messages.warning(request, f'Импорт завершён с предупреждениями. Пропущено: {skipped}.')
+
+    return render(request, 'adminpanel/group_import.html', {'form': form, 'report': report})
+
+
+@role_required(User.Role.ADMIN)
+def admin_import_template_csv(request, import_type):
+    if import_type not in IMPORT_TEMPLATES:
+        messages.error(request, 'Неизвестный тип шаблона.')
+        return redirect('accounts:admin_dashboard')
+    return build_template_csv_response(import_type)
+
+
+@role_required(User.Role.ADMIN)
+def admin_import_template_xlsx(request, import_type):
+    if import_type not in IMPORT_TEMPLATES:
+        messages.error(request, 'Неизвестный тип шаблона.')
+        return redirect('accounts:admin_dashboard')
+    return build_template_xlsx_response(import_type)
 
 
 @role_required(User.Role.ADMIN)
