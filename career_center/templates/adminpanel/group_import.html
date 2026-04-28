@@ -16,54 +16,78 @@
   <div class="card admin-import-card">
     <h2>Загрузить файл</h2>
     <p class="muted">Скачайте шаблон, заполните его и загрузите обратно в систему.</p>
+
     <form method="post" enctype="multipart/form-data" class="admin-import-form">
       {% csrf_token %}
+
       <div class="form-field custom-file-field">
         <label class="custom-file-upload">
           {{ form.import_file }}
           <span>Выбрать файл</span>
         </label>
-        <div class="selected-file-box" id="selected-file-box"><span class="selected-file-label">Файл не выбран</span></div>
+
+        <div class="selected-file-box" id="selected-file-box">
+          <span class="selected-file-label">Файл не выбран</span>
+        </div>
+
         {{ form.import_file.errors }}
       </div>
+
       <button class="btn btn-primary" type="submit">Импортировать группы</button>
     </form>
   </div>
 
   <div class="card admin-import-help">
     <h2>Формат файла</h2>
-    <div class="csv-format-box"><code>name,specialty_letter,admission_year,course_number,curator_email</code></div>
+
+    <div class="csv-format-box">
+      <code>name,specialty_letter,admission_year,course_number,curator_email</code>
+    </div>
+
     <div class="csv-example">
       <strong>Пример строки:</strong>
       <code>Н - 121/2,Н,2021,1,ivanova.curator@example.com</code>
     </div>
+
     <p class="muted">Название группы должно совпадать с группой в системе.</p>
 
-<div class="import-template-box">
-  <div>
-    <h3>Шаблон для заполнения</h3>
-    <p>Скачайте готовый файл, заполните данные и загрузите его обратно.</p>
-  </div>
+    <div class="import-template-box">
+      <div>
+        <h3>Шаблон для заполнения</h3>
+      </div>
 
-  <div class="import-template-actions">
-    <a class="btn btn-link" href="{% url 'accounts:admin_student_import_template_xlsx' %}">Скачать Excel</a>
-    <a class="btn btn-link" href="{% url 'accounts:admin_student_import_template_csv' %}">Скачать CSV</a>
+      <div class="import-template-actions">
+        <a class="btn btn-link" href="{% url 'accounts:admin_group_import_template_xlsx' %}">Скачать Excel</a>
+        <a class="btn btn-link" href="{% url 'accounts:admin_group_import_template_csv' %}">Скачать CSV</a>
+      </div>
+    </div>
   </div>
-</div>
-    
 </section>
 
 {% if report %}
 <section class="section card admin-import-report">
   <h2>Отчёт об импорте</h2>
+
   <div class="import-report-grid">
-    <div class="import-report-item"><span>Создано</span><strong>{{ report.created }}</strong></div>
-    <div class="import-report-item"><span>Пропущено</span><strong>{{ report.skipped }}</strong></div>
+    <div class="import-report-item">
+      <span>Создано</span>
+      <strong>{{ report.created }}</strong>
+    </div>
+
+    <div class="import-report-item">
+      <span>Пропущено</span>
+      <strong>{{ report.skipped }}</strong>
+    </div>
   </div>
+
   {% if report.errors %}
     <div class="import-errors">
       <h3>Ошибки и предупреждения</h3>
-      <ul>{% for err in report.errors %}<li>{{ err }}</li>{% endfor %}</ul>
+      <ul>
+        {% for err in report.errors %}
+          <li>{{ err }}</li>
+        {% endfor %}
+      </ul>
     </div>
   {% endif %}
 </section>
@@ -73,7 +97,9 @@
   document.addEventListener('DOMContentLoaded', function () {
     const fileInput = document.querySelector('.custom-file-field input[type="file"]');
     const fileBox = document.getElementById('selected-file-box');
+
     if (!fileInput || !fileBox) return;
+
     fileInput.addEventListener('change', function () {
       if (fileInput.files && fileInput.files.length > 0) {
         fileBox.classList.add('has-file');

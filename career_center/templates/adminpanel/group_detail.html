@@ -1,36 +1,144 @@
 {% extends 'base_dashboard.html' %}
 {% block title %}Карточка группы{% endblock %}
-{% block content %}
-<section class="hero"><div class="hero-kicker">Группа</div><h1>{{ group.name }}</h1><p>{{ group.specialty_ref.name|default:group.specialty }}</p></section>
 
-<section class="section grid grid-2">
-  <div class="card">
-    <h2>Данные группы</h2>
-    <form method="post" class="form-grid">
-      {% csrf_token %}
-      <input type="hidden" name="action" value="update">
-      {{ form.as_p }}
-      <div class="inline-actions"><button class="btn btn-primary" type="submit">Сохранить</button></div>
-    </form>
-    <form method="post" class="inline-actions">{% csrf_token %}<input type="hidden" name="action" value="toggle_active"><button class="btn" type="submit">{% if group.is_active %}Деактивировать{% else %}Активировать{% endif %}</button></form>
-    <form method="post" class="inline-actions">{% csrf_token %}<input type="hidden" name="action" value="sync_students"><button class="btn btn-link" type="submit">Синхронизировать студентов группы</button></form>
+{% block content %}
+<section class="hero admin-profile-hero group-profile-hero">
+  <div class="admin-profile-avatar">
+    {{ group.specialty_ref.letter_code|default:group.name|slice:":1"|upper }}
   </div>
 
-  <div class="card">
-    <h2>Состав группы</h2>
-    <p class="muted">Куратор: {{ group.curator.full_name|default:'не назначен' }}</p>
-    <p class="muted">Код специальности: {{ group.specialty_ref.code|default:'—' }}</p>
-    <p class="muted">Буквенный код: {{ group.specialty_ref.letter_code|default:'—' }}</p>
-    <p class="muted">Студентов: {{ students_count }}</p>
-    <div class="row-list section">
-      {% for student in students %}
-        <div class="row-item">
-          <div><strong>{{ student.full_name }}</strong><div class="muted">{{ student.email }}</div></div>
-          <div class="muted">{{ student.specialty|default:'—' }}</div>
-          <a class="btn btn-link" href="{% url 'accounts:admin_student_detail' student.id %}">Открыть</a>
+  <div class="admin-profile-info">
+    <div class="hero-kicker">Группа</div>
+    <h1>{{ group.name }}</h1>
+    <p>{{ group.specialty_ref.name|default:group.specialty|default:'Специальность не указана' }}</p>
+
+    <div class="admin-profile-badges">
+      <span class="profile-badge">Курс: {{ group.course_number|default:'—' }}</span>
+      <span class="profile-badge">Год: {{ group.admission_year|default:'—' }}</span>
+      <span class="profile-badge">Студентов: {{ students_count }}</span>
+      {% if group.is_active %}
+        <span class="profile-badge">Активна</span>
+      {% else %}
+        <span class="profile-badge">Неактивна</span>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<section class="section group-detail-stack">
+  <div class="card group-detail-card">
+    <h2>Данные группы</h2>
+
+    <form method="post" class="group-main-form">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="update">
+
+      <div class="group-detail-fields">
+        <div class="form-field">
+          <label for="{{ form.name.id_for_label }}">Название группы</label>
+          {{ form.name }}
+          {{ form.name.errors }}
         </div>
+
+        <div class="form-field">
+          <label for="{{ form.specialty_ref.id_for_label }}">Специальность</label>
+          {{ form.specialty_ref }}
+          {{ form.specialty_ref.errors }}
+        </div>
+
+        <div class="form-field">
+          <label for="{{ form.admission_year.id_for_label }}">Год поступления</label>
+          {{ form.admission_year }}
+          {{ form.admission_year.errors }}
+        </div>
+
+        <div class="form-field">
+          <label for="{{ form.course_number.id_for_label }}">Курс</label>
+          {{ form.course_number }}
+          {{ form.course_number.errors }}
+        </div>
+
+        <div class="form-field">
+          <label for="{{ form.curator.id_for_label }}">Куратор</label>
+          {{ form.curator }}
+          {{ form.curator.errors }}
+        </div>
+
+        <div class="group-access-card group-access-card-compact">
+          <label class="admin-switch admin-switch-small">
+            {{ form.is_active }}
+            <span class="admin-switch-ui"></span>
+          </label>
+
+          <div>
+            <strong>Группа активна</strong>
+            <p>Если выключить, группа останется в базе, но будет считаться неактивной.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="admin-form-actions">
+        <button class="btn btn-primary" type="submit">Сохранить</button>
+      </div>
+    </form>
+
+    <form method="post" class="group-sync-form">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="sync_students">
+      <button class="btn btn-link" type="submit">Синхронизировать студентов группы</button>
+    </form>
+  </div>
+
+  <div class="card group-detail-card">
+    <h2>Состав группы</h2>
+
+    <div class="group-summary-list">
+      <div>
+        <span>Куратор</span>
+        <strong>{{ group.curator.full_name|default:'Не назначен' }}</strong>
+      </div>
+
+      <div>
+        <span>Код специальности</span>
+        <strong>{{ group.specialty_ref.code|default:'—' }}</strong>
+      </div>
+
+      <div>
+        <span>Буквенный код</span>
+        <strong>{{ group.specialty_ref.letter_code|default:'—' }}</strong>
+      </div>
+
+      <div>
+        <span>Студентов</span>
+        <strong>{{ students_count }}</strong>
+      </div>
+    </div>
+
+    <div class="group-students-list">
+      {% for student in students %}
+        <article class="group-student-row">
+          <div class="admin-curator-main">
+            <div class="admin-curator-avatar small">
+              {{ student.full_name|default:student.email|slice:":1"|upper }}
+            </div>
+
+            <div class="admin-curator-name">
+              <strong>{{ student.full_name }}</strong>
+              <span>{{ student.email }}</span>
+            </div>
+          </div>
+
+          <div class="group-student-specialty">
+            {{ student.specialty|default:'—' }}
+          </div>
+
+          <a class="btn btn-link" href="{% url 'accounts:admin_student_detail' student.id %}">Открыть</a>
+        </article>
       {% empty %}
-        <p class="muted">В группе пока нет студентов.</p>
+        <div class="admin-empty-state">
+          <strong>В группе пока нет студентов</strong>
+          <p>Студенты появятся после назначения этой учебной группы.</p>
+        </div>
       {% endfor %}
     </div>
   </div>
