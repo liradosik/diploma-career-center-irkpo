@@ -123,7 +123,7 @@
 
           <div class="admin-student-cell">
             <span class="cell-label">Куратор</span>
-            <strong>{{ student.study_group.curator.full_name|default:student.curator.full_name|default:'не назначен' }}</strong>
+            <p>{{ student.study_group.curator.full_name|default:student.curator.full_name|default:'не назначен' }}</p>
           </div>
 
           <div class="student-status-plain">

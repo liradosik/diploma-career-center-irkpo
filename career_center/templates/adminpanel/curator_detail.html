@@ -1,63 +1,172 @@
 {% extends 'base_dashboard.html' %}
 {% block title %}Карточка куратора{% endblock %}
+
 {% block content %}
-<section class="hero"><div class="hero-kicker">Куратор</div><h1>{{ curator.full_name }}</h1><p>{{ curator.email }}</p></section>
-<section class="section grid grid-2">
-  <div class="card">
+<section class="hero admin-profile-hero curator-profile-hero">
+  <div class="admin-profile-avatar">
+    {{ curator.full_name|default:curator.email|slice:":1"|upper }}
+  </div>
+
+  <div class="admin-profile-info">
+    <div class="hero-kicker">Куратор</div>
+    <h1>{{ curator.full_name }}</h1>
+    <p>{{ curator.email }}</p>
+
+    <div class="admin-profile-badges">
+      <span class="profile-badge">Групп: {{ groups|length }}</span>
+      <span class="profile-badge">Студентов: {{ students|length }}</span>
+
+      {% if curator.is_active %}
+        <span class="profile-badge profile-badge-success">Доступ открыт</span>
+      {% else %}
+        <span class="profile-badge profile-badge-danger">Доступ закрыт</span>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<section class="section curator-detail-grid">
+  <div class="card curator-detail-card">
     <h2>Основные данные</h2>
-    <form method="post" class="form-grid">
+
+    <form method="post" class="curator-main-form">
       {% csrf_token %}
       <input type="hidden" name="action" value="update_profile">
-      {{ form.as_p }}
-      <div class="inline-actions"><button class="btn btn-primary" type="submit">Сохранить</button></div>
+
+      <div class="curator-form-grid">
+        <div class="form-field">
+          <label for="{{ form.full_name.id_for_label }}">ФИО</label>
+          {{ form.full_name }}
+          {{ form.full_name.errors }}
+        </div>
+
+        <div class="form-field">
+          <label for="{{ form.email.id_for_label }}">Email</label>
+          {{ form.email }}
+          {{ form.email.errors }}
+        </div>
+      </div>
+
+      {% if form.is_active %}
+        <div class="account-access-card curator-access-card">
+          <label class="admin-switch admin-switch-small">
+            {{ form.is_active }}
+            <span class="admin-switch-ui"></span>
+          </label>
+
+          <div>
+            <strong>Доступ к аккаунту</strong>
+            <p>Если выключить доступ, куратор останется в базе, но не сможет войти в личный кабинет.</p>
+          </div>
+        </div>
+      {% endif %}
+
+      <button class="btn btn-primary" type="submit">Сохранить</button>
     </form>
   </div>
-  <div class="card">
+
+  <div class="card curator-detail-card">
     <h2>Сброс пароля</h2>
-    <form method="post">
+
+    <form method="post" class="curator-password-form">
       {% csrf_token %}
       <input type="hidden" name="action" value="reset_password">
-      <label>Новый временный пароль</label>
-      <input name="temp_password" type="text" required>
+
+      <div class="form-field">
+        <label>Новый временный пароль</label>
+        <input name="temp_password" type="text" required>
+      </div>
+
       <p class="muted">После сброса администратор передаёт временный пароль пользователю.</p>
+
       <button class="btn btn-primary" type="submit">Сбросить пароль</button>
     </form>
   </div>
-  <div class="card">
-    <h2>Опасные действия</h2>
-    <form method="post" class="inline-actions">{% csrf_token %}<input type="hidden" name="action" value="toggle_active"><button class="btn" type="submit">{% if curator.is_active %}Деактивировать{% else %}Активировать{% endif %}</button></form>
-    <form method="post">
+</section>
+
+<section class="section card admin-related-card">
+  <h2>Закреплённые группы</h2>
+
+  <div class="admin-related-list">
+    {% for group in groups %}
+      <article class="admin-related-row curator-group-row">
+        <div>
+          <strong>{{ group.name }}</strong>
+          <span>{{ group.specialty_ref.name|default:group.specialty|default:'—' }}</span>
+        </div>
+
+        <div>
+          <span class="cell-label">Курс</span>
+          <strong>{{ group.course_number|default:'—' }}</strong>
+        </div>
+
+        <div>
+          <span class="cell-label">Год поступления</span>
+          <strong>{{ group.admission_year|default:'—' }}</strong>
+        </div>
+      </article>
+    {% empty %}
+      <div class="admin-empty-state">
+        <strong>Нет закреплённых групп</strong>
+        <p>Группы появятся здесь после назначения куратора.</p>
+      </div>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="section card admin-related-card">
+  <h2>Закреплённые студенты</h2>
+
+  <div class="admin-related-list">
+    {% for st in students %}
+      <article class="admin-related-row curator-student-row">
+        <div class="admin-curator-main">
+          <div class="admin-curator-avatar small">
+            {{ st.full_name|default:st.email|slice:":1"|upper }}
+          </div>
+
+          <div class="admin-curator-name">
+            <strong>{{ st.full_name }}</strong>
+            <span>{{ st.email }}</span>
+          </div>
+        </div>
+
+        <div>
+          <span class="cell-label">Группа</span>
+          <strong>{{ st.study_group.name|default:st.group|default:'—' }}</strong>
+        </div>
+
+        <div>
+          <span class="cell-label">Специальность</span>
+          <strong>{{ st.study_group.specialty_ref.name|default:st.specialty|default:'—' }}</strong>
+        </div>
+      </article>
+    {% empty %}
+      <div class="admin-empty-state">
+        <strong>Нет закреплённых студентов</strong>
+        <p>Студенты появятся здесь после назначения учебных групп.</p>
+      </div>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="section card curator-delete-card curator-delete-bottom-card">
+  <h2>Удаление аккаунта</h2>
+
+  <div class="danger-inner">
+    <p>Удаление требует подтверждения по email. Используйте только если запись действительно не нужна.</p>
+
+    <form method="post" class="curator-delete-form">
       {% csrf_token %}
       <input type="hidden" name="action" value="delete">
-      <label>Для удаления введите email куратора</label>
-      <input name="confirm_email" type="text" placeholder="{{ curator.email }}" required>
+
+      <div class="form-field">
+        <label>Введите email куратора</label>
+        <input name="confirm_email" type="text" placeholder="{{ curator.email }}" required>
+      </div>
+
       <button class="btn btn-danger" type="submit">Подтвердить удаление</button>
     </form>
-  </div>
-</section>
-<section class="section card">
-  <h2>Закреплённые группы</h2>
-  <div class="row-list">
-    {% for group in groups %}
-      <div class="row-item">
-        <div><strong>{{ group.name }}</strong><div class="muted">{{ group.specialty_ref.name|default:group.specialty }}</div></div>
-        <div class="muted">Курс {{ group.course_number }} • {{ group.admission_year }}</div>
-        <div></div><div></div><div></div>
-      </div>
-    {% empty %}<p class="muted">Нет закреплённых групп.</p>{% endfor %}
-  </div>
-</section>
-<section class="section card">
-  <h2>Закреплённые студенты</h2>
-  <div class="row-list">
-    {% for st in students %}
-      <div class="row-item">
-        <div><strong>{{ st.full_name }}</strong><div class="muted">{{ st.email }}</div></div>
-        <div class="muted">{{ st.group|default:'—' }}</div>
-        <div class="muted">{{ st.specialty|default:'—' }}</div>
-        <div></div><div></div>
-      </div>
-    {% empty %}<p class="muted">Нет закреплённых студентов.</p>{% endfor %}
   </div>
 </section>
 {% endblock %}

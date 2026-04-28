@@ -53,10 +53,19 @@
 
     <p class="muted">Название группы должно совпадать с группой в системе.</p>
 
-    <h3>Шаблон для заполнения</h3>
-    <div class="admin-form-actions">
-      <a class="btn btn-link" href="{% url 'accounts:admin_student_import_template_xlsx' %}">Скачать Excel</a>
-      <a class="btn btn-link" href="{% url 'accounts:admin_student_import_template_csv' %}">Скачать CSV</a>
+    <div class="import-template-box">
+      <div>
+        <h3>Шаблон для заполнения</h3>
+      </div>
+
+      <div class="import-template-actions">
+        <a class="btn btn-link" href="{% url 'accounts:admin_student_import_template_xlsx' %}">
+          Скачать Excel
+        </a>
+        <a class="btn btn-link" href="{% url 'accounts:admin_student_import_template_csv' %}">
+          Скачать CSV
+        </a>
+      </div>
     </div>
   </div>
 </section>

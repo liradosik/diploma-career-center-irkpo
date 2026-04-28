@@ -2284,3 +2284,877 @@ body {
 .selected-file-success {
   color: #0a8f4b;
 }
+/* === Import page final polish === */
+
+.import-template-box {
+  display: grid;
+  gap: 14px;
+  margin-top: 20px;
+  padding: 18px;
+  border: 1px solid #dceaff;
+  border-radius: 20px;
+  background: #f7fbff;
+}
+
+.import-template-box h3 {
+  margin: 0 0 5px;
+  color: #172536;
+  font-size: 18px;
+}
+
+.import-template-box p {
+  margin: 0;
+  color: #64748b;
+  line-height: 1.45;
+}
+
+.import-template-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.import-template-actions .btn {
+  min-width: 142px;
+  justify-content: center;
+}
+
+.custom-file-upload,
+.custom-file-upload span {
+  font-weight: 650;
+}
+
+.selected-file-box {
+  margin-top: 10px;
+}
+/* === Curators admin redesign === */
+
+.admin-curators-page {
+  display: grid;
+  gap: 28px;
+}
+
+.admin-curator-create-card {
+  max-width: none;
+}
+
+.admin-create-curator-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px 20px;
+}
+
+.admin-create-curator-form .form-field-wide {
+  grid-column: 1 / -1;
+}
+
+.admin-create-curator-form .form-field:nth-child(3) {
+  grid-column: 1 / -1;
+  max-width: 520px;
+}
+
+.admin-curator-filters {
+  display: grid;
+  grid-template-columns: minmax(260px, 360px) minmax(160px, 220px);
+  gap: 10px;
+  padding: 14px;
+  margin-bottom: 20px;
+  border: 1px solid #e1e9f5;
+  border-radius: 22px;
+  background: #f8fbff;
+}
+
+.admin-curator-filters input,
+.admin-curator-filters button {
+  min-height: 44px;
+  border-radius: 16px;
+}
+
+.admin-curator-list {
+  display: grid;
+  gap: 12px;
+}
+
+.admin-curator-row {
+  display: grid;
+  grid-template-columns: minmax(300px, 1.4fr) minmax(110px, .45fr) minmax(130px, .5fr) minmax(150px, .55fr) auto;
+  align-items: center;
+  gap: 18px;
+  padding: 16px 18px;
+  border: 1px solid #e1e9f5;
+  border-radius: 22px;
+  background: #fff;
+  transition: border-color .15s ease, background-color .15s ease;
+}
+
+.admin-curator-row:hover {
+  border-color: #cfe1fb;
+  background: #fbfdff;
+}
+
+.admin-curator-main {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.admin-curator-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 58px;
+  height: 58px;
+  flex: 0 0 58px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #2b6fe3, #3b8cff);
+  color: #fff;
+  font-size: 26px;
+  font-weight: 900;
+  box-shadow: 0 16px 34px rgba(43, 111, 227, .18);
+}
+
+.admin-curator-avatar.small {
+  width: 46px;
+  height: 46px;
+  flex-basis: 46px;
+  border-radius: 15px;
+  font-size: 20px;
+}
+
+.admin-curator-name {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.admin-curator-name strong {
+  color: #0f1f33;
+  font-size: 18px;
+  line-height: 1.18;
+}
+
+.admin-curator-name span {
+  color: #64748b;
+  overflow-wrap: anywhere;
+}
+
+.admin-curator-cell {
+  display: grid;
+  gap: 4px;
+}
+
+.admin-curator-cell strong {
+  color: #13243a;
+  font-size: 20px;
+}
+
+.admin-curator-status {
+  justify-self: start;
+}
+
+/* === Curator detail === */
+
+.admin-profile-hero {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  padding: 56px 58px;
+  border-radius: 32px;
+  border: 1px solid #dceaff;
+  background: linear-gradient(135deg, #f4f9ff, #edf5ff);
+  box-shadow: 0 24px 70px rgba(31, 84, 145, .10);
+}
+
+.admin-profile-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 118px;
+  height: 118px;
+  flex: 0 0 118px;
+  border-radius: 28px;
+  background: linear-gradient(135deg, #2b6fe3, #3b8cff);
+  color: #fff;
+  font-size: 54px;
+  font-weight: 900;
+  box-shadow: 0 22px 48px rgba(43, 111, 227, .22);
+}
+
+.admin-profile-info {
+  min-width: 0;
+}
+
+.admin-profile-info h1 {
+  margin: 10px 0 10px;
+}
+
+.admin-profile-info p {
+  margin: 0;
+  color: #64748b;
+  font-size: 18px;
+}
+
+.admin-profile-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.profile-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1px solid #d7e5f7;
+  background: #fff;
+  color: #3465a1;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.profile-badge-success {
+  color: #0a8f4b;
+  background: #eaf8f1;
+  border-color: #cceedd;
+}
+
+.profile-badge-danger {
+  color: #b42318;
+  background: #fdeeee;
+  border-color: #f5caca;
+}
+
+.admin-profile-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(360px, .82fr);
+  gap: 28px;
+  align-items: start;
+}
+
+.admin-profile-card,
+.admin-danger-card,
+.admin-related-card {
+  padding: 34px;
+}
+
+.admin-curator-detail-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px 20px;
+}
+
+.admin-curator-detail-form .form-field-wide {
+  grid-column: 1 / -1;
+}
+
+.admin-password-form {
+  display: grid;
+  gap: 14px;
+}
+
+.admin-password-form .btn {
+  width: fit-content;
+}
+
+.admin-danger-card {
+  grid-column: 2;
+  border-color: #ffc9c9;
+}
+
+.danger-inner {
+  padding: 20px;
+  border-radius: 22px;
+  border: 1px solid #ffc9c9;
+  background: #fff8f8;
+}
+
+.danger-inner p {
+  margin-top: 0;
+  color: #64748b;
+  line-height: 1.45;
+}
+
+.danger-inner form {
+  display: grid;
+  gap: 12px;
+}
+
+.admin-related-card {
+  margin-top: 0;
+}
+
+.admin-related-list {
+  display: grid;
+  gap: 12px;
+}
+
+.admin-related-row {
+  display: grid;
+  grid-template-columns: minmax(280px, 1.2fr) minmax(120px, .4fr) minmax(160px, .5fr);
+  gap: 18px;
+  align-items: center;
+  padding: 16px 18px;
+  border: 1px solid #e1e9f5;
+  border-radius: 20px;
+  background: #fff;
+}
+
+.admin-related-row strong {
+  color: #0f1f33;
+}
+
+.admin-related-row span:not(.cell-label) {
+  display: block;
+  margin-top: 4px;
+  color: #64748b;
+}
+
+.admin-related-student-row {
+  grid-template-columns: minmax(320px, 1.2fr) minmax(150px, .45fr) minmax(260px, .8fr);
+}
+
+/* === Curator import uses same template polish as students === */
+
+.admin-import-help .import-template-box {
+  margin-top: 20px;
+}
+
+@media (max-width: 1280px) {
+  .admin-curator-row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .admin-profile-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-danger-card {
+    grid-column: auto;
+  }
+
+  .admin-related-row,
+  .admin-related-student-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .admin-create-curator-form,
+  .admin-curator-filters,
+  .admin-curator-row,
+  .admin-curator-detail-form {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-create-curator-form .form-field:nth-child(3) {
+    grid-column: auto;
+    max-width: none;
+  }
+
+  .admin-profile-hero {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 34px;
+  }
+}
+/* === Curator pages final fixes === */
+
+/* Create curator form: equal field width */
+.admin-create-curator-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px 22px;
+}
+
+.admin-create-curator-form .form-field,
+.admin-create-curator-form .form-field input {
+  width: 100%;
+  max-width: none;
+}
+
+.admin-create-curator-form .form-field:nth-child(3),
+.admin-create-curator-form .form-field-wide {
+  grid-column: 1 / -1;
+}
+
+.admin-create-curator-form .form-field:nth-child(3) input {
+  max-width: 520px;
+}
+
+/* Curator detail stable layout */
+.curator-profile-hero {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+
+.curator-detail-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(380px, 0.82fr);
+  gap: 28px;
+  align-items: stretch;
+}
+
+.curator-detail-card,
+.curator-delete-card {
+  padding: 34px;
+}
+
+.curator-main-form,
+.curator-password-form,
+.curator-delete-form {
+  display: grid;
+  gap: 18px;
+}
+
+.curator-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px 20px;
+}
+
+.curator-form-grid .form-field,
+.curator-form-grid input,
+.curator-password-form input,
+.curator-delete-form input {
+  width: 100%;
+  max-width: none;
+}
+
+.curator-access-card {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 20px 22px;
+  border-radius: 22px;
+  border: 1px solid #d7e8ff;
+  background: #f5faff;
+}
+
+.curator-access-card strong {
+  display: block;
+  margin-bottom: 4px;
+  color: #0f1f33;
+  font-size: 18px;
+}
+
+.curator-access-card p {
+  margin: 0;
+  color: #64748b;
+  line-height: 1.45;
+}
+
+/* Normal switch instead of centered checkbox */
+.admin-switch {
+  position: relative;
+  display: inline-flex;
+  width: 62px;
+  height: 36px;
+  flex: 0 0 62px;
+  cursor: pointer;
+}
+
+.admin-switch input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.admin-switch-ui {
+  position: relative;
+  width: 62px;
+  height: 36px;
+  border-radius: 999px;
+  background: #cbd5e1;
+  transition: background-color .18s ease;
+}
+
+.admin-switch-ui::after {
+  content: "";
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(15, 31, 51, .18);
+  transition: transform .18s ease;
+}
+
+.admin-switch input[type="checkbox"]:checked + .admin-switch-ui {
+  background: linear-gradient(135deg, #2b6fe3, #3b8cff);
+}
+
+.admin-switch input[type="checkbox"]:checked + .admin-switch-ui::after {
+  transform: translateX(26px);
+}
+
+.curator-main-form > .btn,
+.curator-password-form > .btn {
+  width: fit-content;
+  min-width: 150px;
+}
+
+.curator-delete-card {
+  grid-column: 2;
+  border-color: #ffc9c9;
+}
+
+.curator-delete-card .danger-inner {
+  padding: 22px;
+  border-radius: 24px;
+  border: 1px solid #ffc9c9;
+  background: #fff8f8;
+}
+
+.curator-delete-card .btn-danger {
+  width: 100%;
+}
+
+/* Related curator data */
+.curator-group-row {
+  grid-template-columns: minmax(320px, 1.4fr) minmax(120px, .45fr) minmax(180px, .55fr);
+}
+
+.curator-student-row {
+  grid-template-columns: minmax(360px, 1.3fr) minmax(150px, .45fr) minmax(320px, .9fr);
+}
+
+/* Import curator template box without duplicate text */
+.admin-import-help .import-template-box p:empty {
+  display: none;
+}
+
+@media (max-width: 1280px) {
+  .curator-detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .curator-delete-card {
+    grid-column: auto;
+  }
+
+  .curator-group-row,
+  .curator-student-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .admin-create-curator-form,
+  .curator-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-create-curator-form .form-field:nth-child(3) {
+    grid-column: auto;
+  }
+
+  .admin-create-curator-form .form-field:nth-child(3) input {
+    max-width: none;
+  }
+
+  .curator-profile-hero {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+/* === Curator detail final polish === */
+
+/* 1. Карточка удаления аккаунта */
+.curator-delete-card {
+  grid-column: 1 / -1;
+  width: 100%;
+  margin-top: 8px;
+}
+
+.curator-delete-card .danger-inner {
+  width: 100%;
+  max-width: none;
+}
+
+.curator-delete-card .btn-danger {
+  width: 100%;
+  max-width: 420px;
+}
+
+/* если хочешь кнопку не во всю ширину, а аккуратнее — можно так:
+.curator-delete-card .btn-danger {
+  width: fit-content;
+  min-width: 260px;
+}
+*/
+
+/* 2. Нормальный отступ между блоками "Закреплённые группы" и "Закреплённые студенты" */
+.admin-related-card + .admin-related-card {
+  margin-top: 28px;
+}
+
+/* 3. Убираем слишком сильную жирность у второстепенной информации */
+.curator-group-row > div:not(:first-child) strong,
+.curator-student-row > div:not(:first-child) strong {
+  font-weight: 500;
+  color: #334155;
+}
+
+/* Чуть спокойнее делаем подписи */
+.curator-group-row .cell-label,
+.curator-student-row .cell-label {
+  font-weight: 500;
+  color: #64748b;
+}
+
+/* Специальность в карточках студентов — тоже мягче */
+.curator-student-row > div:last-child strong {
+  font-weight: 500;
+  color: #334155;
+}
+
+/* Курс и год поступления — менее резкие */
+.curator-group-row > div:nth-child(2) strong,
+.curator-group-row > div:nth-child(3) strong {
+  font-weight: 500;
+  color: #334155;
+}
+
+/* Группа и специальность у закреплённых студентов — менее резкие */
+.curator-student-row > div:nth-child(2) strong,
+.curator-student-row > div:nth-child(3) strong {
+  font-weight: 500;
+  color: #334155;
+}
+
+/* 4. На всякий случай — одинаковая ширина полей в создании куратора */
+.admin-create-curator-form .form-field,
+.admin-create-curator-form .form-field input {
+  width: 100%;
+  max-width: none;
+}
+
+/* 5. Чтобы карточки снизу не липли друг к другу */
+.admin-related-card {
+  overflow: hidden;
+}
+/* === Curator detail bottom delete + compact switch === */
+
+/* Удаление аккаунта переносим визуально в самый низ */
+.curator-delete-bottom-card {
+  grid-column: auto;
+  width: 100%;
+  margin-top: 28px;
+  border-color: #ffc9c9;
+}
+
+.curator-delete-bottom-card .danger-inner {
+  max-width: none;
+  padding: 24px 28px;
+  border-radius: 24px;
+  border: 1px solid #ffc9c9;
+  background: #fff8f8;
+}
+
+.curator-delete-bottom-card .danger-inner p {
+  margin: 0 0 16px;
+  color: #64748b;
+  line-height: 1.45;
+}
+
+.curator-delete-bottom-card .curator-delete-form {
+  display: grid;
+  gap: 14px;
+}
+
+.curator-delete-bottom-card input {
+  width: 100%;
+  max-width: none;
+}
+
+.curator-delete-bottom-card .btn-danger {
+  width: fit-content;
+  min-width: 260px;
+}
+
+/* Верхняя сетка куратора: только основные данные + сброс пароля */
+.curator-detail-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(380px, 0.82fr);
+  gap: 28px;
+  align-items: stretch;
+}
+
+/* Компактный свитч доступа */
+.admin-switch-small {
+  width: 50px;
+  height: 30px;
+  flex: 0 0 50px;
+}
+
+.admin-switch-small .admin-switch-ui {
+  width: 50px;
+  height: 30px;
+}
+
+.admin-switch-small .admin-switch-ui::after {
+  top: 4px;
+  left: 4px;
+  width: 22px;
+  height: 22px;
+}
+
+.admin-switch-small input[type="checkbox"]:checked + .admin-switch-ui::after {
+  transform: translateX(20px);
+}
+
+.curator-access-card {
+  align-items: center;
+  gap: 16px;
+  padding: 18px 20px;
+}
+
+.curator-access-card strong {
+  font-size: 17px;
+}
+
+.curator-access-card p {
+  font-size: 15px;
+}
+
+/* Отступ между закреплёнными группами и студентами */
+.admin-related-card + .admin-related-card {
+  margin-top: 28px;
+}
+
+/* Делаем второстепенные данные спокойнее */
+.curator-group-row > div:not(:first-child) strong,
+.curator-student-row > div:not(:first-child) strong,
+.curator-student-row > div:last-child strong {
+  font-weight: 500;
+  color: #334155;
+}
+
+.curator-group-row .cell-label,
+.curator-student-row .cell-label {
+  font-weight: 500;
+  color: #64748b;
+}
+
+/* Курс, год, группа, специальность — без лишней жирности */
+.curator-group-row > div:nth-child(2) strong,
+.curator-group-row > div:nth-child(3) strong,
+.curator-student-row > div:nth-child(2) strong,
+.curator-student-row > div:nth-child(3) strong {
+  font-weight: 500;
+  color: #334155;
+}
+
+/* Чтобы нижние карточки не слипались и не вылезали */
+.admin-related-card,
+.curator-delete-bottom-card {
+  overflow: hidden;
+}
+
+@media (max-width: 1280px) {
+  .curator-detail-grid {
+    grid-template-columns: 1fr;
+  }
+}
+/* === Curator detail spacing fix === */
+
+.curator-detail-grid {
+  margin-bottom: 28px;
+}
+
+.curator-detail-grid + .admin-related-card {
+  margin-top: 28px;
+}
+/* === Curators list final polish === */
+
+/* Поля создания куратора одинаковой ширины */
+.admin-create-curator-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px 22px;
+}
+
+.admin-create-curator-form .form-field {
+  width: 100%;
+  max-width: none;
+}
+
+.admin-create-curator-form .form-field input {
+  width: 100%;
+  max-width: none;
+}
+
+.admin-create-curator-form .form-field:nth-child(3),
+.admin-create-curator-form .form-field-wide {
+  grid-column: 1 / -1;
+}
+
+.admin-create-curator-form .form-field:nth-child(3) {
+  max-width: 520px;
+}
+
+/* Если email всё ещё уже из-за старых стилей */
+.admin-create-curator-form .form-field:nth-child(2),
+.admin-create-curator-form .form-field:nth-child(2) input {
+  width: 100%;
+  max-width: none;
+}
+
+/* Список кураторов: числа и подписи спокойнее */
+.admin-curator-cell strong {
+  font-weight: 500;
+  color: #475569;
+  font-size: 17px;
+}
+
+.admin-curator-cell .cell-label {
+  font-weight: 500;
+  color: #94a3b8;
+  letter-spacing: .04em;
+}
+
+/* Доступ открыт — мягче, как учебный статус у студентов */
+.admin-curator-status .student-access-badge {
+  background: transparent;
+  border-color: transparent;
+  padding: 0;
+  color: #64748b;
+  font-weight: 500;
+  box-shadow: none;
+}
+
+.admin-curator-status .student-access-badge.is-open,
+.admin-curator-status .student-access-badge.is-closed {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  border-radius: 0;
+  color: #64748b;
+  font-weight: 500;
+}
+
+/* Закрытый доступ — тоже спокойно */
+.admin-curator-status .student-access-badge.is-closed {
+  color: #b45309;
+  background: rgba(245, 158, 11, .09);
+  border: 1px solid rgba(245, 158, 11, .16);
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+@media (max-width: 760px) {
+  .admin-create-curator-form {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-create-curator-form .form-field:nth-child(3) {
+    max-width: none;
+  }
+}

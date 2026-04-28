@@ -1,38 +1,102 @@
 {% extends 'base_dashboard.html' %}
 {% block title %}Кураторы{% endblock %}
-{% block content %}
-<section class="hero"><div class="hero-kicker">Администрирование</div><h1>Кураторы</h1><p>Управление кураторами и закреплением студентов.</p></section>
 
-<section class="section card form-card">
-  <h2>Создать куратора</h2>
-  <form method="post" class="form-grid">
-    {% csrf_token %}
-    <p class="full"><label>{{ form.full_name.label }}</label>{{ form.full_name }}</p>
-    <p class="full"><label>{{ form.email.label }}</label>{{ form.email }}</p>
-    <p class="full"><label>{{ form.password.label }}</label>{{ form.password }}</p>
-    <p class="full"><button class="btn btn-primary" type="submit">Создать</button> <a class="btn btn-link" href="{% url 'accounts:admin_curator_import' %}">Импорт CSV / Excel</a></p>
-  </form>
+{% block content %}
+<section class="hero admin-page-hero">
+  <div>
+    <div class="hero-kicker">Администрирование</div>
+    <h1>Кураторы</h1>
+    <p>Управление кураторами, доступом к аккаунтам и закреплёнными группами.</p>
+  </div>
 </section>
 
-<section class="section card">
-  <h2>Список кураторов</h2>
-  <form method="get" class="filters">
-    <input name="q" placeholder="Поиск по ФИО/email" value="{{ request.GET.q }}">
-    <button class="btn btn-link" type="submit">Применить</button>
-  </form>
+<section class="section admin-curators-page">
+  <div class="card admin-create-card admin-curator-create-card">
+    <div class="admin-card-head">
+      <h2>Создать куратора</h2>
+    </div>
 
-  <div class="row-list">
-    {% for curator in curators %}
-      <div class="row-item">
-        <div><strong>{{ curator.full_name }}</strong><div class="muted">{{ curator.email }}</div></div>
-        <div class="muted">Групп: {{ curator.groups_count }}</div>
-        <div class="muted">Студентов: {{ curator.students_count }}</div>
-        <div class="muted">{% if curator.is_active %}Активен{% else %}Неактивен{% endif %}</div>
-        <a class="btn btn-link" href="{% url 'accounts:admin_curator_detail' curator.id %}">Открыть</a>
+    <form method="post" class="admin-create-curator-form">
+      {% csrf_token %}
+
+      <div class="form-field">
+        <label for="{{ form.full_name.id_for_label }}">ФИО</label>
+        {{ form.full_name }}
+        {{ form.full_name.errors }}
       </div>
-    {% empty %}
-      <p class="muted">Кураторы не найдены.</p>
-    {% endfor %}
+
+      <div class="form-field">
+        <label for="{{ form.email.id_for_label }}">Email</label>
+        {{ form.email }}
+        {{ form.email.errors }}
+      </div>
+
+      <div class="form-field">
+        <label for="{{ form.password.id_for_label }}">Временный пароль</label>
+        {{ form.password }}
+        {{ form.password.errors }}
+      </div>
+
+      <div class="form-field-wide admin-form-actions">
+        <button class="btn btn-primary" type="submit">Создать куратора</button>
+        <a class="btn btn-link" href="{% url 'accounts:admin_curator_import' %}">Импорт CSV / Excel</a>
+      </div>
+    </form>
+  </div>
+
+  <div class="card admin-list-card">
+    <div class="admin-card-head">
+      <h2>Список кураторов</h2>
+    </div>
+
+    <form method="get" class="admin-filter-panel admin-curator-filters">
+      <input name="q" placeholder="ФИО или email" value="{{ request.GET.q }}">
+      <button class="btn btn-link" type="submit">Применить</button>
+    </form>
+
+    <div class="admin-curator-list">
+      {% for curator in curators %}
+        <article class="admin-curator-row">
+          <div class="admin-curator-main">
+            <div class="admin-curator-avatar">
+              {{ curator.full_name|default:curator.email|slice:":1"|upper }}
+            </div>
+
+            <div class="admin-curator-name">
+              <strong>{{ curator.full_name }}</strong>
+              <span>{{ curator.email }}</span>
+            </div>
+          </div>
+
+          <div class="admin-curator-cell">
+            <span class="cell-label">Группы</span>
+            <strong>{{ curator.groups_count }}</strong>
+          </div>
+
+          <div class="admin-curator-cell">
+            <span class="cell-label">Студенты</span>
+            <strong>{{ curator.students_count }}</strong>
+          </div>
+
+          <div class="admin-curator-status">
+            {% if curator.is_active %}
+              <span class="student-access-badge is-open">Доступ открыт</span>
+            {% else %}
+              <span class="student-access-badge is-closed">Доступ закрыт</span>
+            {% endif %}
+          </div>
+
+          <a class="btn btn-link admin-row-action" href="{% url 'accounts:admin_curator_detail' curator.id %}">
+            Открыть
+          </a>
+        </article>
+      {% empty %}
+        <div class="admin-empty-state">
+          <strong>Кураторы не найдены</strong>
+          <p>Попробуйте изменить поиск или создать нового куратора.</p>
+        </div>
+      {% endfor %}
+    </div>
   </div>
 </section>
 {% endblock %}
