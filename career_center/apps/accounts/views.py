@@ -215,6 +215,7 @@ def admin_dashboard(request):
         'students_total': students_total,
         'students_active': students_qs.filter(is_active=True).count(),
         'students_studying': students_qs.filter(academic_status=User.AcademicStatus.STUDYING).count(),
+        'students_academic_leave': students_qs.filter(academic_status=User.AcademicStatus.ACADEMIC_LEAVE).count(),
         'students_graduate': students_qs.filter(academic_status=User.AcademicStatus.GRADUATE).count(),
         'students_inactive_status': students_qs.filter(academic_status=User.AcademicStatus.INACTIVE).count(),
         'inactive_users_total': User.objects.filter(is_active=False).count(),
@@ -243,6 +244,7 @@ def admin_dashboard(request):
         },
         'student_status_chart': [
             students_qs.filter(academic_status=User.AcademicStatus.STUDYING).count(),
+            students_qs.filter(academic_status=User.AcademicStatus.ACADEMIC_LEAVE).count(),
             students_qs.filter(academic_status=User.AcademicStatus.GRADUATE).count(),
             students_qs.filter(academic_status=User.AcademicStatus.INACTIVE).count(),
         ],
@@ -299,7 +301,12 @@ def admin_students(request):
         students = students.filter(specialty__icontains=specialty)
     if is_active in {'1', '0'}:
         students = students.filter(is_active=(is_active == '1'))
-    if academic_status in {User.AcademicStatus.STUDYING, User.AcademicStatus.GRADUATE, User.AcademicStatus.INACTIVE}:
+    if academic_status in {
+        User.AcademicStatus.STUDYING,
+        User.AcademicStatus.ACADEMIC_LEAVE,
+        User.AcademicStatus.GRADUATE,
+        User.AcademicStatus.INACTIVE,
+    }:
         students = students.filter(academic_status=academic_status)
 
     filter_curators = User.objects.filter(role=User.Role.CURATOR).order_by('full_name')
@@ -334,15 +341,6 @@ def admin_student_detail(request, student_id):
                 form.save()
                 messages.success(request, 'Данные студента обновлены.')
                 return redirect('accounts:admin_student_detail', student_id=student.id)
-        elif action == 'toggle_active':
-            student.is_active = not student.is_active
-            if not student.is_active:
-                student.academic_status = User.AcademicStatus.INACTIVE
-            elif student.academic_status == User.AcademicStatus.INACTIVE:
-                student.academic_status = User.AcademicStatus.STUDYING
-            student.save(update_fields=['is_active', 'academic_status'])
-            messages.success(request, 'Статус студента обновлён.')
-            return redirect('accounts:admin_student_detail', student_id=student.id)
         elif action == 'reset_password':
             new_password = request.POST.get('temp_password', '').strip()
             if new_password:

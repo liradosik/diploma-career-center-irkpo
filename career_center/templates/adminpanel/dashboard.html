@@ -92,13 +92,19 @@
 
             <div>
               <span class="dot dot-sky"></span>
+              Академический отпуск
+              <strong>{{ students_academic_leave }}</strong>
+            </div>
+
+            <div>
+              <span class="dot dot-steel"></span>
               Выпускники
               <strong>{{ students_graduate }}</strong>
             </div>
 
             <div>
               <span class="dot dot-gray"></span>
-              Неактивные
+              Отчислены
               <strong>{{ students_inactive_status }}</strong>
             </div>
           </div>
@@ -293,10 +299,10 @@
     new Chart(document.getElementById('studentsStatusChart'), {
       type: 'doughnut',
       data: {
-        labels: ['Обучаются', 'Выпускники', 'Неактивные'],
+        labels: ['Обучаются', 'Академический отпуск', 'Выпускники', 'Отчислены'],
         datasets: [{
           data: studentStatusData,
-          backgroundColor: ['#1e66d0', '#79b7ff', '#cbd8ea'],
+          backgroundColor: ['#1e66d0', '#5f95e8', '#94bff5', '#cbd8ea'],
           borderColor: nonZeroStudentStatus > 1 ? '#ffffff' : 'transparent',
           borderWidth: nonZeroStudentStatus > 1 ? 4 : 0,
           hoverOffset: 4,
