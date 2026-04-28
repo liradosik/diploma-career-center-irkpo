@@ -37,15 +37,16 @@
       {% endfor %}
     </select>
     <select name="is_active">
-      <option value="">Статус</option>
-      <option value="1" {% if is_active_filter == '1' %}selected{% endif %}>Активен</option>
-      <option value="0" {% if is_active_filter == '0' %}selected{% endif %}>Деактивирован</option>
+      <option value="">Доступ к аккаунту</option>
+      <option value="1" {% if is_active_filter == '1' %}selected{% endif %}>Доступ открыт</option>
+      <option value="0" {% if is_active_filter == '0' %}selected{% endif %}>Доступ закрыт</option>
     </select>
     <select name="academic_status">
       <option value="">Учебный статус</option>
       <option value="studying" {% if academic_status_filter == 'studying' %}selected{% endif %}>Обучаются</option>
+      <option value="academic_leave" {% if academic_status_filter == 'academic_leave' %}selected{% endif %}>Академический отпуск</option>
       <option value="graduate" {% if academic_status_filter == 'graduate' %}selected{% endif %}>Выпускники</option>
-      <option value="inactive" {% if academic_status_filter == 'inactive' %}selected{% endif %}>Неактивные</option>
+      <option value="inactive" {% if academic_status_filter == 'inactive' %}selected{% endif %}>Отчисленные</option>
     </select>
     <button class="btn btn-link" type="submit">Применить</button>
   </form>
@@ -56,7 +57,14 @@
         <div><strong>{{ student.full_name }}</strong><div class="muted">{{ student.email }}</div></div>
         <div class="muted">{{ student.study_group.name|default:student.group|default:'—' }}<br>{{ student.study_group.specialty_ref.name|default:student.specialty|default:'—' }}</div>
         <div class="muted">{{ student.study_group.curator.full_name|default:student.curator.full_name|default:'не назначен' }}</div>
-        <div class="muted">{% if student.is_active %}Активен{% else %}Неактивен{% endif %}<br>{{ student.get_academic_status_display }}</div>
+        <div class="muted">
+          {% if student.is_active %}
+            <span class="admin-status admin-status-active">Доступ открыт</span>
+          {% else %}
+            <span class="admin-status admin-status-inactive">Доступ закрыт</span>
+          {% endif %}
+          <br>{{ student.get_academic_status_display }}
+        </div>
         <a class="btn btn-link" href="{% url 'accounts:admin_student_detail' student.id %}">Открыть</a>
       </div>
     {% empty %}

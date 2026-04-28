@@ -680,6 +680,7 @@ textarea { min-height: 110px; }
 }
 .dot-blue { background: var(--primary); }
 .dot-sky { background: #79b7ff; }
+.dot-steel { background: #94bff5; }
 .dot-gray { background: #cbd8ea; }
 
 .status-summary {
