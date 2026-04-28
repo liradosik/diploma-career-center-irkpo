@@ -10,7 +10,7 @@
     <p class="full"><label>{{ form.full_name.label }}</label>{{ form.full_name }}</p>
     <p class="full"><label>{{ form.email.label }}</label>{{ form.email }}</p>
     <p class="full"><label>{{ form.password.label }}</label>{{ form.password }}</p>
-    <p class="full"><button class="btn btn-primary" type="submit">Создать</button></p>
+    <p class="full"><button class="btn btn-primary" type="submit">Создать</button> <a class="btn btn-link" href="{% url 'accounts:admin_curator_import' %}">Импорт CSV / Excel</a></p>
   </form>
 </section>
 

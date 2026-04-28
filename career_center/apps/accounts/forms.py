@@ -280,4 +280,12 @@ class AdminStudyGroupForm(forms.ModelForm):
 
 
 class StudentImportForm(forms.Form):
-    csv_file = forms.FileField(label='CSV файл со студентами')
+    import_file = forms.FileField(label='Файл со студентами (CSV/XLSX)')
+
+
+class CuratorImportForm(forms.Form):
+    import_file = forms.FileField(label='Файл с кураторами (CSV/XLSX)')
+
+
+class GroupImportForm(forms.Form):
+    import_file = forms.FileField(label='Файл с группами (CSV/XLSX)')

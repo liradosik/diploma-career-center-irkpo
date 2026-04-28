@@ -19,7 +19,7 @@
     <p><label>{{ form.curator.label }}</label>{{ form.curator }}</p>
     <p><label>{{ form.is_active.label }}</label>{{ form.is_active }}</p>
     <p class="full muted">Если оставить название пустым, система предложит формат по буквенному коду, курсу и году.</p>
-    <p class="full"><button class="btn btn-primary" type="submit">Сохранить</button></p>
+    <p class="full"><button class="btn btn-primary" type="submit">Сохранить</button> <a class="btn btn-link" href="{% url 'accounts:admin_group_import' %}">Импорт CSV / Excel</a></p>
   </form>
 </section>
 
