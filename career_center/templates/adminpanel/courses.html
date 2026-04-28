@@ -4,7 +4,7 @@
 {% block title %}Курсы и семинары{% endblock %}
 
 {% block content %}
-<section class="hero">
+<section class="hero admin-page-hero">
   <div class="hero-kicker">Администрирование</div>
   <h1>Курсы и семинары</h1>
   <p>Создание и управление обучающими событиями для студентов.</p>
@@ -72,7 +72,7 @@
 <section class="section card admin-wide-card">
   <h2>Список курсов</h2>
 
-  <form method="get" class="filters admin-clean-filters">
+  <form method="get" class="filters admin-clean-filters admin-filter-panel">
     <input
       name="q"
       placeholder="Название или организация"
@@ -124,7 +124,7 @@
           {% endif %}
         </div>
 
-        <a class="btn btn-link admin-row-open" href="{% url 'accounts:admin_course_detail' course.id %}">
+        <a class="btn btn-link admin-row-open admin-row-action" href="{% url 'accounts:admin_course_detail' course.id %}">
           Открыть
         </a>
       </div>

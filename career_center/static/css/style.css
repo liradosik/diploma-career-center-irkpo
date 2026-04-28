@@ -2056,19 +2056,6 @@ body {
   border-radius: 18px;
 }
 
-.student-status-plain {
-  display: grid;
-  gap: 8px;
-  align-items: start;
-  justify-items: start;
-}
-
-.student-status-text {
-  color: #5f6f84;
-  font-size: 14px;
-  font-weight: 700;
-}
-
 .student-access-badge,
 .student-academic-badge {
   min-height: 26px;
@@ -2194,11 +2181,6 @@ body {
 
 .custom-file-upload span {
   font-weight: 700;
-}
-.csv-example code,
-.csv-format-box code {
-  white-space: nowrap;
-  overflow-x: auto;
 }
 /* === CSV import layout balance === */
 
@@ -4561,4 +4543,178 @@ body {
   .admin-activity-filters {
     grid-template-columns: 1fr;
   }
+}
+/* === Admin panel unified visual system (refactor pass) === */
+:root {
+  --admin-card-radius: 22px;
+  --admin-card-padding: 24px;
+  --admin-control-height: 44px;
+  --admin-soft-blue: #f7fbff;
+  --admin-soft-border: #dce7f5;
+  --admin-row-border: #e1e9f5;
+  --admin-status-bg: #eff4fb;
+  --admin-status-text: #45607f;
+}
+
+.hero.admin-page-hero,
+.hero.admin-profile-hero,
+.hero.admin-detail-hero {
+  border-radius: 24px;
+  border: 1px solid #dceaff;
+  background: linear-gradient(135deg, #f4f9ff, #edf5ff);
+  box-shadow: none;
+}
+
+.card.admin-create-card,
+.card.admin-list-card,
+.card.admin-import-card,
+.card.admin-import-help,
+.card.admin-import-report,
+.card.admin-wide-card,
+.card.specialty-form-card,
+.card.specialty-list-card,
+.card.group-detail-card,
+.card.specialty-detail-card,
+.card.vacancy-edit-card,
+.card.vacancy-side-card,
+.card.curator-detail-card,
+.card.admin-related-card,
+.card.curator-delete-card,
+.card.admin-info-card,
+.card.admin-danger-card {
+  border-radius: var(--admin-card-radius);
+  padding: var(--admin-card-padding);
+}
+
+.btn,
+.btn.btn-link,
+.btn.btn-primary,
+.btn.btn-danger,
+.admin-row-action,
+.admin-row-open {
+  min-height: var(--admin-control-height);
+  padding: 0 18px;
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 700;
+  justify-content: center;
+}
+
+.admin-row-action,
+.admin-row-open {
+  min-width: 112px;
+}
+
+.btn.btn-link {
+  border-color: #cfe1fb;
+  background: #f7fbff;
+  color: #1e66d0;
+}
+
+input,
+select,
+textarea,
+.admin-filter-panel input,
+.admin-filter-panel select,
+.admin-filter-panel textarea,
+.admin-filters input,
+.admin-filters select,
+.filters input,
+.filters select {
+  min-height: var(--admin-control-height);
+  border-radius: 14px;
+}
+
+textarea {
+  min-height: 110px;
+}
+
+.admin-filter-panel,
+.admin-student-filters,
+.admin-curator-filters,
+.admin-groups-filters,
+.specialty-filter,
+.vacancy-filters,
+.admin-clean-filters,
+.admin-activity-filters {
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid var(--admin-soft-border);
+  border-radius: var(--admin-card-radius);
+  background: var(--admin-soft-blue);
+}
+
+.admin-student-row,
+.admin-curator-row,
+.admin-group-row,
+.specialty-row,
+.admin-row,
+.admin-course-row,
+.admin-activity-row,
+.admin-related-row,
+.group-student-row,
+.specialty-related-row {
+  border-radius: 18px;
+  border: 1px solid var(--admin-row-border);
+  background: #fff;
+  box-shadow: none;
+  transform: none;
+  transition: none;
+}
+
+.admin-student-row:hover,
+.admin-curator-row:hover,
+.admin-group-row:hover,
+.specialty-row:hover,
+.admin-row:hover,
+.admin-course-row:hover,
+.admin-activity-row:hover,
+.admin-related-row:hover,
+.group-student-row:hover,
+.specialty-related-row:hover {
+  box-shadow: none;
+  transform: none;
+  background: #fff;
+  border-color: var(--admin-row-border);
+}
+
+.badge,
+.student-access-badge,
+.student-academic-badge,
+.profile-badge,
+.vacancy-status,
+.vacancy-status-text,
+.admin-soft-badge {
+  border-radius: 999px;
+  border: 1px solid #d7e5f7;
+  background: var(--admin-status-bg);
+  color: var(--admin-status-text);
+}
+
+.student-access-badge.is-open,
+.profile-badge-success,
+.selected-file-box.has-file {
+  background: #eef4fb;
+  border-color: #d6e2f2;
+  color: #45607f;
+}
+
+.student-access-badge.is-closed,
+.profile-badge-danger,
+.vacancy-status-archive,
+.vacancy-status-text-archive {
+  background: #f4f6fa;
+  border-color: #dde3ed;
+  color: #58687c;
+}
+
+.admin-switch-ui,
+.account-access-switch {
+  border-radius: 999px;
+  background: #dbe7f6;
+}
+
+.admin-switch input:checked + .admin-switch-ui,
+.account-access-toggle input[type="checkbox"]:checked + .account-access-switch {
+  background: #9bbbe3;
 }

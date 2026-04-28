@@ -2,7 +2,7 @@
 {% block title %}Специальности{% endblock %}
 
 {% block content %}
-<section class="hero">
+<section class="hero admin-page-hero">
   <div class="hero-kicker">Администрирование</div>
   <h1>Специальности</h1>
   <p>Справочник специальностей и профилей для учебных групп.</p>
@@ -52,7 +52,7 @@
 <section class="section card specialty-list-card">
   <h2>Список специальностей</h2>
 
-  <form method="get" class="specialty-filter">
+  <form method="get" class="specialty-filter admin-filter-panel">
     <input
       name="q"
       placeholder="Поиск по коду, названию или буквенному коду"
@@ -72,7 +72,7 @@
         </div>
 
         <div class="specialty-row-actions">
-          <a class="btn btn-link" href="{% url 'accounts:admin_specialty_detail' specialty.id %}">
+          <a class="btn btn-link admin-row-action" href="{% url 'accounts:admin_specialty_detail' specialty.id %}">
             Открыть
           </a>
         </div>
