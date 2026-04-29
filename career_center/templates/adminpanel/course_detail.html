@@ -4,125 +4,141 @@
 {% block title %}Курс{% endblock %}
 
 {% block content %}
-<section class="hero admin-detail-hero">
-  <div class="hero-kicker">Курс/семинар</div>
-  <h1>{{ course.title }}</h1>
-  <p>
-    {{ course.organization|default:'Организация не указана' }}
-  </p>
+<section class="hero admin-profile-hero course-profile-hero">
+  <div class="admin-profile-main">
+    <div class="hero-kicker">Курс/семинар</div>
+    <h1>{{ course.title }}</h1>
+    <p>{{ course.organization|default:'Организация не указана' }}</p>
 
-  <div class="admin-detail-badges">
-    <span>{{ KIND_LABELS|dict_get:course.kind }}</span>
-    <span>{{ FORMAT_LABELS|dict_get:course.format_type }}</span>
-    <span>{{ STATUS_LABELS|dict_get:course.status }}</span>
-    {% if course.format_type == 'offline' %}
-      <span>Мест: {{ course.places }} / {{ registrations_count }}</span>
-    {% endif %}
+    <div class="admin-profile-badges">
+      <span class="profile-badge">{{ KIND_LABELS|dict_get:course.kind }}</span>
+      <span class="profile-badge">{{ FORMAT_LABELS|dict_get:course.format_type }}</span>
+      {% if course.status == 'active' %}
+        <span class="profile-badge profile-badge-success status-active">{{ STATUS_LABELS|dict_get:course.status }}</span>
+      {% elif course.status == 'hidden' %}
+        <span class="profile-badge profile-badge-danger status-hidden">{{ STATUS_LABELS|dict_get:course.status }}</span>
+      {% else %}
+        <span class="profile-badge status-archive">{{ STATUS_LABELS|dict_get:course.status }}</span>
+      {% endif %}
+      {% if course.format_type == 'offline' %}
+        <span class="profile-badge">Мест: {{ registrations_count }} / {{ course.places }}</span>
+      {% endif %}
+    </div>
   </div>
 </section>
 
-<section class="section grid grid-2 admin-detail-grid">
+<section class="section vacancy-detail-layout course-detail-layout course-detail-layout-main">
   <div class="card admin-wide-card">
     <h2>Данные курса</h2>
 
-    <form method="post" class="form-grid admin-course-form">
-      {% csrf_token %}
-      <input type="hidden" name="action" value="update">
-
-      <p class="full">
-        <label>{{ form.title.label }}</label>
-        {{ form.title }}
-      </p>
-
-      <p>
-        <label>{{ form.kind.label }}</label>
-        {{ form.kind }}
-      </p>
-
-      <p>
-        <label>{{ form.format_type.label }}</label>
-        {{ form.format_type }}
-      </p>
-
-      <p class="full">
-        <label>{{ form.description.label }}</label>
-        {{ form.description }}
-      </p>
-
-      <p>
-        <label>{{ form.organization.label }}</label>
-        {{ form.organization }}
-      </p>
-
-      <p>
-        <label>{{ form.contacts.label }}</label>
-        {{ form.contacts }}
-      </p>
-
-      <p>
-        <label>{{ form.date.label }}</label>
-        {{ form.date }}
-      </p>
-
-      <p>
-        <label>{{ form.places.label }}</label>
-        {{ form.places }}
-      </p>
-
-      <p>
-        <label>{{ form.status.label }}</label>
-        {{ form.status }}
-      </p>
-
-      <p class="full admin-form-actions">
-        <button class="btn btn-primary" type="submit">
-          Сохранить изменения
-        </button>
-      </p>
-    </form>
-  </div>
-
-  <div class="card admin-course-side-card">
-    <h2>Управление публикацией</h2>
-
-    <div class="admin-info-box">
-      <span>Текущий статус</span>
-      <strong>{{ STATUS_LABELS|dict_get:course.status }}</strong>
-    </div>
-
-    {% if course.format_type == 'offline' %}
-      <div class="admin-info-box">
-        <span>Запись</span>
-        <strong>{{ registrations_count }} из {{ course.places }}</strong>
+    <div class="admin-info-list">
+      <div>
+        <span>Название</span>
+        <strong>{{ course.title }}</strong>
       </div>
-    {% endif %}
 
-    <div class="admin-status-actions">
-      <form method="post">
-        {% csrf_token %}
-        <input type="hidden" name="action" value="set_status">
-        <input type="hidden" name="status" value="active">
-        <button class="btn btn-link" type="submit">Сделать активным</button>
-      </form>
+      <div>
+        <span>Тип</span>
+        <strong>{{ KIND_LABELS|dict_get:course.kind }}</strong>
+      </div>
 
-      <form method="post">
-        {% csrf_token %}
-        <input type="hidden" name="action" value="set_status">
-        <input type="hidden" name="status" value="hidden">
-        <button class="btn btn-link" type="submit">Скрыть</button>
-      </form>
+      <div>
+        <span>Формат</span>
+        <strong>{{ FORMAT_LABELS|dict_get:course.format_type }}</strong>
+      </div>
 
-      <form method="post">
-        {% csrf_token %}
-        <input type="hidden" name="action" value="set_status">
-        <input type="hidden" name="status" value="archive">
-        <button class="btn btn-link" type="submit">В архив</button>
-      </form>
+      <div>
+        <span>Организация</span>
+        <strong>{{ course.organization|default:'—' }}</strong>
+      </div>
+
+      <div>
+        <span>Контакты</span>
+        <strong>{{ course.contacts|default:'—' }}</strong>
+      </div>
+
+      <div>
+        <span>Дата</span>
+        <strong>{{ course.date|default:'—' }}</strong>
+      </div>
+
+      <div>
+        <span>Количество мест</span>
+        <strong>{{ course.places|default:'—' }}</strong>
+      </div>
+
+      <div>
+        <span>Статус</span>
+        <strong>{{ STATUS_LABELS|dict_get:course.status }}</strong>
+      </div>
+
+      <div>
+        <span>Описание</span>
+        <strong>{{ course.description|default:'—' }}</strong>
+      </div>
     </div>
+
+    <details class="admin-edit-details">
+      <summary class="btn btn-link">Редактировать</summary>
+
+      <form method="post" class="form-grid admin-course-form admin-edit-form">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="update">
+
+        <p class="full">
+          <label>{{ form.title.label }}</label>
+          {{ form.title }}
+        </p>
+
+        <p>
+          <label>{{ form.kind.label }}</label>
+          {{ form.kind }}
+        </p>
+
+        <p>
+          <label>{{ form.format_type.label }}</label>
+          {{ form.format_type }}
+        </p>
+
+        <p class="full">
+          <label>{{ form.description.label }}</label>
+          {{ form.description }}
+        </p>
+
+        <p>
+          <label>{{ form.organization.label }}</label>
+          {{ form.organization }}
+        </p>
+
+        <p>
+          <label>{{ form.contacts.label }}</label>
+          {{ form.contacts }}
+        </p>
+
+        <p>
+          <label>{{ form.date.label }}</label>
+          {{ form.date }}
+        </p>
+
+        <p>
+          <label>{{ form.places.label }}</label>
+          {{ form.places }}
+        </p>
+
+        <p>
+          <label>{{ form.status.label }}</label>
+          {{ form.status }}
+        </p>
+
+        <p class="full admin-form-actions">
+          <button class="btn btn-primary" type="submit">Сохранить изменения</button>
+        </p>
+      </form>
+    </details>
   </div>
 </section>
 
-<section class="section card admin-danger-card">
+<section class="section card admin-danger-card detail-delete-bottom">
   <h2>Удаление курса</h2>
 
   <div class="admin-danger-inner">
@@ -130,16 +146,14 @@
       Удаление требует подтверждения по названию. Используйте только если курс действительно больше не нужен.
     </p>
 
-    <form method="post">
+    <form method="post" class="detail-danger-form">
       {% csrf_token %}
       <input type="hidden" name="action" value="delete">
 
       <label>Введите название курса</label>
       <input name="confirm_title" type="text" placeholder="{{ course.title }}" required>
 
-      <button class="btn btn-danger" type="submit">
-        Подтвердить удаление
-      </button>
+      <button class="btn btn-danger" type="submit">Подтвердить удаление</button>
     </form>
   </div>
 </section>

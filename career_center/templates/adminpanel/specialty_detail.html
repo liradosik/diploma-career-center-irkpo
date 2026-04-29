@@ -3,8 +3,6 @@
 
 {% block content %}
 <section class="hero admin-profile-hero specialty-profile-hero">
-  
-
   <div class="admin-profile-info">
     <div class="hero-kicker">Специальность</div>
     <h1>{{ specialty.code }}</h1>
@@ -12,94 +10,118 @@
 
     <div class="admin-profile-badges">
       <span class="profile-badge">Буквенный код: {{ specialty.letter_code|default:'—' }}</span>
-      <span class="profile-badge">Групп: {{ specialty.groups_count|default:0 }}</span>
-      <span class="profile-badge">Студентов: {{ specialty.students_count|default:0 }}</span>
-      <span class="profile-badge">{% if specialty.is_active %}Активна{% else %}Неактивна{% endif %}</span>
+      {% if specialty.is_active %}
+        <span class="profile-badge profile-badge-success status-active">Активна</span>
+      {% else %}
+        <span class="profile-badge profile-badge-danger status-hidden">Неактивна</span>
+      {% endif %}
     </div>
   </div>
 </section>
 
-<section class="section specialty-detail-stack">
-  <div class="card specialty-detail-card">
-    <h2>Данные специальности</h2>
+<section class="section group-detail-layout specialty-detail-layout">
+  <div class="group-detail-main-column">
+    <div class="card admin-info-card">
+      <h2>Структура специальности</h2>
 
-    <form method="post" class="specialty-detail-form">
-      {% csrf_token %}
-      <input type="hidden" name="action" value="update">
-
-      <div class="specialty-detail-fields">
-        <div class="form-field">
-          <label for="{{ form.code.id_for_label }}">Код специальности</label>
-          {{ form.code }}
-          {{ form.code.errors }}
+      <div class="admin-info-list">
+        <div>
+          <span>Код специальности</span>
+          <strong>{{ specialty.code }}</strong>
         </div>
 
-        <div class="form-field">
-          <label for="{{ form.letter_code.id_for_label }}">Буквенный код группы</label>
-          {{ form.letter_code }}
-          {{ form.letter_code.errors }}
+        <div>
+          <span>Буквенный код</span>
+          <strong>{{ specialty.letter_code|default:'—' }}</strong>
         </div>
 
-        <div class="form-field specialty-detail-name">
-          <label for="{{ form.name.id_for_label }}">Название/профиль</label>
-          {{ form.name }}
-          {{ form.name.errors }}
+        <div>
+          <span>Название/профиль</span>
+          <strong>{{ specialty.name|default:'—' }}</strong>
         </div>
 
-        <div class="group-access-card group-access-card-compact specialty-access-card">
-          <label class="admin-switch admin-switch-small">
-            {{ form.is_active }}
-            <span class="admin-switch-ui"></span>
-          </label>
+        <div>
+          <span>Групп</span>
+          <strong>{{ specialty.groups_count|default:0 }}</strong>
+        </div>
 
-          <div>
-            <strong>Специальность активна</strong>
-            <p>Если выключить, специальность останется в базе, но не будет доступна для новых групп.</p>
+        <div>
+          <span>Студентов</span>
+          <strong>{{ specialty.students_count|default:0 }}</strong>
+        </div>
+
+        <div>
+          <span>Статус</span>
+          <strong>{% if specialty.is_active %}Активна{% else %}Неактивна{% endif %}</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="card specialty-detail-card">
+      <h2>Связанные группы</h2>
+
+      <div class="specialty-related-list">
+        {% for group in groups %}
+          <article class="specialty-related-row">
+            <div class="specialty-related-main">
+              <strong>{{ group.name }}</strong>
+            </div>
+
+            <a class="btn btn-link" href="{% url 'accounts:admin_group_detail' group.id %}">Открыть</a>
+          </article>
+        {% empty %}
+          <div class="admin-empty-state">
+            <strong>К этой специальности пока не привязаны группы.</strong>
           </div>
-        </div>
+        {% endfor %}
       </div>
-
-      <div class="admin-form-actions">
-        <button class="btn btn-primary" type="submit">Сохранить</button>
-      </div>
-    </form>
+    </div>
   </div>
 
-  <div class="card specialty-detail-card">
-    <h2>Связанные группы</h2>
+  <div class="group-detail-side-column">
+    <div class="card specialty-detail-card">
+      <h2>Основные данные</h2>
 
-    <div class="specialty-related-list">
-      {% for group in groups %}
-        <article class="specialty-related-row">
-          <div class="specialty-related-main">
-            <strong>{{ group.name }}</strong>
-            <span>{{ group.curator.full_name|default:'Куратор не назначен' }}</span>
+      <form method="post" class="specialty-detail-form">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="update">
+
+        <div class="specialty-detail-fields">
+          <div class="form-field">
+            <label for="{{ form.code.id_for_label }}">Код специальности</label>
+            {{ form.code }}
+            {{ form.code.errors }}
           </div>
 
-          <div class="specialty-related-meta">
-            <div>
-              <span>Курс</span>
-              <strong>{{ group.course_number|default:'—' }}</strong>
-            </div>
-
-            <div>
-              <span>Год поступления</span>
-              <strong>{{ group.admission_year|default:'—' }}</strong>
-            </div>
-
-            <div>
-              <span>Студентов</span>
-              <strong>{{ group.students_count|default:0 }}</strong>
-            </div>
+          <div class="form-field">
+            <label for="{{ form.letter_code.id_for_label }}">Буквенный код группы</label>
+            {{ form.letter_code }}
+            {{ form.letter_code.errors }}
           </div>
 
-          <a class="btn btn-link" href="{% url 'accounts:admin_group_detail' group.id %}">Открыть</a>
-        </article>
-      {% empty %}
-        <div class="admin-empty-state">
-          <strong>К этой специальности пока не привязаны группы.</strong>
+          <div class="form-field specialty-detail-name">
+            <label for="{{ form.name.id_for_label }}">Название/профиль</label>
+            {{ form.name }}
+            {{ form.name.errors }}
+          </div>
+
+          <div class="group-access-card group-access-card-compact specialty-access-card">
+            <label class="admin-switch admin-switch-small">
+              {{ form.is_active }}
+              <span class="admin-switch-ui"></span>
+            </label>
+
+            <div>
+              <strong>Специальность активна</strong>
+              <p>Если выключить, специальность останется в базе, но не будет доступна для новых групп.</p>
+            </div>
+          </div>
         </div>
-      {% endfor %}
+
+        <div class="admin-form-actions">
+          <button class="btn btn-primary" type="submit">Сохранить</button>
+        </div>
+      </form>
     </div>
   </div>
 </section>

@@ -12,75 +12,91 @@
 <section class="section card admin-create-card vacancy-create-card">
   <h2>Создать вакансию</h2>
 
-  <form method="post" class="admin-form">
+  <form method="post" class="admin-form vacancy-create-form">
     {% csrf_token %}
     <input type="hidden" name="action" value="create">
 
-    <div class="admin-form-grid">
-      <div class="form-field">
-        <label>{{ form.title.label }}</label>
-        {{ form.title }}
-        {{ form.title.errors }}
+    <div class="admin-create-split admin-create-split-vacancy">
+      <div class="admin-create-main-fields">
+        <div class="form-field">
+          <label>{{ form.title.label }}</label>
+          {{ form.title }}
+          {{ form.title.errors }}
+        </div>
+
+        <div class="form-field">
+          <label>{{ form.company.label }}</label>
+          {{ form.company }}
+          {{ form.company.errors }}
+        </div>
+
+        <div class="form-field">
+          <label>{{ form.employment_type.label }}</label>
+          <select name="employment_type" id="id_employment_type">
+            <option value="">Выберите тип занятости</option>
+            <option value="Стажировка">Стажировка</option>
+            <option value="Частичная занятость">Частичная занятость</option>
+            <option value="Полная занятость">Полная занятость</option>
+            <option value="Проектная работа">Проектная работа</option>
+            <option value="Практика">Практика</option>
+          </select>
+          {{ form.employment_type.errors }}
+        </div>
+
+        <div class="form-field">
+          <label>{{ form.format_type.label }}</label>
+          <select name="format_type" id="id_format_type">
+            <option value="">Выберите формат</option>
+            <option value="Очно">Очно</option>
+            <option value="Удалённо">Удалённо</option>
+            <option value="Гибрид">Гибрид</option>
+          </select>
+          {{ form.format_type.errors }}
+        </div>
+
+        <div class="form-field">
+          <label>{{ form.direction.label }}</label>
+          {{ form.direction }}
+          {{ form.direction.errors }}
+        </div>
+
+        <div class="form-field">
+          <label>{{ form.contacts.label }}</label>
+          {{ form.contacts }}
+          {{ form.contacts.errors }}
+        </div>
+
+        <div class="form-field">
+          <label>{{ form.status.label }}</label>
+          {{ form.status }}
+          {{ form.status.errors }}
+        </div>
       </div>
 
-      <div class="form-field">
-        <label>{{ form.company.label }}</label>
-        {{ form.company }}
-        {{ form.company.errors }}
-      </div>
+      <div class="admin-create-text-fields">
+        <div class="form-field">
+          <label>{{ form.description.label }}</label>
+          {{ form.description }}
+          {{ form.description.errors }}
+        </div>
 
-      <div class="form-field">
-        <label>{{ form.employment_type.label }}</label>
-        {{ form.employment_type }}
-        {{ form.employment_type.errors }}
-      </div>
+        <div class="form-field">
+          <label>{{ form.responsibilities.label }}</label>
+          {{ form.responsibilities }}
+          {{ form.responsibilities.errors }}
+        </div>
 
-      <div class="form-field">
-        <label>{{ form.format_type.label }}</label>
-        {{ form.format_type }}
-        {{ form.format_type.errors }}
-      </div>
+        <div class="form-field">
+          <label>{{ form.requirements.label }}</label>
+          {{ form.requirements }}
+          {{ form.requirements.errors }}
+        </div>
 
-      <div class="form-field">
-        <label>{{ form.direction.label }}</label>
-        {{ form.direction }}
-        {{ form.direction.errors }}
-      </div>
-
-      <div class="form-field">
-        <label>{{ form.status.label }}</label>
-        {{ form.status }}
-        {{ form.status.errors }}
-      </div>
-
-      <div class="form-field form-field-full">
-        <label>{{ form.description.label }}</label>
-        {{ form.description }}
-        {{ form.description.errors }}
-      </div>
-
-      <div class="form-field form-field-full">
-        <label>{{ form.responsibilities.label }}</label>
-        {{ form.responsibilities }}
-        {{ form.responsibilities.errors }}
-      </div>
-
-      <div class="form-field form-field-full">
-        <label>{{ form.requirements.label }}</label>
-        {{ form.requirements }}
-        {{ form.requirements.errors }}
-      </div>
-
-      <div class="form-field form-field-full">
-        <label>{{ form.conditions.label }}</label>
-        {{ form.conditions }}
-        {{ form.conditions.errors }}
-      </div>
-
-      <div class="form-field form-field-full">
-        <label>{{ form.contacts.label }}</label>
-        {{ form.contacts }}
-        {{ form.contacts.errors }}
+        <div class="form-field">
+          <label>{{ form.conditions.label }}</label>
+          {{ form.conditions }}
+          {{ form.conditions.errors }}
+        </div>
       </div>
     </div>
 
@@ -103,8 +119,22 @@
       <option value="archive" {% if request.GET.status == 'archive' %}selected{% endif %}>Архив</option>
     </select>
 
-    <input name="format_type" placeholder="Формат" value="{{ request.GET.format_type }}">
-    <input name="employment_type" placeholder="Тип занятости" value="{{ request.GET.employment_type }}">
+    <select name="format_type">
+      <option value="">Формат</option>
+      <option value="Очно" {% if request.GET.format_type == 'Очно' %}selected{% endif %}>Очно</option>
+      <option value="Удалённо" {% if request.GET.format_type == 'Удалённо' %}selected{% endif %}>Удалённо</option>
+      <option value="Гибрид" {% if request.GET.format_type == 'Гибрид' %}selected{% endif %}>Гибрид</option>
+    </select>
+
+    <select name="employment_type">
+      <option value="">Тип занятости</option>
+      <option value="Стажировка" {% if request.GET.employment_type == 'Стажировка' %}selected{% endif %}>Стажировка</option>
+      <option value="Частичная занятость" {% if request.GET.employment_type == 'Частичная занятость' %}selected{% endif %}>Частичная занятость</option>
+      <option value="Полная занятость" {% if request.GET.employment_type == 'Полная занятость' %}selected{% endif %}>Полная занятость</option>
+      <option value="Проектная работа" {% if request.GET.employment_type == 'Проектная работа' %}selected{% endif %}>Проектная работа</option>
+      <option value="Практика" {% if request.GET.employment_type == 'Практика' %}selected{% endif %}>Практика</option>
+    </select>
+
     <input name="direction" placeholder="Направление" value="{{ request.GET.direction }}">
 
     <button class="btn btn-link" type="submit">Применить</button>
@@ -149,4 +179,26 @@
     {% endfor %}
   </div>
 </section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const placeholders = {
+      title: 'Например, Junior Python-разработчик',
+      company: 'Например, ООО «Иркутск IT»',
+      direction: 'Например, IT, дизайн, педагогика',
+      contacts: 'Email, телефон или Telegram',
+      description: 'Коротко опишите вакансию и кому она подойдёт',
+      responsibilities: 'Основные задачи студента',
+      requirements: 'Навыки, курс, опыт или личные качества',
+      conditions: 'График, оплата, обучение, оформление'
+    };
+
+    Object.entries(placeholders).forEach(function ([name, text]) {
+      const field = document.querySelector('.vacancy-create-form [name="' + name + '"]');
+      if (field && !field.getAttribute('placeholder')) {
+        field.setAttribute('placeholder', text);
+      }
+    });
+  });
+</script>
 {% endblock %}
