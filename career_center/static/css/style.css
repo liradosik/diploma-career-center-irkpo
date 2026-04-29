@@ -2532,7 +2532,7 @@ input[type="submit"].btn-primary:hover {
 .vacancy-create-card .admin-form .form-field select,
 .vacancy-create-card .admin-form .form-field textarea {
   min-height: 52px;
-  border-color: #cfe0f5;
+  border-color: #c3e1ed;
   border-radius: 18px;
   background: #ffffff !important;
   color: #172536;
@@ -2639,16 +2639,16 @@ input[type="submit"].btn-primary:hover {
 .vacancy-create-card .admin-form .form-field input,
 .vacancy-create-card .admin-form .form-field select,
 .vacancy-create-card .admin-form .form-field textarea {
-  background: #f8fbff !important;
-  border-color: #cfe0f5 !important;
-  color: #172536;
+  background: #fbfcfd !important;
+  border-color: #c3cdda !important;
+  color: #0a052a;
 }
 
 .admin-course-create-card input::placeholder,
 .admin-course-create-card textarea::placeholder,
 .vacancy-create-card input::placeholder,
 .vacancy-create-card textarea::placeholder {
-  color: #8fa1b8;
+  color: #656565;
   opacity: .9;
 }
 
@@ -2656,7 +2656,7 @@ input[type="submit"].btn-primary:hover {
 .vacancy-create-card label,
 .vacancy-create-card .form-field label,
 .vacancy-create-card .admin-form .form-field label {
-  color: #2f435c;
+  color: #000000;
   font-size: 14px;
   font-weight: 500;
 }
