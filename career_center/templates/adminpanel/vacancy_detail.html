@@ -177,20 +177,22 @@
   </div>
 </section>
 
-<section class="section card danger-card vacancy-delete-card detail-delete-bottom">
+<section class="section card curator-delete-card curator-delete-bottom-card">
   <h2>Удаление вакансии</h2>
 
   <div class="danger-inner">
     <p>
-      Удаление требует подтверждения по названию. Используйте только если вакансия действительно больше не нужна.
-    </p>
+      Удаление требует подтверждения по названию. Используйте только если вакансия действительно больше не нужна.</p>
 
-    <form method="post" class="detail-danger-form">
+    <form method="post" class="curator-delete-form">
       {% csrf_token %}
       <input type="hidden" name="action" value="delete">
 
-      <label>Введите название вакансии</label>
+      <div class="form-field">
+<label>Введите название вакансии</label>
       <input name="confirm_title" type="text" placeholder="{{ vacancy.title }}" required>
+      </div>
+      
 
       <button class="btn btn-danger" type="submit">Подтвердить удаление</button>
     </form>
