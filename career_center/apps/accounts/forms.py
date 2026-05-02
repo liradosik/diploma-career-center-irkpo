@@ -155,6 +155,15 @@ class AdminCuratorUpdateForm(forms.ModelForm):
         }
 
 
+class CuratorStudentAcademicStatusForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ('academic_status',)
+        labels = {
+            'academic_status': 'Учебный статус',
+        }
+
+
 class AdminVacancyForm(forms.ModelForm):
     class Meta:
         model = Vacancy

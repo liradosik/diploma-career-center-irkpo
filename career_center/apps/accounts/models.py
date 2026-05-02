@@ -53,8 +53,8 @@ class User(AbstractUser):
     class AcademicStatus(models.TextChoices):
         STUDYING = 'studying', 'Обучается'
         ACADEMIC_LEAVE = 'academic_leave', 'Академический отпуск'
-        GRADUATE = 'graduate', 'Выпускник'
-        INACTIVE = 'inactive', 'Отчислен'
+        EXPELLED = 'expelled', 'Отчислен'
+        GRADUATED = 'graduated', 'Выпускник'
 
     username = None
     email = models.EmailField(unique=True)

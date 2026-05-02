@@ -45,7 +45,7 @@ class Command(BaseCommand):
                         group.save(update_fields=['is_active', 'last_promoted_year'])
                         students = User.objects.filter(role=User.Role.STUDENT, study_group=group)
                         for student in students:
-                            student.academic_status = User.AcademicStatus.GRADUATE
+                            student.academic_status = User.AcademicStatus.GRADUATED
                             sync_student_with_group(student, group)
                             student.save(update_fields=['academic_status', 'study_group', 'group', 'specialty', 'admission_year', 'curator'])
                 continue
