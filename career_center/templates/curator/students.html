@@ -19,14 +19,18 @@
     {% for student in students %}
       <article class="list-item">
         <h3>{{ student.full_name }}</h3>
+        <p class="muted">Email: {{ student.email }}</p>
         <p class="muted">Группа: {{ student.group|default:'—' }} • {{ student.specialty|default:'Специальность не указана' }}</p>
+        <p>
+          <span class="badge badge-status">{{ student.get_academic_status_display }}</span>
+          <span class="badge badge-pending">На проверке: {{ student.portfolio_pending }}</span>
+        </p>
         <p class="muted">
           Портфолио: всего {{ student.portfolio_total }} •
-          pending {{ student.portfolio_pending }} •
-          approved {{ student.portfolio_approved }}
+          подтверждено {{ student.portfolio_approved }}
         </p>
         <div class="inline-actions">
-          <a class="btn btn-link" href="{% url 'accounts:curator_student_detail' student.id %}">Открыть карточку</a>
+          <a class="btn btn-link" href="{% url 'accounts:curator_student_detail' student.id %}">Открыть</a>
         </div>
       </article>
     {% endfor %}

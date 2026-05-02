@@ -31,10 +31,14 @@
           <input type="hidden" name="entry_id" value="{{ e.id }}">
           <label for="comment_{{ e.id }}">Комментарий куратора</label>
           <textarea id="comment_{{ e.id }}" name="curator_comment" placeholder="Добавьте комментарий (необязательно)"></textarea>
-          <div class="inline-actions">
-            <button class="btn btn-primary" name="decision" value="approved" type="submit">Подтвердить</button>
-            <button class="btn" name="decision" value="rejected" type="submit">Отклонить</button>
-          </div>
+          {% if e.student.academic_status == 'studying' %}
+            <div class="inline-actions">
+              <button class="btn btn-primary" name="decision" value="approved" type="submit">Подтвердить</button>
+              <button class="btn" name="decision" value="rejected" type="submit">Отклонить</button>
+            </div>
+          {% else %}
+            <p class="muted">Подтверждение недоступно для статуса «{{ e.student.get_academic_status_display }}».</p>
+          {% endif %}
         </form>
       {% else %}
         <div class="inline-actions">

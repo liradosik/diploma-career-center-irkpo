@@ -23,6 +23,13 @@
     </div>
   </div>
   <div class="card">
+    <h2>Учебный статус</h2>
+    <form method="post" class="section">
+      {% csrf_token %}
+      {{ status_form.academic_status.label_tag }}
+      {{ status_form.academic_status }}
+      <div class="inline-actions"><button class="btn btn-primary" type="submit">Сохранить статус</button></div>
+    </form>
     <h2>Статистика портфолио</h2>
     <section class="grid grid-2">
       <article class="stat-card"><div class="label">Всего</div><div class="value">{{ portfolio_total }}</div></article>
@@ -34,8 +41,8 @@
 </section>
 
 <section class="section card">
-  <h2>Записи портфолио</h2>
-  {% for entry in entries %}
+  <h2>Записи портфолио, требующие проверки</h2>
+  {% for entry in pending_entries %}
     <article class="list-item">
       <h3>{{ entry.title }}</h3>
       <p class="muted">{{ entry.type }} • {{ entry.date }}</p>
@@ -50,7 +57,7 @@
       {% endif %}
     </article>
   {% empty %}
-    <p class="muted">У студента пока нет записей портфолио.</p>
+    <p class="muted">Нет записей, требующих проверки.</p>
   {% endfor %}
 </section>
 {% endblock %}

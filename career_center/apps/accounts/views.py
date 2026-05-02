@@ -29,6 +29,7 @@ from .forms import (
     AdminStudyGroupForm,
     AdminStudentUpdateForm,
     AdminVacancyForm,
+    CuratorStudentAcademicStatusForm,
     CuratorImportForm,
     EmailAuthenticationForm,
     GroupImportForm,
@@ -162,7 +163,7 @@ def curator_students_queryset(curator, include_graduates=False):
         Q(study_group__isnull=True, curator=curator)
     )
     if not include_graduates:
-        qs = qs.exclude(academic_status=User.AcademicStatus.GRADUATE)
+        qs = qs.exclude(academic_status=User.AcademicStatus.GRADUATED)
     return qs.distinct()
 
 
@@ -232,6 +233,10 @@ def curator_dashboard(request):
 
     context = {
         'students_count': students.count(),
+        'studying_count': students.filter(academic_status=User.AcademicStatus.STUDYING).count(),
+        'academic_leave_count': students.filter(academic_status=User.AcademicStatus.ACADEMIC_LEAVE).count(),
+        'expelled_count': students.filter(academic_status=User.AcademicStatus.EXPELLED).count(),
+        'graduated_count': students.filter(academic_status=User.AcademicStatus.GRADUATED).count(),
         'pending_count': pending_entries_qs.count(),
         'approved_count': PortfolioEntry.objects.filter(
             student_id__in=student_ids, status=PortfolioEntry.Status.APPROVED
@@ -274,10 +279,21 @@ def curator_student_detail(request, student_id):
     if resume and resume.is_public and profile:
         resume_public_url = request.build_absolute_uri(f"/resumes/public/{profile.public_resume_token}/")
 
+    if request.method == 'POST':
+        form = CuratorStudentAcademicStatusForm(request.POST, instance=student)
+        if form.is_valid():
+            form.save(update_fields=['academic_status'])
+            messages.success(request, 'Учебный статус студента обновлён.')
+            return redirect('accounts:curator_student_detail', student_id=student.id)
+    else:
+        form = CuratorStudentAcademicStatusForm(instance=student)
+
     context = {
         'student': student,
+        'status_form': form,
         'profile': profile,
         'entries': entries,
+        'pending_entries': entries.filter(status=PortfolioEntry.Status.PENDING),
         'portfolio_total': entries.count(),
         'portfolio_pending': entries.filter(status=PortfolioEntry.Status.PENDING).count(),
         'portfolio_approved': entries.filter(status=PortfolioEntry.Status.APPROVED).count(),
@@ -315,8 +331,8 @@ def admin_dashboard(request):
         'students_active': students_qs.filter(is_active=True).count(),
         'students_studying': students_qs.filter(academic_status=User.AcademicStatus.STUDYING).count(),
         'students_academic_leave': students_qs.filter(academic_status=User.AcademicStatus.ACADEMIC_LEAVE).count(),
-        'students_graduate': students_qs.filter(academic_status=User.AcademicStatus.GRADUATE).count(),
-        'students_inactive_status': students_qs.filter(academic_status=User.AcademicStatus.INACTIVE).count(),
+        'students_graduate': students_qs.filter(academic_status=User.AcademicStatus.GRADUATED).count(),
+        'students_inactive_status': students_qs.filter(academic_status=User.AcademicStatus.EXPELLED).count(),
         'inactive_users_total': User.objects.filter(is_active=False).count(),
         'curators_total': curators_total,
         'groups_active': StudyGroup.objects.filter(is_active=True).count(),
@@ -344,8 +360,8 @@ def admin_dashboard(request):
         'student_status_chart': [
             students_qs.filter(academic_status=User.AcademicStatus.STUDYING).count(),
             students_qs.filter(academic_status=User.AcademicStatus.ACADEMIC_LEAVE).count(),
-            students_qs.filter(academic_status=User.AcademicStatus.GRADUATE).count(),
-            students_qs.filter(academic_status=User.AcademicStatus.INACTIVE).count(),
+            students_qs.filter(academic_status=User.AcademicStatus.GRADUATED).count(),
+            students_qs.filter(academic_status=User.AcademicStatus.EXPELLED).count(),
         ],
         'vacancy_status_chart': [
             vacancy_summary.get(Vacancy.Status.ACTIVE, 0),
@@ -403,8 +419,8 @@ def admin_students(request):
     if academic_status in {
         User.AcademicStatus.STUDYING,
         User.AcademicStatus.ACADEMIC_LEAVE,
-        User.AcademicStatus.GRADUATE,
-        User.AcademicStatus.INACTIVE,
+        User.AcademicStatus.GRADUATED,
+        User.AcademicStatus.EXPELLED,
     }:
         students = students.filter(academic_status=academic_status)
 

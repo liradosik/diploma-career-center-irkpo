@@ -48,7 +48,7 @@ def review_queue(request):
     students = User.objects.filter(role=User.Role.STUDENT).filter(
         Q(study_group__curator=request.user, study_group__is_active=True) |
         Q(study_group__isnull=True, curator=request.user)
-    ).exclude(academic_status=User.AcademicStatus.GRADUATE).distinct()
+    ).exclude(academic_status=User.AcademicStatus.GRADUATED).distinct()
     entries_qs = PortfolioEntry.objects.filter(student__in=students).select_related('student').order_by('-created_at')
 
     if request.method == 'POST':
@@ -57,7 +57,8 @@ def review_queue(request):
         comment = request.POST.get('curator_comment', '').strip()
 
         entry = get_object_or_404(entries_qs, id=entry_id)
-        if entry.status == PortfolioEntry.Status.PENDING and decision in {PortfolioEntry.Status.APPROVED, PortfolioEntry.Status.REJECTED}:
+        can_review = entry.student.academic_status == User.AcademicStatus.STUDYING
+        if entry.status == PortfolioEntry.Status.PENDING and can_review and decision in {PortfolioEntry.Status.APPROVED, PortfolioEntry.Status.REJECTED}:
             entry.status = decision
             entry.curator_comment = comment
             entry.reviewed_by = request.user
