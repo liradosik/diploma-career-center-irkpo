@@ -23,16 +23,13 @@
     {% for e in entries %}
       <article class="curator-review-card">
         <div class="curator-review-head">
-          <h3>{{ e.title }}</h3>
+          <div>
+            <h3>{{ e.title }}</h3>
+            <p class="curator-review-meta-line">{{ e.student.full_name }} · {{ e.type }} · {{ e.date }}</p>
+          </div>
           {% if e.status == 'pending' %}<span class="badge badge-pending">Ожидает проверки</span>{% endif %}
           {% if e.status == 'approved' %}<span class="badge badge-approved">Подтверждено</span>{% endif %}
           {% if e.status == 'rejected' %}<span class="badge badge-rejected">Отклонено</span>{% endif %}
-        </div>
-
-        <div class="curator-review-meta">
-          <div><span>Студент:</span> <strong>{{ e.student.full_name }}</strong></div>
-          <div><span>Раздел:</span> <strong>{{ e.type }}</strong></div>
-          <div><span>Дата:</span> <strong>{{ e.date }}</strong></div>
         </div>
 
         <p>{{ e.description|truncatechars:240 }}</p>

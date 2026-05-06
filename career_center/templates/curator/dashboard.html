@@ -17,47 +17,82 @@
         <p class="muted">Текущая закреплённая нагрузка без выпускников.</p>
       </div>
     </div>
+
     <div class="curator-status-content">
-      <div class="curator-status-donut" style="--studying: {{ studying_count }}; --leave: {{ academic_leave_count }}; --expelled: {{ expelled_count }}; --total: {{ students_count|default:0 }};">
-        <div class="curator-status-donut-center">
-          <strong>{{ students_count }}</strong>
-          <span>студентов</span>
-        </div>
-      </div>
+      <div
+        class="curator-status-donut"
+        aria-label="Статистика студентов"
+        style="--studying: {{ studying_count }}; --leave: {{ academic_leave_count }}; --expelled: {{ expelled_count }}; --graduated: {{ graduated_count }}; --total: {{ students_count|default:0 }};"
+      ></div>
+
       <div class="curator-status-list">
-        <div><span>Обучаются</span><strong>{{ studying_count }}</strong></div>
-        <div><span>Академический отпуск</span><strong>{{ academic_leave_count }}</strong></div>
-        <div><span>Отчислены</span><strong>{{ expelled_count }}</strong></div>
-        <div class="muted"><span>Выпускники в архиве</span><strong>{{ graduated_count }}</strong></div>
+        <div class="curator-status-row">
+          <span><i class="curator-dot curator-dot-primary"></i>Обучаются</span>
+          <strong>{{ studying_count }}</strong>
+        </div>
+        <div class="curator-status-row">
+          <span><i class="curator-dot curator-dot-sky"></i>Академический отпуск</span>
+          <strong>{{ academic_leave_count }}</strong>
+        </div>
+        <div class="curator-status-row">
+          <span><i class="curator-dot curator-dot-steel"></i>Отчислены</span>
+          <strong>{{ expelled_count }}</strong>
+        </div>
+        <div class="curator-status-row is-muted">
+          <span><i class="curator-dot curator-dot-gray"></i>Выпускники в архиве</span>
+          <strong>{{ graduated_count }}</strong>
+        </div>
       </div>
     </div>
   </article>
 
-  <article class="card curator-review-summary">
-    <h2>На проверке</h2>
-    <strong>{{ pending_count }}</strong>
-    <p>Записей портфолио ожидают решения.</p>
-  </article>
+  <article class="card curator-review-summary curator-review-summary-grid">
+  <h2>Портфолио</h2>
+  <p class="muted">Состояние записей студентов на проверке.</p>
+
+  <div class="curator-review-metrics">
+    <div class="curator-review-metric is-pending">
+      <span>На проверке</span>
+      <strong>{{ pending_count }}</strong>
+    </div>
+
+    <div class="curator-review-metric is-approved">
+      <span>Подтверждено</span>
+      <strong>{{ approved_count|default:0 }}</strong>
+    </div>
+
+    <div class="curator-review-metric is-rejected">
+      <span>Отклонено</span>
+      <strong>{{ rejected_count|default:0 }}</strong>
+    </div>
+  </div>
+</article>
 </section>
 
 <section class="section card curator-panel">
   <div class="curator-card-head">
     <div>
       <h2>Недавняя активность студентов</h2>
-      <p class="muted">Пять студентов, которых стоит просмотреть в первую очередь.</p>
+      <p class="muted">Последние события по портфолио, курсам и вакансиям.</p>
     </div>
   </div>
 
-  <div class="curator-list">
+  <div class="curator-activity-list curator-activity-list-compact">
     {% for event in recent_activity %}
-      <article class="curator-activity-card">
+      <article class="curator-activity-item">
         <div class="curator-avatar-small">{{ event.student.full_name|default:event.student.email|slice:":1"|upper }}</div>
-        <div>
-          <h3>{{ event.student.full_name }}</h3>
-          <p class="muted">Группа: {{ event.student.group|default:'—' }}</p>
-          <p>{{ event.title }}</p>
-          <p class="muted">{{ event.created_at|date:'d.m.Y H:i' }}</p>
+        <div class="curator-activity-body">
+          <div class="curator-activity-topline">
+            <h3>{{ event.student.full_name }}</h3>
+            <span class="curator-activity-time">{{ event.created_at|date:'d.m.Y H:i' }}</span>
+          </div>
+          <p class="curator-activity-meta">Группа: {{ event.student.group|default:'—' }}</p>
+          <p class="curator-activity-title">{{ event.title }}</p>
+          {% if event.description %}<p class="curator-activity-description">{{ event.description }}</p>{% endif %}
         </div>
+        <span class="curator-activity-type">
+          {% if event.event_type == 'course_registered' or event.event_type == 'course_cancelled' %}Курс{% elif event.event_type == 'vacancy_applied' %}Вакансия{% else %}Портфолио{% endif %}
+        </span>
       </article>
     {% empty %}
       <div class="curator-empty">

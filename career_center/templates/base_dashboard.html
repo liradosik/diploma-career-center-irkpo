@@ -35,9 +35,9 @@
           <div class="menu-section">
             <div class="menu-group-title">Куратор</div>
             <a class="{% if request.resolver_match.url_name == 'curator_dashboard' %}active{% endif %}" href="{% url 'accounts:curator_dashboard' %}">Главная</a>
-            <a class="{% if request.resolver_match.url_name == 'curator_activity' %}active{% endif %}" href="{% url 'accounts:curator_activity' %}">Активность студентов</a>
             <a class="{% if request.resolver_match.url_name == 'curator_students' or request.resolver_match.url_name == 'curator_student_detail' %}active{% endif %}" href="{% url 'accounts:curator_students' %}">Мои студенты</a>
             <a class="{% if request.resolver_match.url_name == 'review_queue' %}active{% endif %}" href="{% url 'portfolio:review_queue' %}">Проверка портфолио</a>
+            <a class="{% if request.resolver_match.url_name == 'curator_activity' %}active{% endif %}" href="{% url 'accounts:curator_activity' %}">Активность студентов</a>
           </div>
         {% else %}
           <div class="menu-section">

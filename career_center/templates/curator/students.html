@@ -8,7 +8,7 @@
 </section>
 
 <section class="section card curator-students-card">
-  <form method="get" class="curator-filter-pills">
+  <form method="get" class="curator-filter-pills curator-students-switch">
     <button class="{% if not include_graduates %}is-active{% endif %}" type="submit" name="include_graduates" value="0">Текущие студенты</button>
     <button class="{% if include_graduates %}is-active{% endif %}" type="submit" name="include_graduates" value="1">Включая выпускников</button>
   </form>
@@ -19,10 +19,10 @@
         <article class="curator-student-row">
           <div class="curator-student-main">
             <div class="curator-avatar-small">{{ student.full_name|default:student.email|slice:":1"|upper }}</div>
-            <div>
+            <div class="curator-student-text">
               <h3>{{ student.full_name }}</h3>
-              <p class="muted">{{ student.email }}</p>
-              <p class="muted">Группа: {{ student.group|default:'—' }}</p>
+              <p>{{ student.email }}</p>
+              <p>Группа: {{ student.group|default:'—' }}</p>
             </div>
           </div>
           <span class="curator-student-status status-{{ student.academic_status }}">{{ student.get_academic_status_display }}</span>
