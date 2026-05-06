@@ -1,44 +1,120 @@
 {% extends 'base_dashboard.html' %}
 {% block title %}Кабинет куратора{% endblock %}
 {% block content %}
-<section class="hero">
-  <div class="hero-kicker">Кабинет куратора</div>
-  <h1>Кабинет куратора</h1>
-  <p>Закреплённых студентов: {{ students_count }}</p>
+<section class="hero curator-hero">
+  <div>
+    <div class="hero-kicker">Кабинет куратора</div>
+    <h1>Кабинет куратора</h1>
+    <p>Контроль учебного статуса студентов, активности и записей портфолио на проверке.</p>
+  </div>
 </section>
 
-<section class="section grid grid-4">
-  <article class="stat-card"><div class="label">Студентов в группе</div><div class="value">{{ students_count }}</div></article>
-  <article class="stat-card"><div class="label">Обучаются</div><div class="value">{{ studying_count }}</div></article>
-  <article class="stat-card"><div class="label">Академ. отпуск</div><div class="value">{{ academic_leave_count }}</div></article>
-  <article class="stat-card"><div class="label">Отчислены</div><div class="value">{{ expelled_count }}</div></article>
-  <article class="stat-card"><div class="label">Выпускники</div><div class="value">{{ graduated_count }}</div></article>
-  <article class="stat-card"><div class="label">Записей на проверке</div><div class="value">{{ pending_count }}</div></article>
-</section>
+<section class="section curator-overview">
+  <article class="card curator-status-card">
+    <div class="curator-card-head">
+      <div>
+        <h2>Учебная активность</h2>
+        <p class="muted">Студенты закреплённых групп по текущему учебному статусу.</p>
+      </div>
+      <span class="badge badge-primary">Всего: {{ students_count }}</span>
+    </div>
 
-<section class="section card">
-  <h2>Записи на проверку</h2>
-  {% for entry in pending_entries %}
-    <article class="list-item">
-      <h3>{{ entry.title }}</h3>
-      <p class="muted">{{ entry.student.full_name }} • {{ entry.type }} • {{ entry.date }}</p>
-      <span class="badge badge-pending">Ожидает проверки</span>
+    <div class="curator-status-content">
+      <div class="curator-donut" aria-label="Всего студентов">
+        <strong>{{ students_count }}</strong>
+        <span>студентов</span>
+      </div>
+
+      <div class="curator-status-list">
+        <div class="curator-status-row">
+          <span><i class="status-dot status-dot-green"></i>Обучаются</span>
+          <strong>{{ studying_count }}</strong>
+        </div>
+        <div class="curator-status-row">
+          <span><i class="status-dot status-dot-warning"></i>Академический отпуск</span>
+          <strong>{{ academic_leave_count }}</strong>
+        </div>
+        <div class="curator-status-row">
+          <span><i class="status-dot status-dot-danger"></i>Отчислены</span>
+          <strong>{{ expelled_count }}</strong>
+        </div>
+        <div class="curator-status-row">
+          <span><i class="status-dot status-dot-muted"></i>Выпускники</span>
+          <strong>{{ graduated_count }}</strong>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <aside class="curator-side-stats">
+    <article class="card curator-mini-stat curator-mini-stat-primary">
+      <span>На проверке</span>
+      <strong>{{ pending_count }}</strong>
+      <p>записей портфолио ожидают решения</p>
     </article>
-  {% empty %}
-    <p class="muted">Нет записей, ожидающих проверки.</p>
-  {% endfor %}
+
+    <article class="card curator-mini-stat">
+      <span>Активные студенты</span>
+      <strong>{{ studying_count }}</strong>
+      <p>могут получать подтверждения портфолио</p>
+    </article>
+  </aside>
 </section>
 
-<section class="section card">
-  <h2>5 студентов с последней активностью</h2>
-  {% for student in students_with_activity %}
-    <article class="list-item">
-      <h3>{{ student.full_name }}</h3>
-      <p class="muted">Группа: {{ student.group|default:'—' }} • {{ student.specialty|default:'Специальность не указана' }}</p>
-      <p class="muted">Последняя активность: {{ student.last_activity|date:'d.m.Y H:i'|default:'Нет активности' }}</p>
-    </article>
-  {% empty %}
-    <p class="muted">Список студентов пока пуст.</p>
-  {% endfor %}
+<section class="section curator-dashboard-grid">
+  <article class="card curator-panel">
+    <div class="curator-card-head">
+      <div>
+        <h2>Записи на проверку</h2>
+        <p class="muted">Последние материалы, которые ожидают подтверждения.</p>
+      </div>
+      <a class="btn btn-link" href="{% url 'portfolio:review_queue' %}?status=pending">Открыть очередь</a>
+    </div>
+
+    <div class="curator-list">
+      {% for entry in pending_entries %}
+        <article class="curator-entry-row">
+          <div>
+            <h3>{{ entry.title }}</h3>
+            <p class="muted">{{ entry.student.full_name }} • {{ entry.type }} • {{ entry.date }}</p>
+          </div>
+          <span class="badge badge-pending">Ожидает проверки</span>
+        </article>
+      {% empty %}
+        <div class="curator-empty">
+          <strong>Нет записей на проверку</strong>
+          <p>Когда студенты добавят материалы, ожидающие подтверждения, они появятся здесь.</p>
+        </div>
+      {% endfor %}
+    </div>
+  </article>
+
+  <article class="card curator-panel">
+    <div class="curator-card-head">
+      <div>
+        <h2>Последняя активность</h2>
+        <p class="muted">Пять студентов, которых стоит просмотреть в первую очередь.</p>
+      </div>
+      <a class="btn btn-link" href="{% url 'accounts:curator_students' %}">Все студенты</a>
+    </div>
+
+    <div class="curator-list">
+      {% for student in students_with_activity %}
+        <article class="curator-activity-row">
+          <div class="curator-avatar-small">{{ student.full_name|default:student.email|slice:":1"|upper }}</div>
+          <div>
+            <h3>{{ student.full_name }}</h3>
+            <p class="muted">Группа: {{ student.group|default:'—' }}</p>
+            <p class="muted">Последняя активность: {{ student.last_activity|date:'d.m.Y H:i'|default:'Нет активности' }}</p>
+          </div>
+        </article>
+      {% empty %}
+        <div class="curator-empty">
+          <strong>Список студентов пока пуст</strong>
+          <p>Студенты появятся после назначения групп.</p>
+        </div>
+      {% endfor %}
+    </div>
+  </article>
 </section>
 {% endblock %}

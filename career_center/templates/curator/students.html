@@ -4,41 +4,51 @@
 <section class="hero">
   <div class="hero-kicker">Кабинет куратора</div>
   <h1>Мои студенты</h1>
-  <p>Список закреплённых студентов и статус их портфолио.</p>
+  <p>Список закреплённых студентов, учебный статус и состояние портфолио.</p>
 </section>
 
-<section class="section card">
-  <form method="get" class="filters">
+<section class="section card curator-students-card">
+  <form method="get" class="filters curator-filters">
     <select name="include_graduates">
       <option value="0" {% if not include_graduates %}selected{% endif %}>Только активные группы</option>
       <option value="1" {% if include_graduates %}selected{% endif %}>Включая выпускников</option>
     </select>
     <button class="btn btn-link" type="submit">Применить</button>
   </form>
-  {% if students %}
-    {% for student in students %}
-      <article class="list-item">
-        <h3>{{ student.full_name }}</h3>
-        <p class="muted">Email: {{ student.email }}</p>
-        <p class="muted">Группа: {{ student.group|default:'—' }} • {{ student.specialty|default:'Специальность не указана' }}</p>
-        <p>
-          <span class="badge badge-status">{{ student.get_academic_status_display }}</span>
-          <span class="badge badge-pending">На проверке: {{ student.portfolio_pending }}</span>
-        </p>
-        <p class="muted">
-          Портфолио: всего {{ student.portfolio_total }} •
-          подтверждено {{ student.portfolio_approved }}
-        </p>
-        <div class="inline-actions">
-          <a class="btn btn-link" href="{% url 'accounts:curator_student_detail' student.id %}">Открыть</a>
-        </div>
-      </article>
-    {% endfor %}
-  {% else %}
-    <div class="list-item">
-      <h3>Пока нет закреплённых студентов</h3>
-      <p class="muted">Когда администратор назначит студентов, они появятся в этом разделе.</p>
-    </div>
-  {% endif %}
+
+  <div class="curator-student-list">
+    {% if students %}
+      {% for student in students %}
+        <article class="curator-student-row">
+          <div class="curator-student-main">
+            <div class="curator-avatar-small">{{ student.full_name|default:student.email|slice:":1"|upper }}</div>
+            <div>
+              <h3>{{ student.full_name }}</h3>
+              <p class="muted">{{ student.email }}</p>
+              <p class="muted">Группа: {{ student.group|default:'—' }}</p>
+            </div>
+          </div>
+
+          <div class="curator-student-badges">
+            <span class="badge badge-status">{{ student.get_academic_status_display }}</span>
+            <span class="badge badge-pending">На проверке: {{ student.portfolio_pending }}</span>
+          </div>
+
+          <div class="curator-student-portfolio">
+            <span>Портфолио</span>
+            <strong>{{ student.portfolio_approved }} / {{ student.portfolio_total }}</strong>
+            <small>подтверждено / всего</small>
+          </div>
+
+          <a class="btn btn-link curator-open-btn" href="{% url 'accounts:curator_student_detail' student.id %}">Открыть</a>
+        </article>
+      {% endfor %}
+    {% else %}
+      <div class="curator-empty">
+        <strong>Пока нет закреплённых студентов</strong>
+        <p>Когда администратор назначит студентов, они появятся в этом разделе.</p>
+      </div>
+    {% endif %}
+  </div>
 </section>
 {% endblock %}
