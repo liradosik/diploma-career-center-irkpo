@@ -283,7 +283,8 @@ def curator_student_detail(request, student_id):
     if request.method == 'POST':
         form = CuratorStudentAcademicStatusForm(request.POST, instance=student)
         if form.is_valid():
-            form.save(update_fields=['academic_status'])
+            updated_student = form.save(commit=False)
+            updated_student.save(update_fields=['academic_status'])
             messages.success(request, 'Учебный статус студента обновлён.')
             return redirect('accounts:curator_student_detail', student_id=student.id)
     else:
