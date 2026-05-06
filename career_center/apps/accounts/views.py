@@ -38,7 +38,7 @@ from .forms import (
     UserStudentForm,
     sync_student_with_group,
 )
-from .models import Specialty, StudyGroup, User
+from .models import ActivityLog, Specialty, StudyGroup, User
 
 
 class CustomLoginView(LoginView):
@@ -217,6 +217,7 @@ def student_dashboard(request):
 @role_required(User.Role.CURATOR)
 def curator_dashboard(request):
     students = curator_students_queryset(request.user)
+    all_students = curator_students_queryset(request.user, include_graduates=True)
     student_ids = students.values_list('id', flat=True)
 
     pending_entries_qs = (
@@ -226,17 +227,14 @@ def curator_dashboard(request):
         .order_by('-created_at')
     )
 
-    students_with_activity = (
-        students.annotate(last_activity=Max('portfolio_entries__updated_at'))
-        .order_by('-last_activity', 'full_name')[:5]
-    )
+    recent_activity = ActivityLog.objects.filter(student_id__in=student_ids).select_related('student')[:7]
 
     context = {
         'students_count': students.count(),
         'studying_count': students.filter(academic_status=User.AcademicStatus.STUDYING).count(),
         'academic_leave_count': students.filter(academic_status=User.AcademicStatus.ACADEMIC_LEAVE).count(),
         'expelled_count': students.filter(academic_status=User.AcademicStatus.EXPELLED).count(),
-        'graduated_count': students.filter(academic_status=User.AcademicStatus.GRADUATED).count(),
+        'graduated_count': all_students.filter(academic_status=User.AcademicStatus.GRADUATED).count(),
         'pending_count': pending_entries_qs.count(),
         'approved_count': PortfolioEntry.objects.filter(
             student_id__in=student_ids, status=PortfolioEntry.Status.APPROVED
@@ -245,9 +243,30 @@ def curator_dashboard(request):
             student_id__in=student_ids, status=PortfolioEntry.Status.REJECTED
         ).count(),
         'pending_entries': pending_entries_qs[:5],
-        'students_with_activity': students_with_activity,
+        'recent_activity': recent_activity,
     }
     return render(request, 'curator/dashboard.html', context)
+
+
+@role_required(User.Role.CURATOR)
+def curator_activity(request):
+    students = curator_students_queryset(request.user)
+    student_ids = students.values_list('id', flat=True)
+    activity = ActivityLog.objects.filter(student_id__in=student_ids).select_related('student')
+
+    kind = request.GET.get('kind', 'all')
+    if kind == 'portfolio':
+        activity = activity.filter(event_type__startswith='portfolio_')
+    elif kind == 'courses':
+        activity = activity.filter(event_type__in=[ActivityLog.EventType.COURSE_REGISTERED, ActivityLog.EventType.COURSE_CANCELLED])
+    elif kind == 'vacancies':
+        activity = activity.filter(event_type=ActivityLog.EventType.VACANCY_APPLIED)
+    elif kind == 'pending':
+        activity = activity.filter(event_type=ActivityLog.EventType.PORTFOLIO_PENDING)
+    else:
+        kind = 'all'
+
+    return render(request, 'curator/activity.html', {'activity': activity[:80], 'kind': kind})
 
 
 @role_required(User.Role.CURATOR)
@@ -282,7 +301,8 @@ def curator_student_detail(request, student_id):
     if request.method == 'POST':
         form = CuratorStudentAcademicStatusForm(request.POST, instance=student)
         if form.is_valid():
-            form.save(update_fields=['academic_status'])
+            updated_student = form.save(commit=False)
+            updated_student.save(update_fields=['academic_status'])
             messages.success(request, 'Учебный статус студента обновлён.')
             return redirect('accounts:curator_student_detail', student_id=student.id)
     else:

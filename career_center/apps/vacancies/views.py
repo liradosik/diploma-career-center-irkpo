@@ -2,7 +2,7 @@ from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect, render
 
 from apps.accounts.decorators import role_required
-from apps.accounts.models import User
+from apps.accounts.models import ActivityLog, User
 
 from .models import Vacancy, VacancyResponse
 
@@ -30,6 +30,15 @@ def respond(request, pk):
     vacancy = get_object_or_404(Vacancy, pk=pk, status=Vacancy.Status.ACTIVE)
     profile = getattr(request.user, 'student_profile', None)
     resume_link = request.build_absolute_uri(f"/resumes/public/{profile.public_resume_token}/") if profile else ''
-    VacancyResponse.objects.get_or_create(student=request.user, vacancy=vacancy, defaults={'resume_link_snapshot': resume_link})
+    response, created = VacancyResponse.objects.get_or_create(student=request.user, vacancy=vacancy, defaults={'resume_link_snapshot': resume_link})
+    if created:
+        ActivityLog.objects.create(
+            student=request.user,
+            event_type=ActivityLog.EventType.VACANCY_APPLIED,
+            title=f'Откликнулся на вакансию: {vacancy.title}',
+            description=vacancy.company,
+            related_model='vacancies.Vacancy',
+            related_object_id=vacancy.id,
+        )
     messages.success(request, 'Отклик сохранён. Скопируйте ссылку на резюме и отправьте работодателю по указанным контактам.')
     return redirect('vacancies:detail', pk=pk)
