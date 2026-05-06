@@ -4,37 +4,41 @@
 <section class="hero">
   <div class="hero-kicker">Проверка портфолио</div>
   <h1>Очередь записей на модерацию</h1>
-  <p>Показываются только записи студентов, закреплённых за вами.</p>
+  <p>Показываются только записи текущих студентов, закреплённых за вами.</p>
 </section>
 
 <section class="section card curator-filter-card">
   <h2>Фильтр</h2>
-  <div class="inline-actions curator-filter-actions">
-    <a class="btn {% if status_filter == 'all' %}btn-primary{% else %}btn-link{% endif %}" href="{% url 'portfolio:review_queue' %}?status=all">Все</a>
-    <a class="btn {% if status_filter == 'pending' %}btn-primary{% else %}btn-link{% endif %}" href="{% url 'portfolio:review_queue' %}?status=pending">Ожидают проверки</a>
-    <a class="btn {% if status_filter == 'approved' %}btn-primary{% else %}btn-link{% endif %}" href="{% url 'portfolio:review_queue' %}?status=approved">Подтверждено</a>
-    <a class="btn {% if status_filter == 'rejected' %}btn-primary{% else %}btn-link{% endif %}" href="{% url 'portfolio:review_queue' %}?status=rejected">Отклонено</a>
+  <div class="curator-filter-pills">
+    <a class="{% if status_filter == 'all' %}is-active{% endif %}" href="{% url 'portfolio:review_queue' %}?status=all">Все</a>
+    <a class="{% if status_filter == 'pending' %}is-active{% endif %}" href="{% url 'portfolio:review_queue' %}?status=pending">Ожидают проверки</a>
+    <a class="{% if status_filter == 'approved' %}is-active{% endif %}" href="{% url 'portfolio:review_queue' %}?status=approved">Подтверждено</a>
+    <a class="{% if status_filter == 'rejected' %}is-active{% endif %}" href="{% url 'portfolio:review_queue' %}?status=rejected">Отклонено</a>
   </div>
 </section>
 
 <section class="section card curator-panel">
   <h2>Записи</h2>
-
   <div class="curator-review-list">
     {% for e in entries %}
-      <article class="curator-review-row">
+      <article class="curator-review-card">
         <div class="curator-review-head">
-          <div>
-            <h3>{{ e.title }}</h3>
-            <p class="muted">{{ e.student.full_name }} • {{ e.type }} • {{ e.date }}</p>
-          </div>
-
+          <h3>{{ e.title }}</h3>
           {% if e.status == 'pending' %}<span class="badge badge-pending">Ожидает проверки</span>{% endif %}
           {% if e.status == 'approved' %}<span class="badge badge-approved">Подтверждено</span>{% endif %}
           {% if e.status == 'rejected' %}<span class="badge badge-rejected">Отклонено</span>{% endif %}
         </div>
 
+        <div class="curator-review-meta">
+          <div><span>Студент:</span> <strong>{{ e.student.full_name }}</strong></div>
+          <div><span>Раздел:</span> <strong>{{ e.type }}</strong></div>
+          <div><span>Дата:</span> <strong>{{ e.date }}</strong></div>
+        </div>
+
         <p>{{ e.description|truncatechars:240 }}</p>
+
+        {% if e.reviewed_at %}<p class="muted">Проверено: {{ e.reviewed_at|date:'d.m.Y H:i' }}</p>{% endif %}
+        {% if e.curator_comment %}<p class="muted">Комментарий куратора: {{ e.curator_comment }}</p>{% endif %}
 
         {% if e.status == 'pending' %}
           <form method="post" class="curator-review-form">
@@ -42,7 +46,6 @@
             <input type="hidden" name="entry_id" value="{{ e.id }}">
             <label for="comment_{{ e.id }}">Комментарий куратора</label>
             <textarea id="comment_{{ e.id }}" name="curator_comment" placeholder="Добавьте комментарий (необязательно)"></textarea>
-
             {% if e.student.academic_status == 'studying' %}
               <div class="inline-actions">
                 <button class="btn btn-primary" name="decision" value="approved" type="submit">Подтвердить</button>
@@ -52,14 +55,6 @@
               <p class="curator-warning">Подтверждение недоступно для статуса «{{ e.student.get_academic_status_display }}».</p>
             {% endif %}
           </form>
-        {% else %}
-          <div class="inline-actions">
-            {% if e.reviewed_at %}<span class="muted">Проверено: {{ e.reviewed_at|date:'d.m.Y H:i' }}</span>{% endif %}
-          </div>
-        {% endif %}
-
-        {% if e.curator_comment %}
-          <p class="muted">Комментарий куратора: {{ e.curator_comment }}</p>
         {% endif %}
       </article>
     {% empty %}
