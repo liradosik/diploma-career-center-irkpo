@@ -217,6 +217,7 @@ def student_dashboard(request):
 @role_required(User.Role.CURATOR)
 def curator_dashboard(request):
     students = curator_students_queryset(request.user)
+    all_students = curator_students_queryset(request.user, include_graduates=True)
     student_ids = students.values_list('id', flat=True)
 
     pending_entries_qs = (
@@ -236,7 +237,7 @@ def curator_dashboard(request):
         'studying_count': students.filter(academic_status=User.AcademicStatus.STUDYING).count(),
         'academic_leave_count': students.filter(academic_status=User.AcademicStatus.ACADEMIC_LEAVE).count(),
         'expelled_count': students.filter(academic_status=User.AcademicStatus.EXPELLED).count(),
-        'graduated_count': students.filter(academic_status=User.AcademicStatus.GRADUATED).count(),
+        'graduated_count': all_students.filter(academic_status=User.AcademicStatus.GRADUATED).count(),
         'pending_count': pending_entries_qs.count(),
         'approved_count': PortfolioEntry.objects.filter(
             student_id__in=student_ids, status=PortfolioEntry.Status.APPROVED
@@ -282,7 +283,8 @@ def curator_student_detail(request, student_id):
     if request.method == 'POST':
         form = CuratorStudentAcademicStatusForm(request.POST, instance=student)
         if form.is_valid():
-            form.save(update_fields=['academic_status'])
+            updated_student = form.save(commit=False)
+            updated_student.save(update_fields=['academic_status'])
             messages.success(request, 'Учебный статус студента обновлён.')
             return redirect('accounts:curator_student_detail', student_id=student.id)
     else:
