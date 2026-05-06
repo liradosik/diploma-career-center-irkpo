@@ -32,7 +32,7 @@ class Course(models.Model):
 
     @property
     def occupied_places(self):
-        return self.registrations.count()
+        return self.registrations.filter(status=CourseRegistration.Status.REGISTERED).count()
 
     @property
     def has_available_places(self):
@@ -45,12 +45,19 @@ class Course(models.Model):
 
 
 class CourseRegistration(models.Model):
+    class Status(models.TextChoices):
+        REGISTERED = 'registered', 'Записан'
+        CANCELLED = 'cancelled', 'Отменена'
+
     student = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='course_registrations')
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='registrations')
+    status = models.CharField(max_length=16, choices=Status.choices, default=Status.REGISTERED)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = ('student', 'course')
+        constraints = [
+            models.UniqueConstraint(fields=('student', 'course'), condition=models.Q(status='registered'), name='uniq_active_course_registration'),
+        ]
 
     def clean(self):
         if self.course.format_type == Course.Format.OFFLINE and not self.course.has_available_places:

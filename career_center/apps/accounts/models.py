@@ -91,3 +91,28 @@ class StudentProfile(models.Model):
 
     def __str__(self):
         return f'Профиль: {self.user.full_name}'
+
+
+class ActivityLog(models.Model):
+    class EventType(models.TextChoices):
+        PORTFOLIO_CREATED = 'portfolio_created', 'Добавлена запись портфолио'
+        PORTFOLIO_PENDING = 'portfolio_pending', 'Ожидает проверки'
+        PORTFOLIO_APPROVED = 'portfolio_approved', 'Запись портфолио подтверждена'
+        PORTFOLIO_REJECTED = 'portfolio_rejected', 'Запись портфолио отклонена'
+        COURSE_REGISTERED = 'course_registered', 'Запись на курс'
+        COURSE_CANCELLED = 'course_cancelled', 'Отмена записи на курс'
+        VACANCY_APPLIED = 'vacancy_applied', 'Отклик на вакансию'
+
+    student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='activity_logs')
+    event_type = models.CharField(max_length=32, choices=EventType.choices)
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    related_model = models.CharField(max_length=64, blank=True)
+    related_object_id = models.PositiveIntegerField(null=True, blank=True)
+
+    class Meta:
+        ordering = ('-created_at',)
+
+    def __str__(self):
+        return f'{self.student} — {self.get_event_type_display()}'

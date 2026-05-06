@@ -1,0 +1,39 @@
+{% extends 'base_dashboard.html' %}
+{% block title %}Активность студентов{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="hero-kicker">Куратор</div>
+  <h1>Активность студентов</h1>
+  <p>События по портфолио, курсам и вакансиям закреплённых студентов.</p>
+</section>
+
+<section class="section card">
+  <div class="curator-activity-filters">
+    <a class="{% if kind == 'all' %}is-active{% endif %}" href="{% url 'accounts:curator_activity' %}?kind=all">Все</a>
+    <a class="{% if kind == 'portfolio' %}is-active{% endif %}" href="{% url 'accounts:curator_activity' %}?kind=portfolio">Портфолио</a>
+    <a class="{% if kind == 'courses' %}is-active{% endif %}" href="{% url 'accounts:curator_activity' %}?kind=courses">Курсы</a>
+    <a class="{% if kind == 'vacancies' %}is-active{% endif %}" href="{% url 'accounts:curator_activity' %}?kind=vacancies">Вакансии</a>
+    <a class="{% if kind == 'pending' %}is-active{% endif %}" href="{% url 'accounts:curator_activity' %}?kind=pending">Ожидает проверки</a>
+  </div>
+
+  <div class="curator-activity-list">
+    {% for event in activity %}
+      <article class="curator-activity-item">
+        <div class="curator-avatar-small">{{ event.student.full_name|default:event.student.email|slice:":1"|upper }}</div>
+        <div>
+          <h3>{{ event.student.full_name }}</h3>
+          <div class="curator-activity-meta">Группа: {{ event.student.group|default:'—' }} · {{ event.created_at|date:'d.m.Y H:i' }}</div>
+          <p>{{ event.title }}</p>
+          {% if event.description %}<p class="muted">{{ event.description }}</p>{% endif %}
+        </div>
+        <span class="curator-activity-type">{{ event.get_event_type_display }}</span>
+      </article>
+    {% empty %}
+      <div class="curator-activity-empty">
+        <strong>Пока нет активности студентов</strong>
+        <p>События появятся после действий студентов или проверки портфолио.</p>
+      </div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

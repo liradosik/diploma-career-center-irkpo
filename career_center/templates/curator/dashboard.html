@@ -43,25 +43,26 @@
 <section class="section card curator-panel">
   <div class="curator-card-head">
     <div>
-      <h2>Последняя активность</h2>
+      <h2>Недавняя активность студентов</h2>
       <p class="muted">Пять студентов, которых стоит просмотреть в первую очередь.</p>
     </div>
   </div>
 
   <div class="curator-list">
-    {% for student in students_with_activity %}
+    {% for event in recent_activity %}
       <article class="curator-activity-card">
-        <div class="curator-avatar-small">{{ student.full_name|default:student.email|slice:":1"|upper }}</div>
+        <div class="curator-avatar-small">{{ event.student.full_name|default:event.student.email|slice:":1"|upper }}</div>
         <div>
-          <h3>{{ student.full_name }}</h3>
-          <p class="muted">Группа: {{ student.group|default:'—' }}</p>
-          <p class="muted">Последняя активность: {{ student.last_activity|date:'d.m.Y H:i'|default:'пока нет действий' }}</p>
+          <h3>{{ event.student.full_name }}</h3>
+          <p class="muted">Группа: {{ event.student.group|default:'—' }}</p>
+          <p>{{ event.title }}</p>
+          <p class="muted">{{ event.created_at|date:'d.m.Y H:i' }}</p>
         </div>
       </article>
     {% empty %}
       <div class="curator-empty">
-        <strong>Список студентов пока пуст</strong>
-        <p>Студенты появятся после назначения групп.</p>
+        <strong>Пока нет активности студентов</strong>
+        <p>Когда студенты добавят записи портфолио, запишутся на курсы или откликнутся на вакансии, события появятся здесь.</p>
       </div>
     {% endfor %}
   </div>

@@ -38,7 +38,7 @@ from .forms import (
     UserStudentForm,
     sync_student_with_group,
 )
-from .models import Specialty, StudyGroup, User
+from .models import ActivityLog, Specialty, StudyGroup, User
 
 
 class CustomLoginView(LoginView):
@@ -227,10 +227,7 @@ def curator_dashboard(request):
         .order_by('-created_at')
     )
 
-    students_with_activity = (
-        students.annotate(last_activity=Max('portfolio_entries__updated_at'))
-        .order_by('-last_activity', 'full_name')[:5]
-    )
+    recent_activity = ActivityLog.objects.filter(student_id__in=student_ids).select_related('student')[:7]
 
     context = {
         'students_count': students.count(),
@@ -246,9 +243,30 @@ def curator_dashboard(request):
             student_id__in=student_ids, status=PortfolioEntry.Status.REJECTED
         ).count(),
         'pending_entries': pending_entries_qs[:5],
-        'students_with_activity': students_with_activity,
+        'recent_activity': recent_activity,
     }
     return render(request, 'curator/dashboard.html', context)
+
+
+@role_required(User.Role.CURATOR)
+def curator_activity(request):
+    students = curator_students_queryset(request.user)
+    student_ids = students.values_list('id', flat=True)
+    activity = ActivityLog.objects.filter(student_id__in=student_ids).select_related('student')
+
+    kind = request.GET.get('kind', 'all')
+    if kind == 'portfolio':
+        activity = activity.filter(event_type__startswith='portfolio_')
+    elif kind == 'courses':
+        activity = activity.filter(event_type__in=[ActivityLog.EventType.COURSE_REGISTERED, ActivityLog.EventType.COURSE_CANCELLED])
+    elif kind == 'vacancies':
+        activity = activity.filter(event_type=ActivityLog.EventType.VACANCY_APPLIED)
+    elif kind == 'pending':
+        activity = activity.filter(event_type=ActivityLog.EventType.PORTFOLIO_PENDING)
+    else:
+        kind = 'all'
+
+    return render(request, 'curator/activity.html', {'activity': activity[:80], 'kind': kind})
 
 
 @role_required(User.Role.CURATOR)

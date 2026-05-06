@@ -1,4 +1,5 @@
 {% extends 'base_dashboard.html' %}
+{% load ui_extras %}
 {% block title %}Курсы и семинары{% endblock %}
 {% block content %}
 <section class="hero">
@@ -18,7 +19,16 @@
         {% csrf_token %}
         <div class="inline-actions">
           <span class="badge badge-active">Идёт набор</span>
-          <button class="btn btn-primary" type="submit">Записаться</button>
+          {% with reg=registration_map|dict_get:c.id %}
+            {% if reg and reg.status == 'registered' %}
+              <button class="btn btn-link" formaction="{% url 'courses:cancel_registration' reg.id %}" type="submit">Отменить запись</button>
+            {% elif reg and reg.status == 'cancelled' %}
+              <span class="badge">Запись отменена</span>
+              <button class="btn btn-primary" type="submit">Записаться снова</button>
+            {% else %}
+              <button class="btn btn-primary" type="submit">Записаться</button>
+            {% endif %}
+          {% endwith %}
         </div>
       </form>
     </article>

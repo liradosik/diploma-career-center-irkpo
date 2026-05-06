@@ -3,7 +3,7 @@ from django.utils import timezone
 from django.db.models import Q
 
 from apps.accounts.decorators import role_required
-from apps.accounts.models import User
+from apps.accounts.models import ActivityLog, User
 
 from .forms import PortfolioEntryForm
 from .models import PortfolioEntry
@@ -24,6 +24,22 @@ def create_entry(request):
             entry.student = request.user
             entry.status = PortfolioEntry.Status.PENDING
             entry.save()
+            ActivityLog.objects.create(
+                student=request.user,
+                event_type=ActivityLog.EventType.PORTFOLIO_CREATED,
+                title=f'Добавлена запись портфолио: {entry.title}',
+                description=entry.type,
+                related_model='portfolio.PortfolioEntry',
+                related_object_id=entry.id,
+            )
+            ActivityLog.objects.create(
+                student=request.user,
+                event_type=ActivityLog.EventType.PORTFOLIO_PENDING,
+                title=f'Ожидает проверки: {entry.title}',
+                description=entry.type,
+                related_model='portfolio.PortfolioEntry',
+                related_object_id=entry.id,
+            )
             return redirect('portfolio:list')
     else:
         form = PortfolioEntryForm()
@@ -64,6 +80,15 @@ def review_queue(request):
             entry.reviewed_by = request.user
             entry.reviewed_at = timezone.now()
             entry.save(update_fields=['status', 'curator_comment', 'reviewed_by', 'reviewed_at', 'updated_at'])
+            event_type = ActivityLog.EventType.PORTFOLIO_APPROVED if decision == PortfolioEntry.Status.APPROVED else ActivityLog.EventType.PORTFOLIO_REJECTED
+            ActivityLog.objects.create(
+                student=entry.student,
+                event_type=event_type,
+                title=f'{entry.get_status_display()}: {entry.title}',
+                description=entry.type,
+                related_model='portfolio.PortfolioEntry',
+                related_object_id=entry.id,
+            )
 
         return redirect('portfolio:review_queue')
 
