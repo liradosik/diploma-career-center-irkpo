@@ -4,16 +4,13 @@
 <section class="hero">
   <div class="hero-kicker">Кабинет куратора</div>
   <h1>Мои студенты</h1>
-  <p>Список закреплённых студентов, учебный статус и состояние портфолио.</p>
+  <p>Список закреплённых студентов и учебный статус.</p>
 </section>
 
 <section class="section card curator-students-card">
-  <form method="get" class="filters curator-filters">
-    <select name="include_graduates">
-      <option value="0" {% if not include_graduates %}selected{% endif %}>Только активные группы</option>
-      <option value="1" {% if include_graduates %}selected{% endif %}>Включая выпускников</option>
-    </select>
-    <button class="btn btn-link" type="submit">Применить</button>
+  <form method="get" class="curator-filter-pills">
+    <button class="{% if not include_graduates %}is-active{% endif %}" type="submit" name="include_graduates" value="0">Текущие студенты</button>
+    <button class="{% if include_graduates %}is-active{% endif %}" type="submit" name="include_graduates" value="1">Включая выпускников</button>
   </form>
 
   <div class="curator-student-list">
@@ -28,18 +25,7 @@
               <p class="muted">Группа: {{ student.group|default:'—' }}</p>
             </div>
           </div>
-
-          <div class="curator-student-badges">
-            <span class="badge badge-status">{{ student.get_academic_status_display }}</span>
-            <span class="badge badge-pending">На проверке: {{ student.portfolio_pending }}</span>
-          </div>
-
-          <div class="curator-student-portfolio">
-            <span>Портфолио</span>
-            <strong>{{ student.portfolio_approved }} / {{ student.portfolio_total }}</strong>
-            <small>подтверждено / всего</small>
-          </div>
-
+          <span class="curator-student-status status-{{ student.academic_status }}">{{ student.get_academic_status_display }}</span>
           <a class="btn btn-link curator-open-btn" href="{% url 'accounts:curator_student_detail' student.id %}">Открыть</a>
         </article>
       {% endfor %}
