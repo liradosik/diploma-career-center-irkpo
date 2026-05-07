@@ -36,6 +36,7 @@ from .forms import (
     StudentImportForm,
     StudentProfileForm,
     UserStudentForm,
+    StudentAcademicReadonlyForm,
     sync_student_with_group,
 )
 from .models import ActivityLog, Specialty, StudyGroup, User
@@ -203,11 +204,13 @@ def student_dashboard(request):
         'portfolio_total': entries_qs.count(),
         'portfolio_pending': entries_qs.filter(status=PortfolioEntry.Status.PENDING).count(),
         'portfolio_approved': entries_qs.filter(status=PortfolioEntry.Status.APPROVED).count(),
+        'portfolio_rejected': entries_qs.filter(status=PortfolioEntry.Status.REJECTED).count(),
         'resume': resume,
         'resume_is_public': bool(resume and resume.is_public and profile),
         'resume_public_url': resume_public_url,
         'resume_updated_at': getattr(resume, "updated_at", None) if resume else None,
         'registrations': registrations,
+        'registered_courses_count': registrations.filter(status=CourseRegistration.Status.REGISTERED).count(),
         'current_course': current_course,
         'profile_incomplete': not all([request.user.group, request.user.specialty, request.user.admission_year]),
     }
@@ -1164,14 +1167,29 @@ def profile_edit(request):
         profile = StudentProfile.objects.create(user=request.user)
 
     if request.method == 'POST':
-        user_form = UserStudentForm(request.POST, instance=request.user)
-        profile_form = StudentProfileForm(request.POST, request.FILES, instance=profile)
+        user_form = UserStudentForm(request.POST, request.FILES, instance=request.user)
+        profile_form = StudentProfileForm(request.POST, instance=profile)
         if user_form.is_valid() and profile_form.is_valid():
-            user_form.save()
+            user = user_form.save()
+            if request.POST.get('remove_photo') == '1' and user.photo:
+                user.photo.delete(save=False)
+                user.photo = None
+                user.save(update_fields=['photo'])
             profile_form.save()
-            return redirect('accounts:student_dashboard')
+            return redirect('accounts:profile_edit')
     else:
         user_form = UserStudentForm(instance=request.user)
         profile_form = StudentProfileForm(instance=profile)
 
-    return render(request, 'accounts/profile_edit.html', {'user_form': user_form, 'profile_form': profile_form})
+    academic_form = StudentAcademicReadonlyForm(instance=request.user)
+    resume = getattr(request.user, 'resume_settings', None)
+    resume_public_url = request.build_absolute_uri(f"/resumes/public/{profile.public_resume_token}/") if profile else ''
+    current_course = max(date.today().year - request.user.admission_year + 1, 1) if request.user.admission_year else None
+    return render(request, 'accounts/profile_edit.html', {
+        'user_form': user_form,
+        'profile_form': profile_form,
+        'academic_form': academic_form,
+        'resume': resume,
+        'resume_public_url': resume_public_url,
+        'current_course': current_course,
+    })

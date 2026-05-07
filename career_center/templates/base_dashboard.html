@@ -22,14 +22,14 @@
           <div class="menu-section">
             <div class="menu-group-title">Личный кабинет</div>
             <a class="{% if request.resolver_match.url_name == 'student_dashboard' %}active{% endif %}" href="{% url 'accounts:student_dashboard' %}">Главная</a>
-            <a class="{% if request.resolver_match.url_name == 'profile_edit' %}active{% endif %}" href="{% url 'accounts:profile_edit' %}">Профиль</a>
+            <a class="{% if request.resolver_match.url_name == 'profile_edit' %}active{% endif %}" href="{% url 'accounts:profile_edit' %}">Настройки</a>
             <a class="{% if request.resolver_match.namespace == 'portfolio' %}active{% endif %}" href="{% url 'portfolio:list' %}">Моё портфолио</a>
-            <a class="{% if request.resolver_match.namespace == 'resumes' %}active{% endif %}" href="{% url 'resumes:builder' %}">Резюме</a>
+            <a class="{% if request.resolver_match.namespace == 'resumes' %}active{% endif %}" href="{% url 'resumes:builder' %}">Конструктор резюме</a>
           </div>
           <div class="menu-section">
             <div class="menu-group-title">Возможности</div>
             <a class="{% if request.resolver_match.namespace == 'vacancies' %}active{% endif %}" href="{% url 'vacancies:list' %}">Вакансии</a>
-            <a class="{% if request.resolver_match.namespace == 'courses' %}active{% endif %}" href="{% url 'courses:list' %}">Курсы</a>
+            <a class="{% if request.resolver_match.namespace == 'courses' %}active{% endif %}" href="{% url 'courses:list' %}">Курсы и семинары</a>
           </div>
         {% elif request.user.role == 'curator' %}
           <div class="menu-section">
