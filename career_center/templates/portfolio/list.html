@@ -5,8 +5,24 @@
 <section class="hero">
   <div class="hero-kicker">Электронное портфолио</div>
   <h1>Моё портфолио</h1>
-  <p>Здесь хранятся ваши достижения для резюме и откликов на вакансии.</p>
-  <div class="hero-actions"><a class="btn btn-primary" href="{% url 'portfolio:create' %}">Добавить запись</a></div>
+  <p>Здесь собраны ваши достижения, проекты, навыки, сертификаты и материалы для резюме.</p>
+  <div class="hero-actions">
+    <a class="btn btn-primary" href="{% url 'portfolio:create' %}">Добавить запись</a>
+    <a class="btn" href="{% url 'resumes:builder' %}">Поделиться портфолио</a>
+  </div>
+</section>
+
+<section class="section card">
+  <h2>Разделы портфолио</h2>
+  <div class="grid grid-2">
+    {% for sec in section_cards %}
+      <article class="list-item">
+        <h3>{{ sec.title }}</h3>
+        <p class="muted">Записей: {{ sec.count }}</p>
+        <a class="btn btn-link" href="?type={{ sec.code }}">Открыть</a>
+      </article>
+    {% endfor %}
+  </div>
 </section>
 
 <section class="section card">
@@ -14,12 +30,10 @@
   {% for entry in entries %}
     <article class="list-item">
       <h3>{{ entry.title }}</h3>
-      <p class="muted">Тип: {{ PORTFOLIO_TYPE_LABELS|dict_get:entry.type }}</p>
-      <p class="muted">Дата/год: {{ entry.date }}</p>
-      <p>{{ entry.description }}</p>
-      <p class="muted">Статус: {{ STATUS_LABELS|dict_get:entry.status }}</p>
+      <p class="muted">{{ PORTFOLIO_TYPE_LABELS|dict_get:entry.type }} • {{ entry.date }}</p>
+      <p>{{ entry.description|truncatechars:220 }}</p>
       {% if entry.link %}<p class="muted">Ссылка: <a style="color:#1E66D0;" href="{{ entry.link }}">{{ entry.link }}</a></p>{% endif %}
-      {% if entry.file %}<p class="muted">Файл: <a style="color:#1E66D0;" href="{{ entry.file.url }}">Скачать</a></p>{% endif %}
+      {% if entry.file %}<p class="muted">Файл: <a style="color:#1E66D0;" href="{{ entry.file.url }}">Скачать файл</a></p>{% endif %}
       {% if entry.curator_comment %}<p class="muted">Комментарий куратора: {{ entry.curator_comment }}</p>{% endif %}
       <div class="inline-actions">
         {% if entry.status == 'pending' %}<span class="badge badge-pending">Ожидает проверки</span>{% endif %}
