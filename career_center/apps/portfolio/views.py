@@ -1,6 +1,8 @@
+from collections import OrderedDict
+
+from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
-from django.db.models import Q
 
 from apps.accounts.decorators import role_required
 from apps.accounts.models import ActivityLog, User
@@ -9,10 +11,34 @@ from .forms import PortfolioEntryForm
 from .models import PortfolioEntry
 
 
+SECTION_DEFINITIONS = OrderedDict(
+    [
+        ('academic', ('Учебные достижения', ['academic'])),
+        ('project', ('Проекты и работы', ['project'])),
+        ('skill', ('Навыки', ['skill'])),
+        ('certificates', ('Сертификаты и курсы', ['academic'])),
+        ('social_creative', ('Общественная и творческая деятельность', ['creative', 'social', 'sport'])),
+        ('recommendation', ('Отзывы и рекомендации', ['recommendation'])),
+    ]
+)
+
+
 @role_required(User.Role.STUDENT)
 def list_entries(request):
-    entries = PortfolioEntry.objects.filter(student=request.user).order_by('-date')
-    return render(request, 'portfolio/list.html', {'entries': entries})
+    base_qs = PortfolioEntry.objects.filter(student=request.user)
+    entries = base_qs.order_by('-date')
+    selected_type = request.GET.get('type', '')
+    if selected_type:
+        if selected_type in SECTION_DEFINITIONS:
+            entries = entries.filter(type__in=SECTION_DEFINITIONS[selected_type][1])
+        else:
+            entries = entries.filter(type=selected_type)
+
+    section_cards = []
+    for code, (title, types) in SECTION_DEFINITIONS.items():
+        section_cards.append({'code': code, 'title': title, 'count': base_qs.filter(type__in=types).count(), 'types': types})
+
+    return render(request, 'portfolio/list.html', {'entries': entries, 'section_cards': section_cards, 'selected_type': selected_type})
 
 
 @role_required(User.Role.STUDENT)
@@ -24,22 +50,8 @@ def create_entry(request):
             entry.student = request.user
             entry.status = PortfolioEntry.Status.PENDING
             entry.save()
-            ActivityLog.objects.create(
-                student=request.user,
-                event_type=ActivityLog.EventType.PORTFOLIO_CREATED,
-                title=f'Добавлена запись портфолио: {entry.title}',
-                description=entry.type,
-                related_model='portfolio.PortfolioEntry',
-                related_object_id=entry.id,
-            )
-            ActivityLog.objects.create(
-                student=request.user,
-                event_type=ActivityLog.EventType.PORTFOLIO_PENDING,
-                title=f'Ожидает проверки: {entry.title}',
-                description=entry.type,
-                related_model='portfolio.PortfolioEntry',
-                related_object_id=entry.id,
-            )
+            ActivityLog.objects.create(student=request.user, event_type=ActivityLog.EventType.PORTFOLIO_CREATED, title=f'Добавлена запись портфолио: {entry.title}', description=entry.type, related_model='portfolio.PortfolioEntry', related_object_id=entry.id)
+            ActivityLog.objects.create(student=request.user, event_type=ActivityLog.EventType.PORTFOLIO_PENDING, title=f'Ожидает проверки: {entry.title}', description=entry.type, related_model='portfolio.PortfolioEntry', related_object_id=entry.id)
             return redirect('portfolio:list')
     else:
         form = PortfolioEntryForm()
@@ -52,7 +64,13 @@ def edit_entry(request, pk):
     if request.method == 'POST':
         form = PortfolioEntryForm(request.POST, request.FILES, instance=entry)
         if form.is_valid():
-            form.save()
+            updated = form.save(commit=False)
+            if entry.status in {PortfolioEntry.Status.APPROVED, PortfolioEntry.Status.REJECTED}:
+                updated.status = PortfolioEntry.Status.PENDING
+                updated.reviewed_by = None
+                updated.reviewed_at = None
+                ActivityLog.objects.create(student=request.user, event_type=ActivityLog.EventType.PORTFOLIO_PENDING, title=f'Повторная проверка: {updated.title}', description=updated.type, related_model='portfolio.PortfolioEntry', related_object_id=updated.id)
+            updated.save()
             return redirect('portfolio:list')
     else:
         form = PortfolioEntryForm(instance=entry)
@@ -61,18 +79,13 @@ def edit_entry(request, pk):
 
 @role_required(User.Role.CURATOR)
 def review_queue(request):
-    students = User.objects.filter(role=User.Role.STUDENT).filter(
-        Q(study_group__curator=request.user, study_group__is_active=True) |
-        Q(study_group__isnull=True, curator=request.user)
-    ).exclude(academic_status=User.AcademicStatus.GRADUATED).distinct()
+    students = User.objects.filter(role=User.Role.STUDENT).filter(Q(study_group__curator=request.user, study_group__is_active=True) | Q(study_group__isnull=True, curator=request.user)).exclude(academic_status=User.AcademicStatus.GRADUATED).distinct()
     entries_qs = PortfolioEntry.objects.filter(student__in=students).select_related('student').order_by('-created_at')
 
     if request.method == 'POST':
-        entry_id = request.POST.get('entry_id')
+        entry = get_object_or_404(entries_qs, id=request.POST.get('entry_id'))
         decision = request.POST.get('decision')
         comment = request.POST.get('curator_comment', '').strip()
-
-        entry = get_object_or_404(entries_qs, id=entry_id)
         can_review = entry.student.academic_status == User.AcademicStatus.STUDYING
         if entry.status == PortfolioEntry.Status.PENDING and can_review and decision in {PortfolioEntry.Status.APPROVED, PortfolioEntry.Status.REJECTED}:
             entry.status = decision
@@ -81,31 +94,13 @@ def review_queue(request):
             entry.reviewed_at = timezone.now()
             entry.save(update_fields=['status', 'curator_comment', 'reviewed_by', 'reviewed_at', 'updated_at'])
             event_type = ActivityLog.EventType.PORTFOLIO_APPROVED if decision == PortfolioEntry.Status.APPROVED else ActivityLog.EventType.PORTFOLIO_REJECTED
-            ActivityLog.objects.create(
-                student=entry.student,
-                event_type=event_type,
-                title=f'{entry.get_status_display()}: {entry.title}',
-                description=entry.type,
-                related_model='portfolio.PortfolioEntry',
-                related_object_id=entry.id,
-            )
-
+            ActivityLog.objects.create(student=entry.student, event_type=event_type, title=f'{entry.get_status_display()}: {entry.title}', description=entry.type, related_model='portfolio.PortfolioEntry', related_object_id=entry.id)
         return redirect('portfolio:review_queue')
 
     status_filter = request.GET.get('status', 'all')
     if status_filter in {PortfolioEntry.Status.PENDING, PortfolioEntry.Status.APPROVED, PortfolioEntry.Status.REJECTED}:
         entries_qs = entries_qs.filter(status=status_filter)
-    else:
-        status_filter = 'all'
-
-    return render(
-        request,
-        'curator/review_queue.html',
-        {
-            'entries': entries_qs[:50],
-            'status_filter': status_filter,
-        },
-    )
+    return render(request, 'curator/review_queue.html', {'entries': entries_qs[:50], 'status_filter': status_filter})
 
 
 @role_required(User.Role.STUDENT)
