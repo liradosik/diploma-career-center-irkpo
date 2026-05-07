@@ -1,7 +1,9 @@
 {% extends 'base_dashboard.html' %}
+{% load ui_extras %}
 {% block title %}Карточка студента{% endblock %}
 {% block content %}
 <section class="hero curator-student-hero">
+  {% if student.photo %}<img class="avatar-img avatar-lg" src="{{ student.photo.url }}" alt="{{ student.full_name }}">{% else %}<div class="avatar-fallback avatar-lg">{{ student.full_name|initials }}</div>{% endif %}
   <div>
     <div class="hero-kicker">Карточка студента</div>
     <h1>{{ student.full_name }}</h1>

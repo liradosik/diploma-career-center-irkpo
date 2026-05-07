@@ -37,9 +37,11 @@ from .forms import (
     StudentProfileForm,
     UserStudentForm,
     StudentAcademicReadonlyForm,
+    UserProfileSettingsForm,
     sync_student_with_group,
 )
 from .models import ActivityLog, Specialty, StudyGroup, User
+from .utils import apply_user_photo_update
 
 
 class CustomLoginView(LoginView):
@@ -1172,10 +1174,7 @@ def profile_edit(request):
         profile_form = StudentProfileForm(request.POST, instance=profile)
         if user_form.is_valid() and profile_form.is_valid():
             user = user_form.save()
-            if request.POST.get('remove_photo') == '1' and user.photo:
-                user.photo.delete(save=False)
-                user.photo = None
-                user.save(update_fields=['photo'])
+            apply_user_photo_update(request, user)
             profile_form.save()
             return redirect('accounts:profile_edit')
     else:
@@ -1194,3 +1193,31 @@ def profile_edit(request):
         'resume_public_url': resume_public_url,
         'current_course': current_course,
     })
+
+
+@role_required(User.Role.CURATOR)
+def curator_profile_edit(request):
+    if request.method == 'POST':
+        user_form = UserProfileSettingsForm(request.POST, request.FILES, instance=request.user)
+        if user_form.is_valid():
+            user = user_form.save()
+            apply_user_photo_update(request, user)
+            return redirect('accounts:curator_profile_edit')
+    else:
+        user_form = UserProfileSettingsForm(instance=request.user)
+
+    return render(request, 'accounts/user_profile_edit.html', {'user_form': user_form, 'profile_title': 'Настройки куратора'})
+
+
+@role_required(User.Role.ADMIN)
+def admin_profile_edit(request):
+    if request.method == 'POST':
+        user_form = UserProfileSettingsForm(request.POST, request.FILES, instance=request.user)
+        if user_form.is_valid():
+            user = user_form.save()
+            apply_user_photo_update(request, user)
+            return redirect('accounts:admin_profile_edit')
+    else:
+        user_form = UserProfileSettingsForm(instance=request.user)
+
+    return render(request, 'accounts/user_profile_edit.html', {'user_form': user_form, 'profile_title': 'Настройки администратора'})

@@ -1,10 +1,10 @@
 {% extends 'base_dashboard.html' %}
 {% load ui_extras %}
 {% load static %}
-{% block title %}Настройки{% endblock %}
+{% block title %}{{ profile_title }}{% endblock %}
 {% block content %}
 <div class="student-settings-layout">
-  <section class="hero student-hero"><h1>Настройки профиля</h1></section>
+  <section class="hero student-hero"><h1>{{ profile_title }}</h1></section>
   <section class="card student-settings-card">
     <h2>Личные данные</h2>
     <form method="post" enctype="multipart/form-data" class="student-photo-upload" data-avatar-form>{% csrf_token %}
@@ -25,14 +25,9 @@
         <img src="" alt="Предпросмотр обрезки" data-cropper-image>
       </div>
       <input type="hidden" name="cropped_photo_data" data-cropped-photo>
-      <p>{{ profile_form.phone.label_tag }} {{ profile_form.phone }}</p>
-      <p>{{ profile_form.city.label_tag }} {{ profile_form.city }}</p>
-      <p>{{ profile_form.about.label_tag }} {{ profile_form.about }}</p>
       <button class="btn btn-primary" type="submit">Сохранить</button>
     </form>
   </section>
-  <section class="card student-settings-card"><h2>Учебная информация</h2>{{ academic_form.as_p }}<p><strong>Курс:</strong> {{ current_course|default:'—' }}</p></section>
-  <section class="card student-settings-card"><h2>Публичное резюме</h2><p class="student-status-badge {% if resume and resume.is_public %}badge-approved{% else %}badge-pending{% endif %}">{% if resume and resume.is_public %}Включено{% else %}Выключено{% endif %}</p>{% if resume_public_url %}<p class="muted">{{ resume_public_url }}</p>{% endif %}<div class="inline-actions"><a class="btn" href="{% url 'resumes:builder' %}">Конструктор резюме</a>{% if resume and resume.is_public %}<a class="btn" target="_blank" href="{{ resume_public_url }}">Открыть публичное резюме</a><button class="btn" type="button" onclick="navigator.clipboard.writeText('{{ resume_public_url }}')">Скопировать ссылку</button>{% endif %}</div></section>
 </div>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.css">
 <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.js"></script>

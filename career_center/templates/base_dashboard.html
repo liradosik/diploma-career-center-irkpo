@@ -38,6 +38,7 @@
             <a class="{% if request.resolver_match.url_name == 'curator_students' or request.resolver_match.url_name == 'curator_student_detail' %}active{% endif %}" href="{% url 'accounts:curator_students' %}">Мои студенты</a>
             <a class="{% if request.resolver_match.url_name == 'review_queue' %}active{% endif %}" href="{% url 'portfolio:review_queue' %}">Проверка портфолио</a>
             <a class="{% if request.resolver_match.url_name == 'curator_activity' %}active{% endif %}" href="{% url 'accounts:curator_activity' %}">Активность студентов</a>
+            <a class="{% if request.resolver_match.url_name == 'curator_profile_edit' %}active{% endif %}" href="{% url 'accounts:curator_profile_edit' %}">Настройки</a>
           </div>
         {% else %}
           <div class="menu-section">
@@ -67,6 +68,7 @@
             <div class="menu-group-title">Активность</div>
             <a class="{% if request.resolver_match.url_name == 'admin_responses' %}active{% endif %}" href="{% url 'accounts:admin_responses' %}">Отклики</a>
             <a class="{% if request.resolver_match.url_name == 'admin_course_registrations' %}active{% endif %}" href="{% url 'accounts:admin_course_registrations' %}">Записи на курсы</a>
+            <a class="{% if request.resolver_match.url_name == 'admin_profile_edit' %}active{% endif %}" href="{% url 'accounts:admin_profile_edit' %}">Настройки</a>
           </div>
         {% endif %}
       </nav>

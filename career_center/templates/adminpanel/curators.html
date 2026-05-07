@@ -1,4 +1,5 @@
 {% extends 'base_dashboard.html' %}
+{% load ui_extras %}
 {% block title %}Кураторы{% endblock %}
 
 {% block content %}
@@ -58,9 +59,7 @@
       {% for curator in curators %}
         <article class="admin-curator-row">
           <div class="admin-curator-main">
-            <div class="admin-curator-avatar">
-              {{ curator.full_name|default:curator.email|slice:":1"|upper }}
-            </div>
+            {% if curator.photo %}<img class="avatar-img avatar-md" src="{{ curator.photo.url }}" alt="{{ curator.full_name }}">{% else %}<div class="avatar-fallback avatar-md">{{ curator.full_name|initials }}</div>{% endif %}
 
             <div class="admin-curator-name">
               <strong>{{ curator.full_name }}</strong>
