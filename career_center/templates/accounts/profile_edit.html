@@ -1,18 +1,30 @@
 {% extends 'base_dashboard.html' %}
 {% load ui_extras %}
+{% load static %}
 {% block title %}Настройки{% endblock %}
 {% block content %}
 <div class="student-settings-layout">
   <section class="hero student-hero"><h1>Настройки профиля</h1></section>
   <section class="card student-settings-card">
     <h2>Личные данные</h2>
-    <form method="post" enctype="multipart/form-data">{% csrf_token %}
+    <form method="post" enctype="multipart/form-data" class="student-photo-upload" data-avatar-form>{% csrf_token %}
       <p>{{ user_form.full_name.label_tag }} {{ user_form.full_name }}</p>
       <div class="student-photo-card">
-        {% if request.user.photo %}<img class="student-avatar-img" src="{{ request.user.photo.url }}" alt="Фото профиля">{% else %}<div class="student-avatar-fallback">{{ request.user.full_name|initials }}</div>{% endif %}
-        <p>{{ user_form.photo.label_tag }} {{ user_form.photo }}</p>
-        {% if request.user.photo %}<label><input type="checkbox" name="remove_photo" value="1"> Удалить фото</label>{% endif %}
+        <div class="student-avatar-preview">
+          {% if request.user.photo %}<img class="student-avatar-img" src="{{ request.user.photo.url }}" alt="Фото профиля">{% else %}<div class="student-avatar-fallback">{{ request.user.full_name|initials }}</div>{% endif %}
+        </div>
+        <div class="student-photo-actions">
+          <label class="btn" for="{{ user_form.photo.id_for_label }}">Выбрать фото</label>
+          {{ user_form.photo }}
+          {% if request.user.photo %}<label><input type="checkbox" name="remove_photo" value="1"> Удалить фото</label>{% endif %}
+        </div>
       </div>
+      <div class="student-cropper-wrap" data-cropper-wrap hidden>
+        <h3>Настройте аватар</h3>
+        <p class="muted">Перемещайте и масштабируйте фото. Будет сохранён квадратный фрагмент.</p>
+        <img src="" alt="Предпросмотр обрезки" data-cropper-image>
+      </div>
+      <input type="hidden" name="cropped_photo_data" data-cropped-photo>
       <p>{{ profile_form.phone.label_tag }} {{ profile_form.phone }}</p>
       <p>{{ profile_form.city.label_tag }} {{ profile_form.city }}</p>
       <p>{{ profile_form.about.label_tag }} {{ profile_form.about }}</p>
@@ -22,4 +34,7 @@
   <section class="card student-settings-card"><h2>Учебная информация</h2>{{ academic_form.as_p }}<p><strong>Курс:</strong> {{ current_course|default:'—' }}</p></section>
   <section class="card student-settings-card"><h2>Публичное резюме</h2><p class="student-status-badge {% if resume and resume.is_public %}badge-approved{% else %}badge-pending{% endif %}">{% if resume and resume.is_public %}Включено{% else %}Выключено{% endif %}</p>{% if resume_public_url %}<p class="muted">{{ resume_public_url }}</p>{% endif %}<div class="inline-actions"><a class="btn" href="{% url 'resumes:builder' %}">Конструктор резюме</a>{% if resume and resume.is_public %}<a class="btn" target="_blank" href="{{ resume_public_url }}">Открыть публичное резюме</a><button class="btn" type="button" onclick="navigator.clipboard.writeText('{{ resume_public_url }}')">Скопировать ссылку</button>{% endif %}</div></section>
 </div>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.css">
+<script src="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.js"></script>
+<script src="{% static 'js/student-avatar-cropper.js' %}"></script>
 {% endblock %}
