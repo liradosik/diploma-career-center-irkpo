@@ -1,6 +1,8 @@
 from datetime import date
+import base64
 import csv
 import io
+import uuid
 
 from openpyxl import Workbook, load_workbook
 from openpyxl.styles import Font
@@ -8,6 +10,7 @@ from openpyxl.utils import get_column_letter
 
 from django.contrib import messages
 from django.contrib.auth.views import LoginView, LogoutView
+from django.core.files.base import ContentFile
 from django.db import transaction
 from django.db.models import Count, F, Max, Q
 from django.http import HttpResponse
@@ -1171,7 +1174,26 @@ def profile_edit(request):
         user_form = UserStudentForm(request.POST, request.FILES, instance=request.user)
         profile_form = StudentProfileForm(request.POST, instance=profile)
         if user_form.is_valid() and profile_form.is_valid():
+            previous_photo = request.user.photo if request.user.photo else None
             user = user_form.save()
+            uploaded_new_photo = bool(request.FILES.get('photo'))
+            cropped_photo_data = (request.POST.get('cropped_photo_data') or '').strip()
+            if cropped_photo_data.startswith('data:image'):
+                try:
+                    header, encoded = cropped_photo_data.split(';base64,', 1)
+                    ext = header.split('/')[-1].lower()
+                    if ext not in {'jpg', 'jpeg', 'png', 'webp'}:
+                        ext = 'jpg'
+                    decoded = base64.b64decode(encoded)
+                    filename = f"avatar_{user.pk}_{uuid.uuid4().hex[:8]}.{ext}"
+                    user.photo.save(filename, ContentFile(decoded), save=False)
+                    user.save(update_fields=['photo'])
+                    if previous_photo and previous_photo.name != user.photo.name:
+                        previous_photo.delete(save=False)
+                except (ValueError, TypeError, base64.binascii.Error):
+                    pass
+            elif uploaded_new_photo and previous_photo and user.photo and previous_photo.name != user.photo.name:
+                previous_photo.delete(save=False)
             if request.POST.get('remove_photo') == '1' and user.photo:
                 user.photo.delete(save=False)
                 user.photo = None
