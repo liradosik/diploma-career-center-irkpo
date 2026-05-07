@@ -6,6 +6,7 @@
 {% block content %}
 <div class="admin-dashboard">
   <section class="dashboard-hero">
+    {% if request.user.photo %}<img class="avatar-img avatar-lg" src="{{ request.user.photo.url }}" alt="{{ request.user.full_name }}">{% else %}<div class="avatar-fallback avatar-lg">{{ request.user.full_name|initials }}</div>{% endif %}
     <div>
       <div class="hero-kicker">АДМИНИСТРИРОВАНИЕ</div>
       <h1>Панель администратора</h1>

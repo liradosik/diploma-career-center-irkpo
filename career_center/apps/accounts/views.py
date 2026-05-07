@@ -40,9 +40,11 @@ from .forms import (
     StudentProfileForm,
     UserStudentForm,
     StudentAcademicReadonlyForm,
+    UserProfileSettingsForm,
     sync_student_with_group,
 )
 from .models import ActivityLog, Specialty, StudyGroup, User
+from .utils import apply_user_photo_update
 
 
 class CustomLoginView(LoginView):
@@ -1176,28 +1178,7 @@ def profile_edit(request):
         if user_form.is_valid() and profile_form.is_valid():
             previous_photo = request.user.photo if request.user.photo else None
             user = user_form.save()
-            uploaded_new_photo = bool(request.FILES.get('photo'))
-            cropped_photo_data = (request.POST.get('cropped_photo_data') or '').strip()
-            if cropped_photo_data.startswith('data:image'):
-                try:
-                    header, encoded = cropped_photo_data.split(';base64,', 1)
-                    ext = header.split('/')[-1].lower()
-                    if ext not in {'jpg', 'jpeg', 'png', 'webp'}:
-                        ext = 'jpg'
-                    decoded = base64.b64decode(encoded)
-                    filename = f"avatar_{user.pk}_{uuid.uuid4().hex[:8]}.{ext}"
-                    user.photo.save(filename, ContentFile(decoded), save=False)
-                    user.save(update_fields=['photo'])
-                    if previous_photo and previous_photo.name != user.photo.name:
-                        previous_photo.delete(save=False)
-                except (ValueError, TypeError, base64.binascii.Error):
-                    pass
-            elif uploaded_new_photo and previous_photo and user.photo and previous_photo.name != user.photo.name:
-                previous_photo.delete(save=False)
-            if request.POST.get('remove_photo') == '1' and user.photo:
-                user.photo.delete(save=False)
-                user.photo = None
-                user.save(update_fields=['photo'])
+            apply_user_photo_update(request, user)
             profile_form.save()
             return redirect('accounts:profile_edit')
     else:
@@ -1216,3 +1197,31 @@ def profile_edit(request):
         'resume_public_url': resume_public_url,
         'current_course': current_course,
     })
+
+
+@role_required(User.Role.CURATOR)
+def curator_profile_edit(request):
+    if request.method == 'POST':
+        user_form = UserProfileSettingsForm(request.POST, request.FILES, instance=request.user)
+        if user_form.is_valid():
+            user = user_form.save()
+            apply_user_photo_update(request, user)
+            return redirect('accounts:curator_profile_edit')
+    else:
+        user_form = UserProfileSettingsForm(instance=request.user)
+
+    return render(request, 'accounts/user_profile_edit.html', {'user_form': user_form, 'profile_title': 'Настройки куратора'})
+
+
+@role_required(User.Role.ADMIN)
+def admin_profile_edit(request):
+    if request.method == 'POST':
+        user_form = UserProfileSettingsForm(request.POST, request.FILES, instance=request.user)
+        if user_form.is_valid():
+            user = user_form.save()
+            apply_user_photo_update(request, user)
+            return redirect('accounts:admin_profile_edit')
+    else:
+        user_form = UserProfileSettingsForm(instance=request.user)
+
+    return render(request, 'accounts/user_profile_edit.html', {'user_form': user_form, 'profile_title': 'Настройки администратора'})

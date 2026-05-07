@@ -1,4 +1,5 @@
 {% extends 'base_dashboard.html' %}
+{% load ui_extras %}
 {% block title %}Мои студенты{% endblock %}
 {% block content %}
 <section class="hero">
@@ -18,7 +19,7 @@
       {% for student in students %}
         <article class="curator-student-row">
           <div class="curator-student-main">
-            <div class="curator-avatar-small">{{ student.full_name|default:student.email|slice:":1"|upper }}</div>
+            {% if student.photo %}<img class="avatar-img avatar-sm" src="{{ student.photo.url }}" alt="{{ student.full_name }}">{% else %}<div class="avatar-fallback avatar-sm">{{ student.full_name|initials }}</div>{% endif %}
             <div class="curator-student-text">
               <h3>{{ student.full_name }}</h3>
               <p>{{ student.email }}</p>

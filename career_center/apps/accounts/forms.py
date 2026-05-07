@@ -41,6 +41,13 @@ class UserStudentForm(forms.ModelForm):
         labels = {'full_name': 'ФИО', 'photo': 'Фото'}
 
 
+class UserProfileSettingsForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ('full_name', 'photo')
+        labels = {'full_name': 'ФИО', 'photo': 'Фото'}
+
+
 
 
 class StudentAcademicReadonlyForm(forms.ModelForm):

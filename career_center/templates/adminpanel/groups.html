@@ -1,4 +1,5 @@
 {% extends 'base_dashboard.html' %}
+{% load ui_extras %}
 {% block title %}Группы{% endblock %}
 
 {% block content %}
@@ -98,7 +99,7 @@
 
         <div class="admin-group-cell">
           <span>Куратор</span>
-          <strong>{{ group.curator.full_name|default:'Без куратора' }}</strong>
+          <strong>{% if group.curator %}{% if group.curator.photo %}<img class="avatar-img avatar-sm" src="{{ group.curator.photo.url }}" alt="{{ group.curator.full_name }}">{% else %}<span class="avatar-fallback avatar-sm">{{ group.curator.full_name|initials }}</span>{% endif %} {{ group.curator.full_name }}{% else %}Без куратора{% endif %}</strong>
         </div>
 
         <div class="admin-group-cell">

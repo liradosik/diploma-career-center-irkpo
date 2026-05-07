@@ -1,4 +1,5 @@
 {% extends 'base_dashboard.html' %}
+{% load ui_extras %}
 {% block title %}Студенты{% endblock %}
 
 {% block content %}
@@ -105,9 +106,7 @@
       {% for student in students %}
         <article class="admin-student-row">
           <div class="admin-student-main">
-            <div class="admin-student-avatar">
-              {{ student.full_name|default:student.email|slice:":1"|upper }}
-            </div>
+            {% if student.photo %}<img class="avatar-img avatar-md" src="{{ student.photo.url }}" alt="{{ student.full_name }}">{% else %}<div class="avatar-fallback avatar-md">{{ student.full_name|initials }}</div>{% endif %}
 
             <div class="admin-student-name">
               <strong>{{ student.full_name }}</strong>

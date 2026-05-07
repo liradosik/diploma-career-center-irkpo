@@ -3916,3 +3916,10 @@ input[type="submit"].btn-primary:hover {
 .student-photo-actions{display:flex;flex-direction:column;gap:10px}
 .student-cropper-wrap{margin:12px 0;padding:14px;border:1px solid #dbeafe;border-radius:14px;background:#f8fbff}
 .student-cropper-wrap img{max-width:100%;max-height:380px;display:block}
+/* === User avatar UI === */
+.avatar-img,.avatar-fallback{border-radius:50%;object-fit:cover;display:inline-flex;align-items:center;justify-content:center;vertical-align:middle}
+.avatar-img{border:1px solid #dbeafe}
+.avatar-fallback{background:linear-gradient(135deg,#1e66d0,#5da2ff);color:#fff;font-weight:700}
+.avatar-sm{width:40px;height:40px;font-size:14px}
+.avatar-md{width:56px;height:56px;font-size:18px}
+.avatar-lg{width:128px;height:128px;font-size:30px}
