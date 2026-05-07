@@ -3897,3 +3897,16 @@ input[type="submit"].btn-primary:hover {
     grid-template-columns: 1fr;
   }
 }
+/* === Student UI polish === */
+.student-dashboard,.student-settings-layout{display:flex;flex-direction:column;gap:16px}
+.student-hero{padding:24px;border-radius:20px;background:#eef5ff}
+.student-profile-card,.student-preview-card,.student-settings-card,.student-photo-card,.student-resume-status{padding:20px;border-radius:18px}
+.student-stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}
+.student-stat-card{background:#fff;border:1px solid #d9e5f8;border-radius:14px;padding:14px}
+.student-preview-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.student-preview-list{display:flex;flex-direction:column;gap:10px}
+.student-preview-item{padding:12px;border:1px solid #e2ebfa;border-radius:12px;background:#fff}
+.student-status-badge{display:inline-block;padding:6px 12px;border-radius:999px;font-weight:600}
+@media (max-width: 900px){.student-preview-grid{grid-template-columns:1fr}}
+.student-avatar-img{width:80px;height:80px;border-radius:50%;object-fit:cover;border:1px solid #dbeafe}
+.student-avatar-fallback{width:80px;height:80px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#1e66d0,#5da2ff);color:#fff;font-weight:700}

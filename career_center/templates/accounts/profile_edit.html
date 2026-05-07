@@ -1,17 +1,25 @@
 {% extends 'base_dashboard.html' %}
-{% block title %}Профиль студента{% endblock %}
+{% load ui_extras %}
+{% block title %}Настройки{% endblock %}
 {% block content %}
-<section class="hero">
-  <div class="hero-kicker">Профиль</div>
-  <h1>Редактирование профиля студента</h1>
-  <p>Заполните персональные данные для корректного отображения в резюме и портфолио.</p>
-</section>
-<section class="section card form-card">
-  <form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ user_form.as_p }}
-    {{ profile_form.as_p }}
-    <div class="inline-actions"><button class="btn btn-primary" type="submit">Сохранить</button></div>
-  </form>
-</section>
+<div class="student-settings-layout">
+  <section class="hero student-hero"><h1>Настройки профиля</h1></section>
+  <section class="card student-settings-card">
+    <h2>Личные данные</h2>
+    <form method="post" enctype="multipart/form-data">{% csrf_token %}
+      <p>{{ user_form.full_name.label_tag }} {{ user_form.full_name }}</p>
+      <div class="student-photo-card">
+        {% if request.user.photo %}<img class="student-avatar-img" src="{{ request.user.photo.url }}" alt="Фото профиля">{% else %}<div class="student-avatar-fallback">{{ request.user.full_name|initials }}</div>{% endif %}
+        <p>{{ user_form.photo.label_tag }} {{ user_form.photo }}</p>
+        {% if request.user.photo %}<label><input type="checkbox" name="remove_photo" value="1"> Удалить фото</label>{% endif %}
+      </div>
+      <p>{{ profile_form.phone.label_tag }} {{ profile_form.phone }}</p>
+      <p>{{ profile_form.city.label_tag }} {{ profile_form.city }}</p>
+      <p>{{ profile_form.about.label_tag }} {{ profile_form.about }}</p>
+      <button class="btn btn-primary" type="submit">Сохранить</button>
+    </form>
+  </section>
+  <section class="card student-settings-card"><h2>Учебная информация</h2>{{ academic_form.as_p }}<p><strong>Курс:</strong> {{ current_course|default:'—' }}</p></section>
+  <section class="card student-settings-card"><h2>Публичное резюме</h2><p class="student-status-badge {% if resume and resume.is_public %}badge-approved{% else %}badge-pending{% endif %}">{% if resume and resume.is_public %}Включено{% else %}Выключено{% endif %}</p>{% if resume_public_url %}<p class="muted">{{ resume_public_url }}</p>{% endif %}<div class="inline-actions"><a class="btn" href="{% url 'resumes:builder' %}">Конструктор резюме</a>{% if resume and resume.is_public %}<a class="btn" target="_blank" href="{{ resume_public_url }}">Открыть публичное резюме</a><button class="btn" type="button" onclick="navigator.clipboard.writeText('{{ resume_public_url }}')">Скопировать ссылку</button>{% endif %}</div></section>
+</div>
 {% endblock %}

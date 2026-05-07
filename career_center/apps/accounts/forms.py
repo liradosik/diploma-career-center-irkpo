@@ -30,14 +30,34 @@ class EmailAuthenticationForm(AuthenticationForm):
 class StudentProfileForm(forms.ModelForm):
     class Meta:
         model = StudentProfile
-        fields = ('phone', 'city', 'about', 'photo')
+        fields = ('phone', 'city', 'about')
+        labels = {'phone': 'Телефон', 'city': 'Город', 'about': 'О себе'}
 
 
 class UserStudentForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ('full_name', 'group', 'specialty', 'admission_year')
+        fields = ('full_name', 'photo')
+        labels = {'full_name': 'ФИО', 'photo': 'Фото'}
 
+
+
+
+class StudentAcademicReadonlyForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ('group', 'specialty', 'admission_year', 'academic_status')
+        labels = {
+            'group': 'Группа',
+            'specialty': 'Специальность',
+            'admission_year': 'Год поступления',
+            'academic_status': 'Учебный статус',
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.disabled = True
 
 def sync_student_with_group(user, study_group):
     user.study_group = study_group
