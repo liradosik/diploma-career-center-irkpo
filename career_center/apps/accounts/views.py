@@ -182,12 +182,13 @@ def student_dashboard(request):
     entries_qs = PortfolioEntry.objects.filter(student=request.user)
     recent_entries = entries_qs.order_by('-created_at')[:5]
 
-    registrations = (
+    registrations_qs = (
         CourseRegistration.objects
         .filter(student=request.user)
         .select_related('course')
-        .order_by('-created_at')[:5]
+        .order_by('-created_at')
     )
+    registrations = registrations_qs[:5]
 
     resume = getattr(request.user, 'resume_settings', None)
     profile = getattr(request.user, 'student_profile', None)
@@ -210,7 +211,7 @@ def student_dashboard(request):
         'resume_public_url': resume_public_url,
         'resume_updated_at': getattr(resume, "updated_at", None) if resume else None,
         'registrations': registrations,
-        'registered_courses_count': registrations.filter(status=CourseRegistration.Status.REGISTERED).count(),
+        'registered_courses_count': registrations_qs.filter(status=CourseRegistration.Status.REGISTERED).count(),
         'current_course': current_course,
         'profile_incomplete': not all([request.user.group, request.user.specialty, request.user.admission_year]),
     }
