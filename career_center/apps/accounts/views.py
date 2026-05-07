@@ -1,6 +1,8 @@
 from datetime import date
+import base64
 import csv
 import io
+import uuid
 
 from openpyxl import Workbook, load_workbook
 from openpyxl.styles import Font
@@ -8,6 +10,7 @@ from openpyxl.utils import get_column_letter
 
 from django.contrib import messages
 from django.contrib.auth.views import LoginView, LogoutView
+from django.core.files.base import ContentFile
 from django.db import transaction
 from django.db.models import Count, F, Max, Q
 from django.http import HttpResponse
@@ -1173,6 +1176,7 @@ def profile_edit(request):
         user_form = UserStudentForm(request.POST, request.FILES, instance=request.user)
         profile_form = StudentProfileForm(request.POST, instance=profile)
         if user_form.is_valid() and profile_form.is_valid():
+            previous_photo = request.user.photo if request.user.photo else None
             user = user_form.save()
             apply_user_photo_update(request, user)
             profile_form.save()
