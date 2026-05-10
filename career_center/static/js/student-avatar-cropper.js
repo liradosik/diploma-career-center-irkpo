@@ -8,10 +8,22 @@
   const modal = document.querySelector('[data-avatar-modal]');
   const cropperImage = modal ? modal.querySelector('[data-cropper-image]') : null;
   const applyBtn = modal ? modal.querySelector('[data-avatar-apply]') : null;
-  const cancelButtons = modal ? modal.querySelectorAll('[data-avatar-modal-cancel]') : [];
+  const cancelButtons = modal ? modal.querySelectorAll('[data-avatar-cancel]') : [];
+  const cancelBtn = cancelButtons.length ? cancelButtons[0] : null;
 
-  if (!fileInput || !hiddenInput) return;
-  if (typeof window.Cropper === 'undefined' || !modal || !cropperImage || !applyBtn) return;
+  if (!fileInput || !hiddenInput || !modal || !cropperImage || !applyBtn || !cancelBtn) {
+    console.warn('Avatar cropper: required elements not found.', {
+      fileInput: Boolean(fileInput),
+      hiddenInput: Boolean(hiddenInput),
+      modal: Boolean(modal),
+      cropperImage: Boolean(cropperImage),
+      applyBtn: Boolean(applyBtn),
+      cancelBtn: Boolean(cancelBtn),
+    });
+    return;
+  }
+
+  if (typeof window.Cropper === 'undefined') return;
 
   let cropper = null;
   let currentObjectUrl = '';

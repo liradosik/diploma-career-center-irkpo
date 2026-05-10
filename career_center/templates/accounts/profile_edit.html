@@ -32,7 +32,7 @@
   <section class="card student-settings-card"><h2>Публичное резюме</h2><p class="student-status-badge {% if resume and resume.is_public %}badge-approved{% else %}badge-pending{% endif %}">{% if resume and resume.is_public %}Включено{% else %}Выключено{% endif %}</p>{% if resume_public_url %}<p class="muted">{{ resume_public_url }}</p>{% endif %}<div class="inline-actions"><a class="btn" href="{% url 'resumes:builder' %}">Конструктор резюме</a>{% if resume and resume.is_public %}<a class="btn" target="_blank" href="{{ resume_public_url }}">Открыть публичное резюме</a><button class="btn" type="button" onclick="navigator.clipboard.writeText('{{ resume_public_url }}')">Скопировать ссылку</button>{% endif %}</div></section>
 </div>
 <div class="avatar-modal" data-avatar-modal hidden>
-  <div class="avatar-modal-backdrop" data-avatar-modal-cancel></div>
+  <div class="avatar-modal-backdrop" data-avatar-cancel></div>
   <div class="avatar-modal-card" role="dialog" aria-modal="true" aria-label="Настройте аватар">
     <h3>Настройте аватар</h3>
     <p class="muted">Перемещайте и масштабируйте фото.</p>
@@ -41,7 +41,7 @@
     </div>
     <div class="avatar-modal-actions">
       <button type="button" class="btn btn-primary" data-avatar-apply>Применить</button>
-      <button type="button" class="btn" data-avatar-modal-cancel>Отмена</button>
+      <button type="button" class="btn" data-avatar-cancel>Отмена</button>
     </div>
   </div>
 </div>
