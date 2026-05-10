@@ -42,6 +42,9 @@ class ResumeSettingsForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         if self.instance and self.instance.selected_sections:
             self.initial['selected_sections'] = self.instance.selected_sections
+        self.fields['title'].widget.attrs.update({'data-preview': 'title'})
+        self.fields['about'].widget.attrs.update({'data-preview': 'about'})
+        self.fields['template'].widget.attrs.update({'data-preview': 'template'})
 
     def save(self, commit=True):
         instance = super().save(commit=False)

@@ -17,10 +17,10 @@
   <div class="card student-resume-settings">
     <h2>Настройки резюме</h2>
     <form method="post" id="resume-settings-form">{% csrf_token %}
-      <p>{{ form.title.label_tag }} {{ form.title.as_widget(attrs={'data-preview':'title'}) }}</p>
-      <p>{{ form.about.label_tag }} {{ form.about.as_widget(attrs={'data-preview':'about'}) }}</p>
+      <p>{{ form.title.label_tag }} {{ form.title }}</p>
+      <p>{{ form.about.label_tag }} {{ form.about }}</p>
       <p>{{ form.is_public.label_tag }} {{ form.is_public }}</p>
-      <p class="student-resume-template-choice">{{ form.template.label_tag }} {{ form.template.as_widget(attrs={'data-preview':'template'}) }}</p>
+      <p class="student-resume-template-choice">{{ form.template.label_tag }} {{ form.template }}</p>
       <h3>Разделы резюме</h3>
       <div class="student-resume-section-list" data-preview="sections">{{ form.selected_sections }}</div>
     </form>
