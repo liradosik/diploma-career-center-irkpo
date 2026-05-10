@@ -3983,3 +3983,11 @@ input[type="submit"].btn-primary:hover {
 .public-resume-document.resume-template-modern header{padding:14px;border-radius:12px;background:linear-gradient(135deg,#eff6ff,#f8fbff)}
 .public-resume-document.resume-template-academic{border-color:#94a3b8;box-shadow:none}
 .public-resume-document.resume-template-academic header{border-bottom:2px solid #cbd5e1;padding-bottom:10px}
+
+.student-vacancy-list .student-vacancy-card{margin-bottom:14px;border-radius:14px;border:1px solid #dbeafe}
+.student-vacancy-card .badge{background:#eff6ff;color:#1e3a8a}
+.student-vacancy-card form{display:inline}
+.student-vacancy-detail .badge{background:#eff6ff;color:#1e3a8a}
+.student-vacancy-contact-card{border:1px solid #bfdbfe;background:#f8fbff}
+.student-response-card{border:1px solid #bfdbfe;background:#f8fbff}
+.student-response-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
