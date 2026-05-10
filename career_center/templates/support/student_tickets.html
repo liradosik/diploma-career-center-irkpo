@@ -1,0 +1,33 @@
+{% extends 'base_dashboard.html' %}
+
+{% block title %}Техподдержка{% endblock %}
+
+{% block content %}
+<section class="support-page">
+  <div class="page-heading"><h1>Техподдержка</h1></div>
+  <div class="card support-ticket-form">
+    <h2>Создать обращение</h2>
+    <form method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button class="btn-primary" type="submit">Создать обращение</button>
+    </form>
+  </div>
+  <div class="support-ticket-list">
+    {% for ticket in tickets %}
+      <article class="card support-ticket-card">
+        <div class="support-ticket-head">
+          <span class="support-ticket-status status-{{ ticket.status }}">{{ ticket.get_status_display }}</span>
+          <span class="muted">{{ ticket.created_at|date:'d.m.Y H:i' }}</span>
+        </div>
+        <h3>{{ ticket.subject }}</h3>
+        <p><strong>Категория:</strong> {{ ticket.get_category_display }}</p>
+        <p>{{ ticket.message|linebreaksbr }}</p>
+        {% if ticket.admin_response %}<div class="support-ticket-response"><strong>Ответ администратора:</strong><p>{{ ticket.admin_response|linebreaksbr }}</p></div>{% endif %}
+      </article>
+    {% empty %}
+      <p class="muted">У вас пока нет обращений.</p>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends 'base_dashboard.html' %}
+{% block title %}Обращения{% endblock %}
+{% block content %}
+<section class="admin-support-list">
+  <div class="page-heading"><h1>Обращения в поддержку</h1></div>
+  <form method="get" class="card form-grid">
+    <p><label>Статус</label><select name="status"><option value="">Все</option>{% for v,l in status_choices %}<option value="{{ v }}" {% if status_filter == v %}selected{% endif %}>{{ l }}</option>{% endfor %}</select></p>
+    <p><label>Категория</label><select name="category"><option value="">Все</option>{% for v,l in category_choices %}<option value="{{ v }}" {% if category_filter == v %}selected{% endif %}>{{ l }}</option>{% endfor %}</select></p>
+    <p><button type="submit" class="btn-primary">Применить</button></p>
+  </form>
+  {% for ticket in tickets %}
+    <a href="{% url 'accounts:admin_support_ticket_detail' ticket.id %}" class="card support-ticket-card">
+      <h3>{{ ticket.subject }}</h3>
+      <p>{{ ticket.student.full_name }}{% if ticket.student.study_group %} · {{ ticket.student.study_group.name }}{% endif %}</p>
+      <p>{{ ticket.get_category_display }} · <span class="support-ticket-status status-{{ ticket.status }}">{{ ticket.get_status_display }}</span> · {{ ticket.created_at|date:'d.m.Y H:i' }}</p>
+    </a>
+  {% empty %}<p class="muted">Обращений не найдено.</p>{% endfor %}
+</section>
+{% endblock %}

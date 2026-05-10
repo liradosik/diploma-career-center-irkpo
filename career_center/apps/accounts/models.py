@@ -122,3 +122,36 @@ class ActivityLog(models.Model):
 
     def __str__(self):
         return f'{self.student} — {self.get_event_type_display()}'
+
+
+class SupportTicket(models.Model):
+    class Category(models.TextChoices):
+        LOGIN = 'login', 'Проблема со входом'
+        PROFILE = 'profile', 'Ошибка в личных данных'
+        PORTFOLIO = 'portfolio', 'Проблема с портфолио'
+        RESUME = 'resume', 'Проблема с резюме'
+        COURSES = 'courses', 'Проблема с курсом или записью'
+        VACANCIES = 'vacancies', 'Проблема с вакансией или откликом'
+        OTHER = 'other', 'Другое'
+
+    class Status(models.TextChoices):
+        NEW = 'new', 'Новое'
+        IN_PROGRESS = 'in_progress', 'В работе'
+        RESOLVED = 'resolved', 'Решено'
+        CLOSED = 'closed', 'Закрыто'
+
+    student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='support_tickets')
+    category = models.CharField(max_length=32, choices=Category.choices, default=Category.OTHER)
+    subject = models.CharField(max_length=255)
+    message = models.TextField()
+    status = models.CharField(max_length=32, choices=Status.choices, default=Status.NEW)
+    admin_response = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    resolved_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ('-created_at',)
+
+    def __str__(self):
+        return f'{self.student.full_name}: {self.subject}'

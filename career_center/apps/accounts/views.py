@@ -15,6 +15,7 @@ from django.db import transaction
 from django.db.models import Count, F, Max, Q
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
 from django.urls import reverse
 from django.views.decorators.http import require_GET
 
@@ -37,13 +38,15 @@ from .forms import (
     EmailAuthenticationForm,
     GroupImportForm,
     StudentImportForm,
+    SupportTicketAdminUpdateForm,
+    SupportTicketCreateForm,
     StudentProfileForm,
     UserStudentForm,
     StudentAcademicReadonlyForm,
     UserProfileSettingsForm,
     sync_student_with_group,
 )
-from .models import ActivityLog, Specialty, StudyGroup, User
+from .models import ActivityLog, Specialty, StudyGroup, SupportTicket, User
 from .utils import apply_user_photo_update
 
 
@@ -228,6 +231,21 @@ def student_dashboard(request):
         'curator': curator,
     }
     return render(request, 'dashboard/student_dashboard.html', context)
+
+
+@role_required(User.Role.STUDENT)
+def student_support_tickets(request):
+    tickets = SupportTicket.objects.filter(student=request.user)
+    form = SupportTicketCreateForm()
+    if request.method == 'POST':
+        form = SupportTicketCreateForm(request.POST)
+        if form.is_valid():
+            ticket = form.save(commit=False)
+            ticket.student = request.user
+            ticket.save()
+            messages.success(request, 'Обращение отправлено в техподдержку.')
+            return redirect('accounts:student_support_tickets')
+    return render(request, 'support/student_tickets.html', {'tickets': tickets, 'form': form})
 
 
 @role_required(User.Role.CURATOR)
@@ -1172,6 +1190,46 @@ def admin_course_registrations(request):
     if date_to:
         registrations = registrations.filter(created_at__date__lte=date_to)
     return render(request, 'adminpanel/course_registrations.html', {'registrations': registrations})
+
+
+@role_required(User.Role.ADMIN)
+def admin_support_tickets(request):
+    tickets = SupportTicket.objects.select_related('student', 'student__study_group').order_by('-created_at')
+    status = request.GET.get('status', '').strip()
+    category = request.GET.get('category', '').strip()
+    if status in {choice[0] for choice in SupportTicket.Status.choices}:
+        tickets = tickets.filter(status=status)
+    if category in {choice[0] for choice in SupportTicket.Category.choices}:
+        tickets = tickets.filter(category=category)
+    return render(
+        request,
+        'adminpanel/support_tickets.html',
+        {
+            'tickets': tickets,
+            'status_filter': status,
+            'category_filter': category,
+            'status_choices': SupportTicket.Status.choices,
+            'category_choices': SupportTicket.Category.choices,
+        },
+    )
+
+
+@role_required(User.Role.ADMIN)
+def admin_support_ticket_detail(request, ticket_id):
+    ticket = get_object_or_404(SupportTicket.objects.select_related('student', 'student__study_group'), id=ticket_id)
+    form = SupportTicketAdminUpdateForm(instance=ticket)
+    if request.method == 'POST':
+        form = SupportTicketAdminUpdateForm(request.POST, instance=ticket)
+        if form.is_valid():
+            updated_ticket = form.save(commit=False)
+            if updated_ticket.status in {SupportTicket.Status.RESOLVED, SupportTicket.Status.CLOSED}:
+                updated_ticket.resolved_at = updated_ticket.resolved_at or timezone.now()
+            else:
+                updated_ticket.resolved_at = None
+            updated_ticket.save()
+            messages.success(request, 'Обращение обновлено.')
+            return redirect('accounts:admin_support_ticket_detail', ticket_id=ticket.id)
+    return render(request, 'adminpanel/support_ticket_detail.html', {'ticket': ticket, 'form': form})
 
 
 @role_required(User.Role.STUDENT)

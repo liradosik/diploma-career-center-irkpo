@@ -18,6 +18,8 @@ from .views import (
     admin_responses,
     admin_specialties,
     admin_specialty_detail,
+    admin_support_ticket_detail,
+    admin_support_tickets,
     admin_student_detail,
     admin_import_template_csv,
     admin_import_template_xlsx,
@@ -33,6 +35,7 @@ from .views import (
     profile_edit,
     redirect_by_role,
     student_dashboard,
+    student_support_tickets,
 )
 
 urlpatterns = [
@@ -40,6 +43,7 @@ urlpatterns = [
     path('logout/', CustomLogoutView.as_view(), name='logout'),
     path('redirect/', redirect_by_role, name='redirect_by_role'),
     path('student/dashboard/', student_dashboard, name='student_dashboard'),
+    path('student/support/', student_support_tickets, name='student_support_tickets'),
     path('student/profile/', profile_edit, name='profile_edit'),
     path('curator/dashboard/', curator_dashboard, name='curator_dashboard'),
     path('curator/activity/', curator_activity, name='curator_activity'),
@@ -72,4 +76,6 @@ urlpatterns = [
     path('admin/courses/<int:course_id>/', admin_course_detail, name='admin_course_detail'),
     path('admin/responses/', admin_responses, name='admin_responses'),
     path('admin/course-registrations/', admin_course_registrations, name='admin_course_registrations'),
+    path('admin/support/', admin_support_tickets, name='admin_support_tickets'),
+    path('admin/support/<int:ticket_id>/', admin_support_ticket_detail, name='admin_support_ticket_detail'),
 ]
