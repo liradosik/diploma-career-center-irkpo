@@ -300,7 +300,7 @@ def curator_student_detail(request, student_id):
         curator_students_queryset(request.user, include_graduates=True),
         id=student_id,
     )
-    entries = PortfolioEntry.objects.filter(student=student).order_by('-created_at')
+    entries = PortfolioEntry.objects.filter(student=student).prefetch_related('attachments').order_by('-created_at')
     resume = getattr(student, 'resume_settings', None)
     profile = getattr(student, 'student_profile', None)
     resume_public_url = ''
@@ -512,10 +512,12 @@ def admin_student_detail(request, student_id):
             'curator': student.study_group.curator,
         }
 
+    portfolio_entries = PortfolioEntry.objects.filter(student=student).prefetch_related('attachments').order_by('-created_at')[:10]
+
     return render(
         request,
         'adminpanel/student_detail.html',
-        {'student': student, 'form': form, 'group_profile': group_profile},
+        {'student': student, 'form': form, 'group_profile': group_profile, 'portfolio_entries': portfolio_entries},
     )
 
 
