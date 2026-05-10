@@ -41,7 +41,7 @@
     <div class="student-course-actions inline-actions"><a class="btn" href="{% url 'courses:detail' c.pk %}">Подробнее</a></div>
   </article>
 {% empty %}
-  <section class="card"><p class="muted">Подходящих мероприятий не найдено.</p></section>
+  <section class="card empty-state"><p class="muted">Подходящих мероприятий не найдено.</p></section>
 {% endfor %}
 </section>
 {% endblock %}
