@@ -1,0 +1,36 @@
+{% load ui_extras %}
+{% if attachments or legacy_file %}
+  <div class="portfolio-attachments-block">
+    <div class="portfolio-attachments-list">
+      {% for attachment in attachments %}
+        <div class="portfolio-attachment-item">
+          {% if attachment.filename|is_image_file %}
+            <a href="{{ attachment.file.url }}" target="_blank" rel="noopener">
+              <img src="{{ attachment.file.url }}" alt="{{ attachment.filename }}" class="portfolio-attachment-thumb">
+            </a>
+            <span>{{ attachment.filename }}</span>
+            <a href="{{ attachment.file.url }}" target="_blank" rel="noopener">Открыть</a>
+          {% else %}
+            <span>{{ attachment.filename }}</span>
+            <a href="{{ attachment.file.url }}" target="_blank" rel="noopener">Скачать</a>
+          {% endif %}
+        </div>
+      {% endfor %}
+
+      {% if legacy_file %}
+        <div class="portfolio-attachment-item">
+          {% if legacy_file.name|basename|is_image_file %}
+            <a href="{{ legacy_file.url }}" target="_blank" rel="noopener">
+              <img src="{{ legacy_file.url }}" alt="{{ legacy_file.name|basename }}" class="portfolio-attachment-thumb">
+            </a>
+            <span>{{ legacy_file.name|basename }}</span>
+            <a href="{{ legacy_file.url }}" target="_blank" rel="noopener">Открыть</a>
+          {% else %}
+            <span>{{ legacy_file.name|basename }}</span>
+            <a href="{{ legacy_file.url }}" target="_blank" rel="noopener">Скачать</a>
+          {% endif %}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+{% endif %}
