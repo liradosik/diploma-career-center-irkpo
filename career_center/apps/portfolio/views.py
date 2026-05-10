@@ -1,5 +1,6 @@
 from collections import OrderedDict
 
+from django.contrib import messages
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
@@ -8,7 +9,7 @@ from apps.accounts.decorators import role_required
 from apps.accounts.models import ActivityLog, User
 
 from .forms import PortfolioEntryForm
-from .models import PortfolioEntry
+from .models import PortfolioAttachment, PortfolioEntry
 
 
 SECTION_DEFINITIONS = OrderedDict(
@@ -25,7 +26,7 @@ SECTION_DEFINITIONS = OrderedDict(
 
 @role_required(User.Role.STUDENT)
 def list_entries(request):
-    base_qs = PortfolioEntry.objects.filter(student=request.user)
+    base_qs = PortfolioEntry.objects.filter(student=request.user).prefetch_related('attachments')
     entries = base_qs.order_by('-date')
     selected_type = request.GET.get('type', '')
     if selected_type:
@@ -38,7 +39,18 @@ def list_entries(request):
     for code, (title, types) in SECTION_DEFINITIONS.items():
         section_cards.append({'code': code, 'title': title, 'count': base_qs.filter(type__in=types).count(), 'types': types})
 
-    return render(request, 'portfolio/list.html', {'entries': entries, 'section_cards': section_cards, 'selected_type': selected_type})
+    profile = getattr(request.user, 'profile', None)
+    resume = getattr(request.user, 'resume_settings', None)
+    resume_public_url = request.build_absolute_uri(f"/resumes/public/{profile.public_resume_token}/") if profile else ''
+    can_share = bool(resume and resume.is_public and profile)
+
+    return render(request, 'portfolio/list.html', {
+        'entries': entries,
+        'section_cards': section_cards,
+        'selected_type': selected_type,
+        'can_share': can_share,
+        'resume_public_url': resume_public_url,
+    })
 
 
 @role_required(User.Role.STUDENT)
@@ -50,6 +62,8 @@ def create_entry(request):
             entry.student = request.user
             entry.status = PortfolioEntry.Status.PENDING
             entry.save()
+            for file_obj in form.cleaned_data['attachments']:
+                PortfolioAttachment.objects.create(entry=entry, file=file_obj)
             ActivityLog.objects.create(student=request.user, event_type=ActivityLog.EventType.PORTFOLIO_CREATED, title=f'Добавлена запись портфолио: {entry.title}', description=entry.type, related_model='portfolio.PortfolioEntry', related_object_id=entry.id)
             ActivityLog.objects.create(student=request.user, event_type=ActivityLog.EventType.PORTFOLIO_PENDING, title=f'Ожидает проверки: {entry.title}', description=entry.type, related_model='portfolio.PortfolioEntry', related_object_id=entry.id)
             return redirect('portfolio:list')
@@ -71,12 +85,18 @@ def edit_entry(request, pk):
                 updated.reviewed_at = None
                 ActivityLog.objects.create(student=request.user, event_type=ActivityLog.EventType.PORTFOLIO_PENDING, title=f'Повторная проверка: {updated.title}', description=updated.type, related_model='portfolio.PortfolioEntry', related_object_id=updated.id)
             updated.save()
+
+            delete_ids = request.POST.getlist('delete_attachments')
+            if delete_ids:
+                PortfolioAttachment.objects.filter(entry=entry, id__in=delete_ids).delete()
+            for file_obj in form.cleaned_data['attachments']:
+                PortfolioAttachment.objects.create(entry=entry, file=file_obj)
             return redirect('portfolio:list')
     else:
         form = PortfolioEntryForm(instance=entry)
-    return render(request, 'portfolio/form.html', {'form': form, 'entry': entry})
+    return render(request, 'portfolio/form.html', {'form': form, 'entry': entry, 'existing_attachments': entry.attachments.all()})
 
-
+# unchanged below
 @role_required(User.Role.CURATOR)
 def review_queue(request):
     students = User.objects.filter(role=User.Role.STUDENT).filter(Q(study_group__curator=request.user, study_group__is_active=True) | Q(study_group__isnull=True, curator=request.user)).exclude(academic_status=User.AcademicStatus.GRADUATED).distinct()
