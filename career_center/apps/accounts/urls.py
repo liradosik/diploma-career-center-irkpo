@@ -32,14 +32,17 @@ from .views import (
     curator_activity,
     curator_student_detail,
     curator_students,
+    curator_support_tickets,
     profile_edit,
     redirect_by_role,
     student_dashboard,
     student_support_tickets,
+    public_support_ticket_create,
 )
 
 urlpatterns = [
     path('login/', CustomLoginView.as_view(), name='login'),
+    path('support/', public_support_ticket_create, name='public_support_ticket_create'),
     path('logout/', CustomLogoutView.as_view(), name='logout'),
     path('redirect/', redirect_by_role, name='redirect_by_role'),
     path('student/dashboard/', student_dashboard, name='student_dashboard'),
@@ -49,6 +52,7 @@ urlpatterns = [
     path('curator/activity/', curator_activity, name='curator_activity'),
     path('curator/students/', curator_students, name='curator_students'),
     path('curator/profile/', curator_profile_edit, name='curator_profile_edit'),
+    path('curator/support/', curator_support_tickets, name='curator_support_tickets'),
     path('curator/students/<int:student_id>/', curator_student_detail, name='curator_student_detail'),
     path('admin/dashboard/', admin_dashboard, name='admin_dashboard'),
     path('admin/profile/', admin_profile_edit, name='admin_profile_edit'),

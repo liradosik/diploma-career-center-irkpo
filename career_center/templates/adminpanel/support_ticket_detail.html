@@ -4,8 +4,9 @@
 <section class="admin-support-detail">
   <div class="card">
     <h1>{{ ticket.subject }}</h1>
-    <p><strong>Студент:</strong> {{ ticket.student.full_name }} ({{ ticket.student.email }})</p>
-    <p><strong>Группа:</strong> {{ ticket.student.group|default:'—' }}</p>
+    <p><strong>От кого:</strong> {{ ticket.author_label }}</p>
+    {% if ticket.requester %}<p><strong>Email пользователя:</strong> {{ ticket.requester.email }}</p><p><strong>Группа:</strong> {{ ticket.requester.group|default:"—" }}</p>{% else %}<p><strong>Email для связи:</strong> {{ ticket.public_email|default:"—" }}</p><p><strong>Контакт:</strong> {{ ticket.public_contact|default:"—" }}</p>{% endif %}
+    <p><strong>Источник:</strong> {{ ticket.get_source_display }}</p>
     <p><strong>Категория:</strong> {{ ticket.get_category_display }}</p>
     <p>{{ ticket.message|linebreaksbr }}</p>
   </div>

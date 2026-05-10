@@ -40,6 +40,7 @@ from .forms import (
     StudentImportForm,
     SupportTicketAdminUpdateForm,
     SupportTicketCreateForm,
+    PublicSupportTicketCreateForm,
     StudentProfileForm,
     UserStudentForm,
     StudentAcademicReadonlyForm,
@@ -233,19 +234,54 @@ def student_dashboard(request):
     return render(request, 'dashboard/student_dashboard.html', context)
 
 
+def _save_account_support_ticket(form, user):
+    ticket = form.save(commit=False)
+    ticket.requester = user
+    ticket.student = user if user.role == User.Role.STUDENT else None
+    ticket.requester_type = user.role if user.role in {User.Role.STUDENT, User.Role.CURATOR} else SupportTicket.RequesterType.UNKNOWN
+    ticket.source = SupportTicket.Source.ACCOUNT
+    ticket.save()
+    return ticket
+
+
 @role_required(User.Role.STUDENT)
 def student_support_tickets(request):
-    tickets = SupportTicket.objects.filter(student=request.user)
+    tickets = SupportTicket.objects.filter(requester=request.user).order_by('-created_at')
     form = SupportTicketCreateForm()
     if request.method == 'POST':
         form = SupportTicketCreateForm(request.POST)
         if form.is_valid():
-            ticket = form.save(commit=False)
-            ticket.student = request.user
-            ticket.save()
+            _save_account_support_ticket(form, request.user)
             messages.success(request, 'Обращение отправлено в техподдержку.')
             return redirect('accounts:student_support_tickets')
-    return render(request, 'support/student_tickets.html', {'tickets': tickets, 'form': form})
+    return render(request, 'support/student_tickets.html', {'tickets': tickets, 'form': form, 'support_title': 'Техподдержка'})
+
+
+@role_required(User.Role.CURATOR)
+def curator_support_tickets(request):
+    tickets = SupportTicket.objects.filter(requester=request.user).order_by('-created_at')
+    form = SupportTicketCreateForm()
+    if request.method == 'POST':
+        form = SupportTicketCreateForm(request.POST)
+        if form.is_valid():
+            _save_account_support_ticket(form, request.user)
+            messages.success(request, 'Обращение отправлено в техподдержку.')
+            return redirect('accounts:curator_support_tickets')
+    return render(request, 'support/student_tickets.html', {'tickets': tickets, 'form': form, 'support_title': 'Техподдержка куратора'})
+
+
+def public_support_ticket_create(request):
+    form = PublicSupportTicketCreateForm()
+    if request.method == 'POST':
+        form = PublicSupportTicketCreateForm(request.POST)
+        if form.is_valid():
+            ticket = form.save(commit=False)
+            ticket.source = SupportTicket.Source.PUBLIC
+            ticket.requester_type = form.cleaned_data['requester_type']
+            ticket.save()
+            messages.success(request, 'Обращение отправлено. Администратор свяжется с вами по указанным контактам.')
+            return redirect('accounts:public_support_ticket_create')
+    return render(request, 'support/public_ticket_form.html', {'form': form})
 
 
 @role_required(User.Role.CURATOR)
@@ -398,6 +434,9 @@ def admin_dashboard(request):
         'registrations_total': CourseRegistration.objects.count(),
         'responses_total': VacancyResponse.objects.count(),
         'portfolio_pending_total': PortfolioEntry.objects.filter(status=PortfolioEntry.Status.PENDING).count(),
+        'support_new_total': SupportTicket.objects.filter(status=SupportTicket.Status.NEW).count(),
+        'support_in_progress_total': SupportTicket.objects.filter(status=SupportTicket.Status.IN_PROGRESS).count(),
+        'support_public_total': SupportTicket.objects.filter(source=SupportTicket.Source.PUBLIC).count(),
         'offline_full_courses': Course.objects.filter(format_type=Course.Format.OFFLINE).annotate(
             reg_total=Count('registrations')
         ).filter(reg_total__gte=F('places')).count(),
@@ -1194,13 +1233,19 @@ def admin_course_registrations(request):
 
 @role_required(User.Role.ADMIN)
 def admin_support_tickets(request):
-    tickets = SupportTicket.objects.select_related('student', 'student__study_group').order_by('-created_at')
+    tickets = SupportTicket.objects.select_related('student', 'student__study_group', 'requester', 'requester__study_group').order_by('-created_at')
     status = request.GET.get('status', '').strip()
     category = request.GET.get('category', '').strip()
     if status in {choice[0] for choice in SupportTicket.Status.choices}:
         tickets = tickets.filter(status=status)
+    source = request.GET.get('source', '').strip()
+    requester_type = request.GET.get('requester_type', '').strip()
     if category in {choice[0] for choice in SupportTicket.Category.choices}:
         tickets = tickets.filter(category=category)
+    if source in {choice[0] for choice in SupportTicket.Source.choices}:
+        tickets = tickets.filter(source=source)
+    if requester_type in {choice[0] for choice in SupportTicket.RequesterType.choices}:
+        tickets = tickets.filter(requester_type=requester_type)
     return render(
         request,
         'adminpanel/support_tickets.html',
@@ -1210,13 +1255,17 @@ def admin_support_tickets(request):
             'category_filter': category,
             'status_choices': SupportTicket.Status.choices,
             'category_choices': SupportTicket.Category.choices,
+            'source_choices': SupportTicket.Source.choices,
+            'requester_type_choices': SupportTicket.RequesterType.choices,
+            'source_filter': source,
+            'requester_type_filter': requester_type,
         },
     )
 
 
 @role_required(User.Role.ADMIN)
 def admin_support_ticket_detail(request, ticket_id):
-    ticket = get_object_or_404(SupportTicket.objects.select_related('student', 'student__study_group'), id=ticket_id)
+    ticket = get_object_or_404(SupportTicket.objects.select_related('student', 'student__study_group', 'requester'), id=ticket_id)
     form = SupportTicketAdminUpdateForm(instance=ticket)
     if request.method == 'POST':
         form = SupportTicketAdminUpdateForm(request.POST, instance=ticket)

@@ -186,7 +186,11 @@
         </div>
       {% endif %}
 
-      {% if students_without_group == 0 and groups_without_curator == 0 and portfolio_pending_total == 0 and offline_full_courses == 0 %}
+      {% if support_new_total > 0 %}<div class="attention-item attention-item-plain"><strong>{{ support_new_total }}</strong><span>новых обращений</span></div>{% endif %}
+      {% if support_in_progress_total > 0 %}<div class="attention-item attention-item-plain"><strong>{{ support_in_progress_total }}</strong><span>обращений в работе</span></div>{% endif %}
+      {% if support_public_total > 0 %}<div class="attention-item attention-item-plain"><strong>{{ support_public_total }}</strong><span>публичных обращений без входа</span></div>{% endif %}
+
+      {% if students_without_group == 0 and groups_without_curator == 0 and portfolio_pending_total == 0 and offline_full_courses == 0 and support_new_total == 0 and support_in_progress_total == 0 and support_public_total == 0 %}
         <div class="attention-empty attention-empty-plain">
           Критических задач сейчас нет.
         </div>

@@ -45,6 +45,7 @@
           <div class="menu-section">
             <div class="menu-group-title">Активность</div>
             <a class="{% if request.resolver_match.url_name == 'curator_activity' %}active{% endif %}" href="{% url 'accounts:curator_activity' %}">Активность студентов</a>
+            <a class="{% if request.resolver_match.url_name == 'curator_support_tickets' %}active{% endif %}" href="{% url 'accounts:curator_support_tickets' %}">Техподдержка</a>
           </div>
           <div class="menu-section">
             <div class="menu-group-title">Профиль</div>
