@@ -78,10 +78,6 @@
             <a class="{% if request.resolver_match.url_name == 'admin_responses' %}active{% endif %}" href="{% url 'accounts:admin_responses' %}">Отклики</a>
             <a class="{% if request.resolver_match.url_name == 'admin_course_registrations' %}active{% endif %}" href="{% url 'accounts:admin_course_registrations' %}">Записи на курсы</a>
           </div>
-          <div class="menu-section">
-            <div class="menu-group-title">Профиль</div>
-            <a class="{% if request.resolver_match.url_name == 'admin_profile_edit' %}active{% endif %}" href="{% url 'accounts:admin_profile_edit' %}">Настройки</a>
-          </div>
         {% endif %}
       </nav>
 
