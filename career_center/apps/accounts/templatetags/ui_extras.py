@@ -1,4 +1,5 @@
 from django import template
+from pathlib import Path
 
 register = template.Library()
 
@@ -16,3 +17,17 @@ def initials(full_name):
         return '—'
     parts = [p for p in str(full_name).split() if p]
     return ''.join(part[0].upper() for part in parts[:2])
+
+
+@register.filter
+def basename(path):
+    if not path:
+        return ''
+    return Path(str(path)).name
+
+
+@register.filter
+def is_image_file(filename):
+    if not filename:
+        return False
+    return str(filename).lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.webp'))

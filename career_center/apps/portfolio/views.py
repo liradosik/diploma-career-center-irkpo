@@ -100,7 +100,7 @@ def edit_entry(request, pk):
 @role_required(User.Role.CURATOR)
 def review_queue(request):
     students = User.objects.filter(role=User.Role.STUDENT).filter(Q(study_group__curator=request.user, study_group__is_active=True) | Q(study_group__isnull=True, curator=request.user)).exclude(academic_status=User.AcademicStatus.GRADUATED).distinct()
-    entries_qs = PortfolioEntry.objects.filter(student__in=students).select_related('student').order_by('-created_at')
+    entries_qs = PortfolioEntry.objects.filter(student__in=students).select_related('student').prefetch_related('attachments').order_by('-created_at')
 
     if request.method == 'POST':
         entry = get_object_or_404(entries_qs, id=request.POST.get('entry_id'))
