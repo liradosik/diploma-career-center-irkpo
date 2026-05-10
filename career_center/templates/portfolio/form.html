@@ -1,15 +1,33 @@
 {% extends 'base_dashboard.html' %}
 {% block title %}{% if entry %}Редактирование записи{% else %}Новая запись{% endif %}{% endblock %}
 {% block content %}
-<section class="hero">
+<section class="hero student-portfolio-hero">
   <div class="hero-kicker">Портфолио</div>
-  <h1>{% if entry %}Редактирование записи{% else %}Добавление достижения{% endif %}</h1>
-  <p>Заполняйте поля подробно: это влияет на качество публичного резюме.</p>
+  <h1>{% if entry %}Редактирование записи{% else %}Добавление записи{% endif %}</h1>
+  <p>Добавьте проекты, достижения, сертификаты, отзывы и другие материалы.</p>
 </section>
-<section class="section card form-card">
-  <form method="post" enctype="multipart/form-data">
+<section class="section card student-portfolio-form-card">
+  <form method="post" enctype="multipart/form-data" class="student-portfolio-form">
     {% csrf_token %}
     {{ form.as_p }}
+
+    {% if entry %}
+      <div class="student-portfolio-existing-files">
+        <h3>Текущие вложения</h3>
+        {% if existing_attachments %}
+          {% for attachment in existing_attachments %}
+            <label class="student-portfolio-file-row">
+              <input type="checkbox" name="delete_attachments" value="{{ attachment.id }}">
+              <a href="{{ attachment.file.url }}" target="_blank">{{ attachment.filename }}</a>
+              <span class="muted">Удалить</span>
+            </label>
+          {% endfor %}
+        {% else %}
+          <p class="muted">Вложений пока нет.</p>
+        {% endif %}
+      </div>
+    {% endif %}
+
     <div class="inline-actions"><button class="btn btn-primary" type="submit">Сохранить</button></div>
   </form>
 </section>

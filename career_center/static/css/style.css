@@ -3923,3 +3923,13 @@ input[type="submit"].btn-primary:hover {
 .avatar-sm{width:40px;height:40px;font-size:14px}
 .avatar-md{width:56px;height:56px;font-size:18px}
 .avatar-lg{width:128px;height:128px;font-size:30px}
+
+/* student/portfolio */
+.student-portfolio-section-card,.student-portfolio-entry-card{background:#fff;border:1px solid #dbeafe;border-radius:16px;padding:16px;margin-bottom:14px}
+.student-portfolio-attachments{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.student-portfolio-attachment{display:inline-block;background:#eff6ff;color:#1e40af;padding:6px 10px;border-radius:999px;text-decoration:none;font-size:14px}
+.student-portfolio-attachment:hover{background:#dbeafe}
+.student-portfolio-link{color:#1E66D0;word-break:break-all}
+.student-portfolio-form-card .student-portfolio-form p{margin-bottom:14px}
+.student-portfolio-existing-files{margin:14px 0;padding:12px;border:1px solid #dbeafe;border-radius:12px;background:#f8fbff}
+.student-portfolio-file-row{display:flex;gap:8px;align-items:center;margin:8px 0}

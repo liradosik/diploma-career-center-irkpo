@@ -1,4 +1,7 @@
+from pathlib import Path
+
 from django.conf import settings
+from django.core.validators import FileExtensionValidator
 from django.db import models
 
 
@@ -26,3 +29,19 @@ class PortfolioEntry(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class PortfolioAttachment(models.Model):
+    entry = models.ForeignKey(PortfolioEntry, on_delete=models.CASCADE, related_name='attachments')
+    file = models.FileField(
+        upload_to='portfolio/attachments/',
+        validators=[FileExtensionValidator(allowed_extensions=['pdf', 'jpg', 'jpeg', 'png', 'doc', 'docx', 'zip'])],
+    )
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    @property
+    def filename(self):
+        return Path(self.file.name).name
+
+    def __str__(self):
+        return self.filename
