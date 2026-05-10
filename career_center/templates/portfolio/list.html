@@ -41,15 +41,7 @@
       {% if entry.link %}<p class="muted">Ссылка: <a class="student-portfolio-link" href="{{ entry.link }}" target="_blank">{{ entry.link }}</a></p>{% endif %}
       {% if entry.curator_comment %}<p class="muted">Комментарий куратора: {{ entry.curator_comment }}</p>{% endif %}
 
-      {% if entry.attachments.all %}
-      <div class="student-portfolio-attachments">
-        {% for attachment in entry.attachments.all %}
-          <a href="{{ attachment.file.url }}" class="student-portfolio-attachment" target="_blank">📎 {{ attachment.filename }}</a>
-        {% endfor %}
-      </div>
-      {% endif %}
-
-      {% if entry.file %}<div class="student-portfolio-attachments"><a href="{{ entry.file.url }}" class="student-portfolio-attachment" target="_blank">📎 {{ entry.file.name|cut:'portfolio/files/' }}</a></div>{% endif %}
+      {% include 'portfolio/_attachments.html' with attachments=entry.attachments.all legacy_file=entry.file %}
 
       <div class="inline-actions">
         {% if entry.status == 'pending' %}<span class="badge badge-pending">Ожидает проверки</span>{% endif %}

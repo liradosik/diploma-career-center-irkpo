@@ -1,23 +1,43 @@
 {% extends 'base_dashboard.html' %}
 {% block title %}{{ vacancy.title }}{% endblock %}
 {% block content %}
-<section class="hero">
+<section class="hero student-vacancy-detail">
   <div class="hero-kicker">Карточка вакансии</div>
   <h1>{{ vacancy.title }}</h1>
-  <p>{{ vacancy.company }} • {{ vacancy.employment_type }} • {{ vacancy.format_type }}</p>
-  <div class="hero-actions">
-    <form method="post" action="{% url 'vacancies:respond' vacancy.pk %}">{% csrf_token %}<button class="btn btn-primary" type="submit">Откликнуться</button></form>
-    {% if resume_link %}<a class="btn" href="{{ resume_link }}">Открыть публичное резюме</a>{% endif %}
+  <p>{{ vacancy.company }}</p>
+  <div class="inline-actions">
+    <span class="badge">{{ vacancy.format_type }}</span>
+    <span class="badge">{{ vacancy.employment_type }}</span>
+    <span class="badge">{{ vacancy.direction }}</span>
   </div>
+  {% if not response %}<form method="post" action="{% url 'vacancies:respond' vacancy.pk %}">{% csrf_token %}<button class="btn btn-primary" type="submit">Откликнуться</button></form>{% endif %}
 </section>
 
-<section class="section card">
-  <h2>Описание и требования</h2>
-  <div class="list-item"><h3>Описание</h3><p>{{ vacancy.description }}</p></div>
-  <div class="list-item"><h3>Обязанности</h3><p>{{ vacancy.responsibilities }}</p></div>
-  <div class="list-item"><h3>Требования</h3><p>{{ vacancy.requirements }}</p></div>
-  <div class="list-item"><h3>Условия</h3><p>{{ vacancy.conditions }}</p></div>
-  <div class="list-item"><h3>Контакты</h3><p>{{ vacancy.contacts }}</p></div>
-  {% if response %}<div class="list-item"><span class="badge badge-approved">Отклик уже сохранён</span><p class="muted">При отправке работодателю используйте ссылку на публичное резюме.</p></div>{% endif %}
+<section class="section card student-vacancy-detail">
+  {% if vacancy.description %}<div class="list-item"><h3>Описание</h3><p>{{ vacancy.description }}</p></div>{% endif %}
+  {% if vacancy.responsibilities %}<div class="list-item"><h3>Обязанности</h3><p>{{ vacancy.responsibilities }}</p></div>{% endif %}
+  {% if vacancy.requirements %}<div class="list-item"><h3>Требования</h3><p>{{ vacancy.requirements }}</p></div>{% endif %}
+  {% if vacancy.conditions %}<div class="list-item"><h3>Условия</h3><p>{{ vacancy.conditions }}</p></div>{% endif %}
 </section>
+
+<section class="section card student-vacancy-contact-card">
+  <h2>Контакты работодателя</h2>
+  <p>{{ vacancy.contacts }}</p>
+</section>
+
+{% if response %}
+<section class="section card student-response-card">
+  {% if just_responded %}<h2>Отклик сохранён. Свяжитесь с работодателем.</h2>{% else %}<h2>Вы уже откликнулись на эту вакансию. Контакты работодателя доступны ниже.</h2>{% endif %}
+  <div class="student-response-actions inline-actions">
+    {% if resume_public_url %}
+      <a class="btn" target="_blank" href="{{ resume_public_url }}">Открыть публичное резюме</a>
+      <button class="btn" type="button" onclick="navigator.clipboard.writeText('{{ resume_public_url }}')">Скопировать ссылку на резюме</button>
+      <a class="btn" target="_blank" href="{{ resume_pdf_url }}">Скачать PDF</a>
+    {% else %}
+      <p class="muted">Публичное резюме не опубликовано. Вы можете включить его в конструкторе резюме.</p>
+      <a class="btn btn-primary" href="{% url 'resumes:builder' %}">Перейти в конструктор резюме</a>
+    {% endif %}
+  </div>
+</section>
+{% endif %}
 {% endblock %}
