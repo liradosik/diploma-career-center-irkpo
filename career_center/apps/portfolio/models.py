@@ -30,6 +30,13 @@ class PortfolioEntry(models.Model):
     def __str__(self):
         return self.title
 
+    class Meta:
+        indexes = [
+            models.Index(fields=['student', 'status'], name='portfolio_entry_ss_idx'),
+            models.Index(fields=['student', '-created_at'], name='portfolio_entry_sc_idx'),
+            models.Index(fields=['status', '-created_at'], name='portfolio_entry_stc_idx'),
+        ]
+
 
 class PortfolioAttachment(models.Model):
     entry = models.ForeignKey(PortfolioEntry, on_delete=models.CASCADE, related_name='attachments')

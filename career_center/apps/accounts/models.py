@@ -72,9 +72,21 @@ class User(AbstractUser):
     contact_email = models.EmailField(blank=True)
     contact_note = models.TextField(blank=True)
     contact_availability = models.CharField(max_length=255, blank=True)
+    # NOTE: Поля group/specialty сохранены для legacy-совместимости (старые импорты/данные).
+    # Каноническая нормализованная связь: User.study_group -> StudyGroup -> Specialty.
+    # После полной миграции исторических данных эти текстовые поля можно вывести из эксплуатации.
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['full_name']
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['role'], name='accounts_user_role_idx'),
+            models.Index(fields=['academic_status'], name='accounts_user_ac_status_idx'),
+            models.Index(fields=['study_group'], name='accounts_user_st_group_idx'),
+            models.Index(fields=['curator'], name='accounts_user_curator_idx'),
+            models.Index(fields=['is_active'], name='accounts_user_is_active_idx'),
+        ]
 
     def __str__(self):
         return self.full_name or self.email
@@ -119,6 +131,10 @@ class ActivityLog(models.Model):
 
     class Meta:
         ordering = ('-created_at',)
+        indexes = [
+            models.Index(fields=['student', '-created_at'], name='accounts_actlog_sc_idx'),
+            models.Index(fields=['event_type', '-created_at'], name='accounts_actlog_ec_idx'),
+        ]
 
     def __str__(self):
         return f'{self.student} — {self.get_event_type_display()}'
@@ -152,6 +168,12 @@ class SupportTicket(models.Model):
 
     class Meta:
         ordering = ('-created_at',)
+        indexes = [
+            models.Index(fields=['student', 'status'], name='accounts_ticket_st_idx'),
+            models.Index(fields=['status', '-created_at'], name='accounts_ticket_sc_idx'),
+            models.Index(fields=['category', 'status'], name='accounts_ticket_cs_idx'),
+        ]
 
     def __str__(self):
         return f'{self.student.full_name}: {self.subject}'
+

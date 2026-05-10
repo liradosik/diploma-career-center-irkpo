@@ -30,6 +30,13 @@ class Course(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        indexes = [
+            models.Index(fields=['status', 'date'], name='course_status_date_idx'),
+            models.Index(fields=['kind', 'status'], name='course_kind_status_idx'),
+            models.Index(fields=['format_type', 'status'], name='course_format_status_idx'),
+        ]
+
     @property
     def occupied_places(self):
         return self.registrations.filter(status=CourseRegistration.Status.REGISTERED).count()
