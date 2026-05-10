@@ -1,31 +1,40 @@
 {% extends 'base_dashboard.html' %}
 {% block title %}Вакансии{% endblock %}
 {% block content %}
-<section class="hero">
+<section class="hero student-vacancy-list">
   <div class="hero-kicker">Раздел занятости</div>
   <h1>Вакансии и стажировки</h1>
-  <p>Найдите предложение, подходящее по формату занятости и карьерному треку.</p>
-  <form method="get" class="section">
-    <label for="q">Поиск вакансий</label>
-    <input id="q" type="text" name="q" value="{{ request.GET.q }}" placeholder="Например: junior python, аналитик, практика">
-    <div class="inline-actions"><button class="btn btn-primary" type="submit">Найти</button></div>
+  <p>Подберите предложение по формату, типу занятости и карьерному направлению.</p>
+</section>
+
+<section class="section card student-vacancy-list">
+  <form method="get" class="grid grid-2">
+    <p class="full"><label for="q">Поиск</label><input id="q" type="text" name="q" value="{{ request.GET.q }}" placeholder="Например: дизайнер, junior, стажировка"></p>
+    <p><label for="employment">Тип занятости</label><select id="employment" name="employment"><option value="">Все</option>{% for option in employment_options %}<option value="{{ option }}" {% if employment_filter == option %}selected{% endif %}>{{ option }}</option>{% endfor %}</select></p>
+    <p><label for="format">Формат</label><select id="format" name="format"><option value="">Все</option>{% for option in format_options %}<option value="{{ option }}" {% if format_filter == option %}selected{% endif %}>{{ option }}</option>{% endfor %}</select></p>
+    <p><label for="direction">Направление</label><select id="direction" name="direction"><option value="">Все</option>{% for option in direction_options %}<option value="{{ option }}" {% if direction_filter == option %}selected{% endif %}>{{ option }}</option>{% endfor %}</select></p>
+    <div class="inline-actions full"><button class="btn btn-primary" type="submit">Применить</button><a class="btn" href="{% url 'vacancies:list' %}">Сбросить</a></div>
   </form>
 </section>
 
-<section class="section card">
-  <h2>Актуальные предложения</h2>
+<section class="section student-vacancy-list">
   {% for v in vacancies %}
-    <article class="list-item">
+    <article class="card student-vacancy-card">
       <h3>{{ v.title }}</h3>
-      <p class="muted">{{ v.company }} • {{ v.format_type }}</p>
-      <p>{{ v.description|truncatechars:170 }}</p>
+      <p class="muted">{{ v.company }}</p>
       <div class="inline-actions">
-        <span class="badge badge-active">Активно</span>
-        <a class="btn btn-link" href="{% url 'vacancies:detail' v.pk %}">Подробнее</a>
+        <span class="badge">{{ v.format_type }}</span>
+        <span class="badge">{{ v.employment_type }}</span>
+        <span class="badge">{{ v.direction }}</span>
+      </div>
+      <p>{{ v.description|truncatechars:180 }}</p>
+      <div class="inline-actions">
+        <a class="btn" href="{% url 'vacancies:detail' v.pk %}">Подробнее</a>
+        <form method="post" action="{% url 'vacancies:respond' v.pk %}">{% csrf_token %}<button class="btn btn-primary" type="submit">Откликнуться</button></form>
       </div>
     </article>
   {% empty %}
-    <p class="muted">Активных вакансий пока нет.</p>
+    <section class="card"><p class="muted">По текущим фильтрам вакансий не найдено.</p></section>
   {% endfor %}
 </section>
 {% endblock %}
