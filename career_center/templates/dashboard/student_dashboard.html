@@ -16,6 +16,28 @@
   </article>
   <article class="card student-resume-status"><h2>Резюме</h2><p class="student-status-badge {% if resume_is_public %}badge-approved{% else %}badge-pending{% endif %}">{% if resume_is_public %}Опубликовано{% else %}Не опубликовано{% endif %}</p><div class="inline-actions"><a class="btn" href="{% url 'resumes:builder' %}">Конструктор резюме</a>{% if resume_is_public %}<a class="btn" href="{{ resume_public_url }}" target="_blank">Открыть публичное резюме</a><button class="btn" type="button" onclick="navigator.clipboard.writeText('{{ resume_public_url }}')">Скопировать ссылку</button>{% endif %}</div></article>
 </section>
+<section class="card student-preview-card">
+  <h2>Ваш куратор</h2>
+  {% if curator %}
+    <div class="curator-contact-card">
+      {% if curator.photo %}
+        <img class="student-avatar-img" src="{{ curator.photo.url }}" alt="{{ curator.full_name }}">
+      {% else %}
+        <div class="student-avatar-fallback">{{ curator.full_name|initials }}</div>
+      {% endif %}
+      <div>
+        <p><strong>{{ curator.full_name }}</strong></p>
+        <p class="muted">{{ curator.contact_email|default:curator.email }}</p>
+        {% if curator.contact_phone %}<p class="muted">Телефон: {{ curator.contact_phone }}</p>{% endif %}
+        {% if curator.contact_telegram %}<p><a href="{{ curator.contact_telegram }}" target="_blank" rel="noopener">Связаться в Telegram</a></p>{% endif %}
+        {% if curator.contact_availability %}<p class="muted">Когда удобно писать: {{ curator.contact_availability }}</p>{% endif %}
+        {% if curator.contact_note %}<p>{{ curator.contact_note }}</p>{% endif %}
+      </div>
+    </div>
+  {% else %}
+    <p class="muted">Куратор группы пока не назначен.</p>
+  {% endif %}
+</section>
 <section class="student-stats-grid"><article class="student-stat-card"><div>Всего записей</div><strong>{{ portfolio_total }}</strong></article><article class="student-stat-card"><div>Ожидают проверки</div><strong>{{ portfolio_pending }}</strong></article><article class="student-stat-card"><div>Подтверждено</div><strong>{{ portfolio_approved }}</strong></article><article class="student-stat-card"><div>Отклонено</div><strong>{{ portfolio_rejected }}</strong></article><article class="student-stat-card"><div>Записан на курсы</div><strong>{{ registered_courses_count }}</strong></article></section>
 <section class="card student-preview-card"><h2>Последние записи портфолио <a class="btn btn-link" href="{% url 'portfolio:list' %}">Все записи</a></h2><div class="student-preview-list">{% for entry in recent_entries %}<div class="student-preview-item"><strong>{{ entry.title }}</strong><p class="muted">{{ PORTFOLIO_TYPE_LABELS|dict_get:entry.type }} • {{ entry.date }}</p>{% if entry.status == 'pending' %}<span class="badge badge-pending">Ожидает проверки</span>{% endif %}{% if entry.status == 'approved' %}<span class="badge badge-approved">Подтверждено</span>{% endif %}{% if entry.status == 'rejected' %}<span class="badge badge-rejected">Отклонено</span>{% endif %}</div>{% empty %}<p class="muted">Пока нет достижений. Добавьте первую запись.</p>{% endfor %}</div></section>
 <section class="card student-preview-card"><h2>Мои курсы и мероприятия <a class="btn btn-link" href="{% url 'courses:list' %}">Все курсы</a></h2><div class="student-preview-list">{% for reg in registrations|slice:':3' %}<div class="student-preview-item"><strong>{{ reg.course.title }}</strong><p class="muted">{{ reg.course.get_kind_display }} • {{ reg.course.date }} • {{ reg.course.get_format_type_display }}</p><span class="badge">{{ reg.get_status_display }}</span></div>{% empty %}<p class="muted">Пока нет записей на курсы и семинары.</p>{% endfor %}</div></section>

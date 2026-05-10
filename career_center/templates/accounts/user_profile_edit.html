@@ -10,7 +10,7 @@
     <div>
       <div class="hero-kicker">Профиль</div>
       <h1>{{ profile_title }}</h1>
-      <p>Настройте отображение аккаунта: ФИО и аватар будут видны в кабинетах, списках и карточках пользователей.</p>
+      <p>Заполните контактный профиль куратора: эти данные увидят закреплённые студенты.</p>
     </div>
   </section>
 
@@ -38,10 +38,9 @@
           >
 
           {% if request.user.photo %}
-            <label class="role-remove-photo">
-              <input type="checkbox" name="remove_photo" value="1">
-              <span>Удалить текущее фото</span>
-            </label>
+            <button class="btn role-remove-photo-btn" type="submit" name="action" value="remove_photo" onclick="return confirm('Удалить текущее фото?')">
+              Удалить фото
+            </button>
           {% endif %}
         </div>
 
@@ -53,8 +52,8 @@
       <div class="role-settings-main-card">
         <div class="role-card-head">
           <div>
-            <h2>Личные данные</h2>
-            <p>Эта информация используется внутри системы.</p>
+            <h2>Личные и контактные данные</h2>
+            <p>Пустые контактные поля не будут показаны студентам.</p>
           </div>
         </div>
 
@@ -62,6 +61,26 @@
           <div class="form-field role-field-full">
             {{ user_form.full_name.label_tag }}
             {{ user_form.full_name }}
+          </div>
+          <div class="form-field">
+            {{ user_form.contact_phone.label_tag }}
+            {{ user_form.contact_phone }}
+          </div>
+          <div class="form-field">
+            {{ user_form.contact_email.label_tag }}
+            {{ user_form.contact_email }}
+          </div>
+          <div class="form-field role-field-full">
+            {{ user_form.contact_telegram.label_tag }}
+            {{ user_form.contact_telegram }}
+          </div>
+          <div class="form-field role-field-full">
+            {{ user_form.contact_availability.label_tag }}
+            {{ user_form.contact_availability }}
+          </div>
+          <div class="form-field role-field-full">
+            {{ user_form.contact_note.label_tag }}
+            {{ user_form.contact_note }}
           </div>
         </div>
 
@@ -71,12 +90,6 @@
           </div>
         {% endif %}
 
-        <div class="student-cropper-wrap role-cropper-card" data-cropper-wrap hidden>
-          <h3>Настройте аватар</h3>
-          <p class="muted">Перемещайте и масштабируйте фото. Будет сохранён квадратный фрагмент.</p>
-          <img src="" alt="Предпросмотр обрезки" data-cropper-image>
-        </div>
-
         <input type="hidden" name="cropped_photo_data" data-cropped-photo>
 
         <div class="role-settings-actions">
@@ -85,6 +98,20 @@
       </div>
     </form>
   </section>
+</div>
+<div class="avatar-modal" data-avatar-modal hidden>
+  <div class="avatar-modal-backdrop" data-avatar-modal-cancel></div>
+  <div class="avatar-modal-card" role="dialog" aria-modal="true" aria-label="Настройте аватар">
+    <h3>Настройте аватар</h3>
+    <p class="muted">Перемещайте и масштабируйте фото.</p>
+    <div class="avatar-modal-cropper">
+      <img src="" alt="Предпросмотр обрезки" data-cropper-image>
+    </div>
+    <div class="avatar-modal-actions">
+      <button type="button" class="btn btn-primary" data-avatar-apply>Применить</button>
+      <button type="button" class="btn" data-avatar-modal-cancel>Отмена</button>
+    </div>
+  </div>
 </div>
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.css">

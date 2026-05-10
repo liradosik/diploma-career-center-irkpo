@@ -7,7 +7,8 @@ from django.core.files.base import ContentFile
 def apply_user_photo_update(request, user):
     previous_photo = user.photo if user.photo else None
 
-    if request.POST.get('remove_photo') == '1' and user.photo:
+    should_remove_photo = request.POST.get('remove_photo') == '1' or request.POST.get('action') == 'remove_photo'
+    if should_remove_photo and user.photo:
         user.photo.delete(save=False)
         user.photo = None
         user.save(update_fields=['photo'])

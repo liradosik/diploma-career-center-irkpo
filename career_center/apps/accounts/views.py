@@ -205,6 +205,12 @@ def student_dashboard(request):
     if request.user.admission_year:
         current_course = max(date.today().year - request.user.admission_year + 1, 1)
 
+    curator = None
+    if request.user.study_group and request.user.study_group.curator:
+        curator = request.user.study_group.curator
+    elif request.user.curator:
+        curator = request.user.curator
+
     context = {
         'recent_entries': recent_entries,
         'portfolio_total': entries_qs.count(),
@@ -219,6 +225,7 @@ def student_dashboard(request):
         'registered_courses_count': registrations_qs.filter(status=CourseRegistration.Status.REGISTERED).count(),
         'current_course': current_course,
         'profile_incomplete': not all([request.user.group, request.user.specialty, request.user.admission_year]),
+        'curator': curator,
     }
     return render(request, 'dashboard/student_dashboard.html', context)
 
@@ -1174,6 +1181,11 @@ def profile_edit(request):
         from .models import StudentProfile
         profile = StudentProfile.objects.create(user=request.user)
 
+    if request.method == 'POST' and request.POST.get('action') == 'remove_photo':
+        apply_user_photo_update(request, request.user)
+        messages.success(request, 'Фото удалено.')
+        return redirect('accounts:profile_edit')
+
     if request.method == 'POST':
         user_form = UserStudentForm(request.POST, request.FILES, instance=request.user)
         profile_form = StudentProfileForm(request.POST, instance=profile)
@@ -1203,11 +1215,17 @@ def profile_edit(request):
 
 @role_required(User.Role.CURATOR)
 def curator_profile_edit(request):
+    if request.method == 'POST' and request.POST.get('action') == 'remove_photo':
+        apply_user_photo_update(request, request.user)
+        messages.success(request, 'Фото удалено.')
+        return redirect('accounts:curator_profile_edit')
+
     if request.method == 'POST':
         user_form = UserProfileSettingsForm(request.POST, request.FILES, instance=request.user)
         if user_form.is_valid():
             user = user_form.save()
             apply_user_photo_update(request, user)
+            messages.success(request, 'Профиль куратора сохранён.')
             return redirect('accounts:curator_profile_edit')
     else:
         user_form = UserProfileSettingsForm(instance=request.user)

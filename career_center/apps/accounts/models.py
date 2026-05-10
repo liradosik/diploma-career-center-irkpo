@@ -67,6 +67,11 @@ class User(AbstractUser):
     curator = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL, related_name='students')
     study_group = models.ForeignKey(StudyGroup, null=True, blank=True, on_delete=models.SET_NULL, related_name='students')
     photo = models.ImageField(upload_to='users/photos/', blank=True, null=True)
+    contact_phone = models.CharField(max_length=32, blank=True)
+    contact_telegram = models.URLField(blank=True)
+    contact_email = models.EmailField(blank=True)
+    contact_note = models.TextField(blank=True)
+    contact_availability = models.CharField(max_length=255, blank=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['full_name']

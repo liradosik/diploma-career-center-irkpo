@@ -16,13 +16,10 @@
         <div class="student-photo-actions">
           <label class="btn" for="{{ user_form.photo.id_for_label }}">Выбрать фото</label>
           {{ user_form.photo }}
-          {% if request.user.photo %}<label><input type="checkbox" name="remove_photo" value="1"> Удалить фото</label>{% endif %}
+          {% if request.user.photo %}
+            <button class="btn role-remove-photo-btn" type="submit" name="action" value="remove_photo" onclick="return confirm('Удалить текущее фото?')">Удалить фото</button>
+          {% endif %}
         </div>
-      </div>
-      <div class="student-cropper-wrap" data-cropper-wrap hidden>
-        <h3>Настройте аватар</h3>
-        <p class="muted">Перемещайте и масштабируйте фото. Будет сохранён квадратный фрагмент.</p>
-        <img src="" alt="Предпросмотр обрезки" data-cropper-image>
       </div>
       <input type="hidden" name="cropped_photo_data" data-cropped-photo>
       <p>{{ profile_form.phone.label_tag }} {{ profile_form.phone }}</p>
@@ -33,6 +30,20 @@
   </section>
   <section class="card student-settings-card"><h2>Учебная информация</h2>{{ academic_form.as_p }}<p><strong>Курс:</strong> {{ current_course|default:'—' }}</p></section>
   <section class="card student-settings-card"><h2>Публичное резюме</h2><p class="student-status-badge {% if resume and resume.is_public %}badge-approved{% else %}badge-pending{% endif %}">{% if resume and resume.is_public %}Включено{% else %}Выключено{% endif %}</p>{% if resume_public_url %}<p class="muted">{{ resume_public_url }}</p>{% endif %}<div class="inline-actions"><a class="btn" href="{% url 'resumes:builder' %}">Конструктор резюме</a>{% if resume and resume.is_public %}<a class="btn" target="_blank" href="{{ resume_public_url }}">Открыть публичное резюме</a><button class="btn" type="button" onclick="navigator.clipboard.writeText('{{ resume_public_url }}')">Скопировать ссылку</button>{% endif %}</div></section>
+</div>
+<div class="avatar-modal" data-avatar-modal hidden>
+  <div class="avatar-modal-backdrop" data-avatar-modal-cancel></div>
+  <div class="avatar-modal-card" role="dialog" aria-modal="true" aria-label="Настройте аватар">
+    <h3>Настройте аватар</h3>
+    <p class="muted">Перемещайте и масштабируйте фото.</p>
+    <div class="avatar-modal-cropper">
+      <img src="" alt="Предпросмотр обрезки" data-cropper-image>
+    </div>
+    <div class="avatar-modal-actions">
+      <button type="button" class="btn btn-primary" data-avatar-apply>Применить</button>
+      <button type="button" class="btn" data-avatar-modal-cancel>Отмена</button>
+    </div>
+  </div>
 </div>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.css">
 <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.js"></script>
