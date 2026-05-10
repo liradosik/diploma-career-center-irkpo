@@ -10,7 +10,7 @@
     <div>
       <div class="hero-kicker">Профиль</div>
       <h1>{{ profile_title }}</h1>
-      <p>Настройте отображение аккаунта: ФИО и аватар будут видны в кабинетах, списках и карточках пользователей.</p>
+      <p>Заполните контактный профиль куратора: эти данные увидят закреплённые студенты.</p>
     </div>
   </section>
 
@@ -38,10 +38,9 @@
           >
 
           {% if request.user.photo %}
-            <label class="role-remove-photo">
-              <input type="checkbox" name="remove_photo" value="1">
-              <span>Удалить текущее фото</span>
-            </label>
+            <button class="btn role-remove-photo-btn" type="submit" name="action" value="remove_photo">
+              Удалить фото
+            </button>
           {% endif %}
         </div>
 
@@ -53,8 +52,8 @@
       <div class="role-settings-main-card">
         <div class="role-card-head">
           <div>
-            <h2>Личные данные</h2>
-            <p>Эта информация используется внутри системы.</p>
+            <h2>Личные и контактные данные</h2>
+            <p>Пустые контактные поля не будут показаны студентам.</p>
           </div>
         </div>
 
@@ -62,6 +61,26 @@
           <div class="form-field role-field-full">
             {{ user_form.full_name.label_tag }}
             {{ user_form.full_name }}
+          </div>
+          <div class="form-field">
+            {{ user_form.contact_phone.label_tag }}
+            {{ user_form.contact_phone }}
+          </div>
+          <div class="form-field">
+            {{ user_form.contact_email.label_tag }}
+            {{ user_form.contact_email }}
+          </div>
+          <div class="form-field role-field-full">
+            {{ user_form.contact_telegram.label_tag }}
+            {{ user_form.contact_telegram }}
+          </div>
+          <div class="form-field role-field-full">
+            {{ user_form.contact_availability.label_tag }}
+            {{ user_form.contact_availability }}
+          </div>
+          <div class="form-field role-field-full">
+            {{ user_form.contact_note.label_tag }}
+            {{ user_form.contact_note }}
           </div>
         </div>
 
