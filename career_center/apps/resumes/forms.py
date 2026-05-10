@@ -4,6 +4,12 @@ from .models import ResumeSettings
 
 
 class ResumeSettingsForm(forms.ModelForm):
+    TEMPLATE_CHOICES = [
+        ('classic', 'Классический'),
+        ('compact', 'Компактный'),
+        ('modern', 'Современный'),
+        ('academic', 'Академический'),
+    ]
     SECTION_CHOICES = [
         ('contacts', 'Контакты'),
         ('education', 'Образование'),
@@ -20,10 +26,17 @@ class ResumeSettingsForm(forms.ModelForm):
         widget=forms.CheckboxSelectMultiple,
         label='Разделы резюме',
     )
+    template = forms.ChoiceField(choices=TEMPLATE_CHOICES, label='Шаблон резюме')
 
     class Meta:
         model = ResumeSettings
-        fields = ('title', 'about', 'is_public', 'selected_sections')
+        fields = ('title', 'about', 'is_public', 'template', 'selected_sections')
+        labels = {
+            'title': 'Желаемая должность / заголовок резюме',
+            'about': 'О себе',
+            'is_public': 'Публичное резюме',
+            'template': 'Шаблон резюме',
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

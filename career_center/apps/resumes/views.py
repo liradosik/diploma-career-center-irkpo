@@ -9,14 +9,23 @@ from .forms import ResumeSettingsForm
 from .models import ResumeSettings
 
 
-def _group_entries(entries):
+def _resume_payload(student, resume, profile):
+    entries = list(
+        PortfolioEntry.objects.filter(student=student, status=PortfolioEntry.Status.APPROVED)
+        .prefetch_related('attachments')
+        .order_by('-date', '-created_at')
+    )
+    about_text = ((getattr(resume, 'about', '') or '') or getattr(profile, 'about', '') or '').strip()
+    section_defaults = ['contacts', 'education', 'skills', 'projects', 'achievements', 'certificates', 'recommendations']
+    selected_sections = (getattr(resume, 'selected_sections', None) or section_defaults)
     grouped = {
         'skills': [e for e in entries if e.type == 'skill'],
         'projects': [e for e in entries if e.type == 'project'],
-        'achievements': [e for e in entries if e.type in {'academic', 'creative', 'sport', 'social'}],
+        'achievements': [e for e in entries if e.type == 'academic'],
+        'certificates': [e for e in entries if e.type in {'creative', 'sport', 'social'}],
         'recommendations': [e for e in entries if e.type == 'recommendation'],
     }
-    return grouped
+    return entries, grouped, about_text, selected_sections
 
 
 def _resume_payload(student, resume, profile):
