@@ -3933,3 +3933,21 @@ input[type="submit"].btn-primary:hover {
 .student-portfolio-form-card .student-portfolio-form p{margin-bottom:14px}
 .student-portfolio-existing-files{margin:14px 0;padding:12px;border:1px solid #dbeafe;border-radius:12px;background:#f8fbff}
 .student-portfolio-file-row{display:flex;gap:8px;align-items:center;margin:8px 0}
+
+.portfolio-attachments-block{margin:10px 0 6px}
+.portfolio-attachments-list{display:flex;flex-direction:column;gap:8px}
+.portfolio-attachment-item{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:8px 10px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px}
+.portfolio-attachment-thumb{width:44px;height:44px;object-fit:cover;border-radius:8px;border:1px solid #cbd5e1;display:block}
+.portfolio-attachment-item a{color:#1e40af;text-decoration:none}
+.portfolio-attachment-item a:hover{text-decoration:underline}
+
+.student-resume-builder .hero-actions{display:flex;gap:10px;flex-wrap:wrap}
+.student-resume-settings p{margin-bottom:14px}
+.student-resume-settings ul{list-style:none;padding:0;margin:8px 0 0}
+.student-resume-settings li{padding:10px;border:1px solid #dbeafe;border-radius:12px;margin-bottom:8px;background:#f8fbff}
+.student-resume-preview{background:#fff}
+.student-resume-preview .list-item{border:1px solid #e5e7eb;border-radius:12px;padding:12px;margin-bottom:10px}
+.public-resume-page{display:flex;flex-direction:column;gap:16px}
+.public-resume-card{border-radius:20px;border:1px solid #dbeafe;background:#fff}
+.public-resume-section{padding:8px 0;border-top:1px solid #e5e7eb}
+.public-resume-attachments .portfolio-attachments-list{gap:6px}

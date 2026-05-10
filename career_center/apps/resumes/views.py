@@ -1,3 +1,4 @@
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 
 from apps.accounts.decorators import role_required
@@ -18,6 +19,25 @@ def _group_entries(entries):
     return grouped
 
 
+def _resume_payload(student, resume, profile):
+    entries = list(
+        PortfolioEntry.objects.filter(student=student, status=PortfolioEntry.Status.APPROVED)
+        .prefetch_related('attachments')
+        .order_by('-date', '-created_at')
+    )
+    about_text = ((getattr(resume, 'about', '') or '') or getattr(profile, 'about', '') or '').strip()
+    section_defaults = ['contacts', 'education', 'skills', 'projects', 'achievements', 'certificates', 'recommendations']
+    selected_sections = (getattr(resume, 'selected_sections', None) or section_defaults)
+    grouped = {
+        'skills': [e for e in entries if e.type == 'skill'],
+        'projects': [e for e in entries if e.type == 'project'],
+        'achievements': [e for e in entries if e.type == 'academic'],
+        'certificates': [e for e in entries if e.type in {'creative', 'sport', 'social'}],
+        'recommendations': [e for e in entries if e.type == 'recommendation'],
+    }
+    return entries, grouped, about_text, selected_sections
+
+
 @role_required(User.Role.STUDENT)
 def builder(request):
     settings_obj, _ = ResumeSettings.objects.get_or_create(student=request.user)
@@ -28,8 +48,7 @@ def builder(request):
             form.save()
     else:
         form = ResumeSettingsForm(instance=settings_obj)
-    entries = list(PortfolioEntry.objects.filter(student=request.user, status=PortfolioEntry.Status.APPROVED))
-    about_text = (settings_obj.about or (profile.about if profile else '')).strip()
+    entries, grouped_entries, about_text, selected_sections = _resume_payload(request.user, settings_obj, profile)
     has_base_data = any(
         [
             request.user.full_name,
@@ -47,7 +66,8 @@ def builder(request):
             'entries': entries,
             'resume': settings_obj,
             'profile': profile,
-            'grouped_entries': _group_entries(entries),
+            'grouped_entries': grouped_entries,
+            'selected_sections': selected_sections,
             'has_resume_data': has_base_data or bool(entries),
             'about_text': about_text,
         },
@@ -57,9 +77,20 @@ def builder(request):
 def public_resume(request, token):
     profile = get_object_or_404(StudentProfile, public_resume_token=token)
     resume = getattr(profile.user, 'resume_settings', None)
-    entries = list(PortfolioEntry.objects.filter(student=profile.user, status=PortfolioEntry.Status.APPROVED))
-    about_text = ((getattr(resume, 'about', '') or '') or profile.about or '').strip()
+    if not resume or not resume.is_public:
+        return render(request, 'resumes/public.html', {'is_unavailable': True, 'student': profile.user}, status=404)
+    entries, grouped_entries, about_text, selected_sections = _resume_payload(profile.user, resume, profile)
     has_resume_data = any([profile.user.full_name, getattr(resume, 'title', ''), about_text, entries])
+    is_owner_view = request.user.is_authenticated and request.user.id == profile.user_id
+    if request.GET.get('download') == 'pdf':
+        html = render(request, 'resumes/public.html', {
+            'student': profile.user, 'profile': profile, 'resume': resume, 'entries': entries,
+            'grouped_entries': grouped_entries, 'about_text': about_text, 'has_resume_data': has_resume_data,
+            'selected_sections': selected_sections, 'is_owner_view': is_owner_view, 'is_pdf_mode': True,
+        }).content
+        response = HttpResponse(html, content_type='text/html; charset=utf-8')
+        response['Content-Disposition'] = f'attachment; filename=\"resume-{profile.user_id}.html\"'
+        return response
     return render(
         request,
         'resumes/public.html',
@@ -68,8 +99,10 @@ def public_resume(request, token):
             'profile': profile,
             'resume': resume,
             'entries': entries,
-            'grouped_entries': _group_entries(entries),
+            'grouped_entries': grouped_entries,
             'about_text': about_text,
             'has_resume_data': has_resume_data,
+            'selected_sections': selected_sections,
+            'is_owner_view': is_owner_view,
         },
     )
