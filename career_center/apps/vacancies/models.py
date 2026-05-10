@@ -22,6 +22,11 @@ class Vacancy(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        indexes = [
+            models.Index(fields=['status', '-created_at'], name='vacancy_status_created_idx'),
+        ]
+
     def __str__(self):
         return f'{self.title} ({self.company})'
 
