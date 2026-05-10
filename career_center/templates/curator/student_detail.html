@@ -68,6 +68,7 @@
         </div>
         <p class="curator-review-meta-line">{{ entry.type }} · {{ entry.date }}</p>
         <p>{{ entry.description|truncatechars:220 }}</p>
+        {% include 'portfolio/_attachments.html' with attachments=entry.attachments.all legacy_file=entry.file %}
         {% if entry.curator_comment %}<p class="muted">Комментарий куратора: {{ entry.curator_comment }}</p>{% endif %}
       </article>
     {% empty %}

@@ -1,0 +1,54 @@
+{% extends 'base_dashboard.html' %}
+{% block title %}{{ course.title }}{% endblock %}
+{% block content %}
+<section class="hero student-course-detail">
+  <div class="hero-kicker">Карточка мероприятия</div>
+  <h1>{{ course.title }}</h1>
+  <div class="student-course-meta inline-actions">
+    <span class="badge">{{ course.get_kind_display }}</span>
+    <span class="badge">{{ course.get_format_type_display }}</span>
+    <span class="badge badge-active">Идёт набор</span>
+  </div>
+</section>
+
+<section class="section card student-course-detail">
+  {% if course.description %}<div class="list-item"><h3>Описание</h3><p>{{ course.description }}</p></div>{% endif %}
+  {% if course.organization %}<div class="list-item"><h3>Организация</h3><p>{{ course.organization }}</p></div>{% endif %}
+  {% if course.date %}<div class="list-item"><h3>Дата</h3><p>{{ course.date }}</p></div>{% endif %}
+  {% if course.contacts %}<div class="list-item"><h3>Контакты</h3><p>{{ course.contacts }}</p></div>{% endif %}
+</section>
+
+{% if course.format_type == 'offline' %}
+<section class="section card student-course-places">
+  <h2>Места</h2>
+  <p>Занято: {{ course.occupied_places_count }} из {{ course.places }}</p>
+  <p>Осталось мест: {{ course.available_places_count }}</p>
+  {% if course.available_places_count <= 0 and not registration %}<span class="badge badge-rejected">Мест нет</span>{% endif %}
+</section>
+{% endif %}
+
+<section class="section card student-course-registration">
+  <h2>Статус записи</h2>
+  {% if registration and registration.status == 'registered' %}
+    <p class="badge badge-approved">Вы записаны</p>
+  {% elif registration and registration.status == 'cancelled' %}
+    <p class="badge">Запись отменена</p>
+  {% elif course.format_type == 'offline' and course.available_places_count <= 0 %}
+    <p class="badge badge-rejected">Мест нет</p>
+  {% else %}
+    <p class="badge badge-active">Идёт набор</p>
+  {% endif %}
+
+  <div class="student-course-actions inline-actions">
+    {% if registration and registration.status == 'registered' %}
+      <form method="post" action="{% url 'courses:cancel_registration' registration.id %}">{% csrf_token %}<button class="btn btn-link" type="submit">Отменить запись</button></form>
+    {% elif course.format_type == 'offline' and course.available_places_count <= 0 %}
+      <button class="btn" type="button" disabled>Запись недоступна</button>
+    {% elif registration and registration.status == 'cancelled' %}
+      <form method="post" action="{% url 'courses:register' course.id %}">{% csrf_token %}<button class="btn btn-primary" type="submit">Записаться снова</button></form>
+    {% else %}
+      <form method="post" action="{% url 'courses:register' course.id %}">{% csrf_token %}<button class="btn btn-primary" type="submit">Записаться</button></form>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}
