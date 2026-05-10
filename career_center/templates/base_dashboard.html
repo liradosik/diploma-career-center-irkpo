@@ -30,6 +30,7 @@
             <div class="menu-group-title">Возможности</div>
             <a class="{% if request.resolver_match.namespace == 'vacancies' %}active{% endif %}" href="{% url 'vacancies:list' %}">Вакансии</a>
             <a class="{% if request.resolver_match.namespace == 'courses' %}active{% endif %}" href="{% url 'courses:list' %}">Курсы и семинары</a>
+            <a class="{% if request.resolver_match.url_name == 'student_support_tickets' %}active{% endif %}" href="{% url 'accounts:student_support_tickets' %}">Техподдержка</a>
           </div>
         {% elif request.user.role == 'curator' %}
           <div class="menu-section">
@@ -77,6 +78,7 @@
             <div class="menu-group-title">Активность</div>
             <a class="{% if request.resolver_match.url_name == 'admin_responses' %}active{% endif %}" href="{% url 'accounts:admin_responses' %}">Отклики</a>
             <a class="{% if request.resolver_match.url_name == 'admin_course_registrations' %}active{% endif %}" href="{% url 'accounts:admin_course_registrations' %}">Записи на курсы</a>
+            <a class="{% if request.resolver_match.url_name == 'admin_support_tickets' or request.resolver_match.url_name == 'admin_support_ticket_detail' %}active{% endif %}" href="{% url 'accounts:admin_support_tickets' %}">Обращения</a>
           </div>
         {% endif %}
       </nav>

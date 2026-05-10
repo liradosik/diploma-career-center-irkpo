@@ -4,7 +4,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from apps.courses.models import Course
 from apps.vacancies.models import Vacancy
 
-from .models import Specialty, StudentProfile, StudyGroup, User
+from .models import Specialty, StudentProfile, StudyGroup, SupportTicket, User
 
 
 RUS_STATUS_CHOICES = [
@@ -298,6 +298,30 @@ class AdminSpecialtyForm(forms.ModelForm):
             if qs.exists():
                 raise forms.ValidationError('Пара «код специальности + буквенный код группы» должна быть уникальной.')
         return cleaned_data
+
+
+class SupportTicketCreateForm(forms.ModelForm):
+    class Meta:
+        model = SupportTicket
+        fields = ('category', 'subject', 'message')
+        labels = {
+            'category': 'Категория',
+            'subject': 'Тема',
+            'message': 'Описание проблемы',
+        }
+
+
+class SupportTicketAdminUpdateForm(forms.ModelForm):
+    class Meta:
+        model = SupportTicket
+        fields = ('status', 'admin_response')
+        labels = {
+            'status': 'Статус',
+            'admin_response': 'Ответ администратора',
+        }
+        widgets = {
+            'admin_response': forms.Textarea(attrs={'rows': 5}),
+        }
 
 
 class AdminStudyGroupForm(forms.ModelForm):
