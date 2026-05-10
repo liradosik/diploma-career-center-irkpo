@@ -2,31 +2,42 @@
 {% load ui_extras %}
 {% block title %}Конструктор резюме{% endblock %}
 {% block content %}
-<section class="hero">
+<section class="hero student-resume-builder">
   <div class="hero-kicker">Конструктор резюме</div>
   <h1>Создание резюме</h1>
-  <p>В публичное резюме попадают подтверждённые куратором записи.</p>
+  <p>Соберите резюме из профиля и подтверждённых записей портфолио.</p>
+  <div class="hero-actions">
+    <button class="btn btn-primary" type="submit" form="resume-settings-form">Сохранить</button>
+    {% if resume and resume.is_public and profile %}<a class="btn" target="_blank" href="{% url 'resumes:public' profile.public_resume_token %}">Открыть публичное резюме</a>{% endif %}
+    {% if profile %}<a class="btn" target="_blank" href="{% url 'resumes:public' profile.public_resume_token %}?download=pdf">Скачать PDF</a>{% endif %}
+  </div>
 </section>
 
-<section class="section grid grid-2">
-  <div class="card">
+<section class="section grid grid-2 student-resume-builder">
+  <div class="card student-resume-settings">
     <h2>Настройки резюме</h2>
-    <form method="post">{% csrf_token %}{{ form.as_p }}<div class="inline-actions"><button class="btn btn-primary" type="submit">Сохранить</button></div></form>
+    <form method="post" id="resume-settings-form">{% csrf_token %}
+      <p>{{ form.title.label_tag }} {{ form.title }}</p>
+      <p>{{ form.about.label_tag }} {{ form.about }}</p>
+      <p>{{ form.is_public.label_tag }} {{ form.is_public }}</p>
+      <h3>Разделы резюме</h3>
+      {{ form.selected_sections }}
+    </form>
   </div>
-  <div class="card">
-    <h2>Предпросмотр</h2>
-    {% if has_resume_data %}
-      <div class="list-item">
-        <h3>{{ request.user.full_name|default:'Имя не заполнено' }}</h3>
-        {% if resume.title %}<p class="muted">{{ resume.title }}</p>{% endif %}
-        {% if about_text %}<p>{{ about_text }}</p>{% else %}<p class="muted">Раздел «О себе» пока пуст.</p>{% endif %}
-      </div>
-      {% for e in entries %}
-        <div class="list-item"><h3>{{ e.title }}</h3><p class="muted">{{ PORTFOLIO_TYPE_LABELS|dict_get:e.type }}</p><p>{{ e.description|truncatechars:120 }}</p></div>
-      {% empty %}<p class="muted">Нет подтверждённых записей для публикации.</p>{% endfor %}
-    {% else %}
-      <p class="muted">Пока нет данных для резюме. Заполните профиль и добавьте записи портфолио.</p>
-    {% endif %}
+  <div class="card student-resume-preview">
+    <h2>Предпросмотр резюме</h2>
+    <div class="list-item">
+      <h3>{{ request.user.full_name|default:'Имя не заполнено' }}</h3>
+      <p class="muted">{{ resume.title }}</p>
+      <p class="muted">{{ request.user.email }} · {{ profile.phone|default:'—' }} · {{ profile.city|default:'—' }}</p>
+      <p class="muted">{{ request.user.group|default:'—' }} · {{ request.user.specialty|default:'—' }}</p>
+    </div>
+    {% if about_text %}<div class="list-item"><h3>О себе</h3><p>{{ about_text }}</p></div>{% endif %}
+    {% if 'projects' in selected_sections and grouped_entries.projects %}<div class="list-item"><h3>Проекты и работы</h3>{% for e in grouped_entries.projects %}<p><strong>{{ e.title }}</strong> — {{ e.description|truncatechars:110 }}</p>{% endfor %}</div>{% endif %}
+    {% if 'achievements' in selected_sections and grouped_entries.achievements %}<div class="list-item"><h3>Учебные достижения</h3>{% for e in grouped_entries.achievements %}<p>{{ e.title }}</p>{% endfor %}</div>{% endif %}
+    {% if 'certificates' in selected_sections and grouped_entries.certificates %}<div class="list-item"><h3>Сертификаты и курсы</h3>{% for e in grouped_entries.certificates %}<p>{{ e.title }}</p>{% endfor %}</div>{% endif %}
+    {% if 'skills' in selected_sections and grouped_entries.skills %}<div class="list-item"><h3>Навыки</h3>{% for e in grouped_entries.skills %}<p>{{ e.title }}</p>{% endfor %}</div>{% endif %}
+    {% if 'recommendations' in selected_sections and grouped_entries.recommendations %}<div class="list-item"><h3>Отзывы и рекомендации</h3>{% for e in grouped_entries.recommendations %}<p>{{ e.title }}</p>{% endfor %}</div>{% endif %}
   </div>
 </section>
 {% endblock %}
