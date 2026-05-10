@@ -8,6 +8,14 @@ from apps.portfolio.models import PortfolioEntry
 from .forms import ResumeSettingsForm
 from .models import ResumeSettings
 
+ALLOWED_RESUME_TEMPLATES = {'classic', 'compact', 'modern', 'academic'}
+
+
+def _normalize_template(template_code):
+    if template_code in ALLOWED_RESUME_TEMPLATES:
+        return template_code
+    return 'classic'
+
 
 def _resume_payload(student, resume, profile):
     entries = list(
@@ -39,6 +47,7 @@ def builder(request):
     else:
         form = ResumeSettingsForm(instance=settings_obj)
     entries, grouped_entries, about_text, selected_sections = _resume_payload(request.user, settings_obj, profile)
+    resume_template = _normalize_template(getattr(settings_obj, 'template', 'classic'))
     has_base_data = any(
         [
             request.user.full_name,
@@ -60,6 +69,7 @@ def builder(request):
             'selected_sections': selected_sections,
             'has_resume_data': has_base_data or bool(entries),
             'about_text': about_text,
+            'resume_template': resume_template,
         },
     )
 
@@ -70,6 +80,7 @@ def public_resume(request, token):
     if not resume or not resume.is_public:
         return render(request, 'resumes/public.html', {'is_unavailable': True, 'student': profile.user}, status=404)
     entries, grouped_entries, about_text, selected_sections = _resume_payload(profile.user, resume, profile)
+    resume_template = _normalize_template(getattr(resume, 'template', 'classic'))
     has_resume_data = any([profile.user.full_name, getattr(resume, 'title', ''), about_text, entries])
     is_owner_view = request.user.is_authenticated and request.user.id == profile.user_id
     if request.GET.get('download') == 'pdf':
@@ -77,6 +88,7 @@ def public_resume(request, token):
             'student': profile.user, 'profile': profile, 'resume': resume, 'entries': entries,
             'grouped_entries': grouped_entries, 'about_text': about_text, 'has_resume_data': has_resume_data,
             'selected_sections': selected_sections, 'is_owner_view': is_owner_view, 'is_pdf_mode': True,
+            'resume_template': resume_template,
         }).content
         response = HttpResponse(html, content_type='text/html; charset=utf-8')
         response['Content-Disposition'] = f'attachment; filename=\"resume-{profile.user_id}.html\"'
@@ -94,5 +106,6 @@ def public_resume(request, token):
             'has_resume_data': has_resume_data,
             'selected_sections': selected_sections,
             'is_owner_view': is_owner_view,
+            'resume_template': resume_template,
         },
     )

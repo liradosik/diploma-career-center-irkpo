@@ -28,7 +28,7 @@
 
   <div class="card student-resume-preview">
     <h2>Предпросмотр резюме</h2>
-    <article class="resume-document resume-template-{{ resume.template|default:'classic' }}" data-preview-document>
+    <article class="resume-document resume-template-{{ resume_template|default:'classic' }}" data-preview-document>
       <header>
         <h1 data-preview-title>{{ resume.title|default:'Студент' }}</h1>
         <p class="resume-subtitle" data-preview-position>{{ resume.title|default:'Желаемая должность не указана' }}</p>

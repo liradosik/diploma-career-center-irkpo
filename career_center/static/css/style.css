@@ -3976,3 +3976,10 @@ input[type="submit"].btn-primary:hover {
 .public-resume-document{padding:16px}
 .public-resume-owner-panel{background:#eff6ff;border:1px solid #bfdbfe;color:#1e3a8a}
 .public-resume-owner-panel a{color:#1e40af}
+.public-resume-document.resume-template-classic{box-shadow:0 8px 24px rgba(15,23,42,.06)}
+.public-resume-document.resume-template-compact{padding:14px}
+.public-resume-document.resume-template-compact .resume-contacts{margin-bottom:8px}
+.public-resume-document.resume-template-modern{border-color:#bfdbfe;box-shadow:0 14px 30px rgba(30,102,208,.12)}
+.public-resume-document.resume-template-modern header{padding:14px;border-radius:12px;background:linear-gradient(135deg,#eff6ff,#f8fbff)}
+.public-resume-document.resume-template-academic{border-color:#94a3b8;box-shadow:none}
+.public-resume-document.resume-template-academic header{border-bottom:2px solid #cbd5e1;padding-bottom:10px}

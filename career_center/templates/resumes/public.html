@@ -17,7 +17,7 @@
     <div class="card public-resume-owner-panel">Вы просматриваете публичную версию резюме. <a href="/">Вернуться в кабинет</a></div>
   {% endif %}
 
-  <article class="card public-resume-document resume-document resume-template-{{ resume.template|default:'classic' }}">
+  <article class="card public-resume-document resume-document resume-template-{{ resume_template|default:'classic' }}">
     <header>
       <h1>{{ student.full_name }}</h1>
       <p class="resume-subtitle">{{ resume.title }}</p>
