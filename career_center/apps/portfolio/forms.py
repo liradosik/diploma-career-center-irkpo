@@ -3,6 +3,26 @@ from django import forms
 from .models import PortfolioAttachment, PortfolioEntry
 
 
+class MultipleFileInput(forms.ClearableFileInput):
+    allow_multiple_selected = True
+
+
+class MultipleFileField(forms.FileField):
+    widget = MultipleFileInput
+
+    def clean(self, data, initial=None):
+        if not data:
+            return []
+
+        if isinstance(data, (list, tuple)):
+            result = []
+            for file in data:
+                result.append(super(MultipleFileField, self).clean(file, initial))
+            return result
+
+        return [super().clean(data, initial)]
+
+
 class PortfolioEntryForm(forms.ModelForm):
     TYPE_CHOICES = [
         ('academic', 'Учебные достижения'),
@@ -14,10 +34,15 @@ class PortfolioEntryForm(forms.ModelForm):
         ('social', 'Общественная деятельность'),
     ]
 
-    attachments = forms.FileField(
+    attachments = MultipleFileField(
         required=False,
         label='Вложения',
-        widget=forms.FileInput(attrs={'multiple': True, 'accept': '.pdf,.jpg,.jpeg,.png,.doc,.docx,.zip'}),
+        widget=MultipleFileInput(
+            attrs={
+                'multiple': True,
+                'accept': '.pdf,.jpg,.jpeg,.png,.doc,.docx,.zip',
+            }
+        ),
         help_text='Можно прикрепить несколько файлов: PDF, JPG/JPEG/PNG, DOC/DOCX, ZIP.',
     )
 
@@ -46,6 +71,8 @@ class PortfolioEntryForm(forms.ModelForm):
     def clean_attachments(self):
         files = self.files.getlist('attachments')
         validator = PortfolioAttachment._meta.get_field('file').validators[0]
-        for f in files:
-            validator(f)
+
+        for file in files:
+            validator(file)
+
         return files
