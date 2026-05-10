@@ -1,25 +1,113 @@
-{% extends 'base_auth.html' %}
-{% block title %}Вход в систему{% endblock %}
+{% extends 'base_public.html' %}
 
-{% block auth_content %}
-<h1>Вход в личный кабинет</h1>
-<p class="muted">Используйте корпоративный email и пароль.</p>
-<div class="section card form-card">
-  <form method="post">
-    {% csrf_token %}
-    {{ form.non_field_errors }}
-    <p>
-      <label for="id_username">Email</label>
-      {{ form.username }}
-    </p>
-    <p>
-      <label for="id_password">Пароль</label>
-      {{ form.password }}
-    </p>
-    <div class="inline-actions">
-      <button class="btn btn-primary" type="submit">Войти</button>
+{% block title %}Вход в личный кабинет{% endblock %}
+
+{% block public_nav_action %}{% endblock %}
+
+{% block content %}
+<section class="login-page">
+  <div class="login-card">
+    <div class="login-form-panel">
+      <div class="login-form-inner">
+        <div class="login-kicker">Вход</div>
+
+        <h1>Войдите в личный кабинет</h1>
+
+        <p class="login-lead">
+          Используйте email и пароль для входа в личный кабинет
+          и доступа ко всем возможностям платформы.
+        </p>
+
+        <form method="post" class="login-form">
+          {% csrf_token %}
+
+          {% if form.non_field_errors %}
+            <div class="login-errors">
+              {{ form.non_field_errors }}
+            </div>
+          {% endif %}
+
+          <div class="login-field">
+            <label for="id_username">Email</label>
+            {{ form.username }}
+            {% if form.username.errors %}
+              <div class="login-field-errors">{{ form.username.errors }}</div>
+            {% endif %}
+          </div>
+
+          <div class="login-field">
+            <label for="id_password">Пароль</label>
+            <div class="login-password-wrap">
+              {{ form.password }}
+            </div>
+            {% if form.password.errors %}
+              <div class="login-field-errors">{{ form.password.errors }}</div>
+            {% endif %}
+          </div>
+
+          <button class="btn btn-primary login-submit" type="submit">Войти</button>
+
+          <p class="login-help">
+            Если возникли вопросы со входом,<br>
+            обратитесь к <span>куратору</span> или
+            <a href="/accounts/support/">напишите в техподдержку</a>.
+          </p>
+        </form>
+      </div>
     </div>
-  </form>
-</div>
-<p class="muted" style="margin-top:12px;"><a href="{% url 'accounts:public_support_ticket_create' %}">Не получается войти? Написать в техподдержку</a></p>
+
+    <aside class="login-info-panel" aria-label="Информация о личном кабинете">
+      <div class="login-info-bg login-info-bg-one"></div>
+      <div class="login-info-bg login-info-bg-two"></div>
+      <div class="login-info-dots"></div>
+
+      <div class="login-info-content">
+        <h2>Добро пожаловать в Центр карьеры ИРКПО</h2>
+
+        <div class="login-info-line"></div>
+
+        <p>
+          Личный кабинет открывает доступ к вашим профессиональным инструментам
+          и возможностям:
+        </p>
+
+        <div class="login-info-list">
+          <div class="login-info-item">
+            <span class="login-info-icon">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M3.5 7.5h6l1.7 2h9.3v8.8a2.2 2.2 0 0 1-2.2 2.2H5.7a2.2 2.2 0 0 1-2.2-2.2V7.5Z"/>
+                <path d="M3.5 7.5V5.7a2.2 2.2 0 0 1 2.2-2.2h3.5l1.8 2h7.3a2.2 2.2 0 0 1 2.2 2.2v1.8"/>
+              </svg>
+            </span>
+            <span>Электронное портфолио и достижения</span>
+          </div>
+
+          <div class="login-info-item">
+            <span class="login-info-icon">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M7 3.5h7l3 3v14H7a2 2 0 0 1-2-2v-13a2 2 0 0 1 2-2Z"/>
+                <path d="M14 3.5v4h4"/>
+                <path d="M8.5 11h7"/>
+                <path d="M8.5 14h7"/>
+                <path d="M8.5 17h4"/>
+              </svg>
+            </span>
+            <span>Резюме и поиск вакансий</span>
+          </div>
+
+          <div class="login-info-item">
+            <span class="login-info-icon">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="m3 9 9-4 9 4-9 4-9-4Z"/>
+                <path d="M7 11v4.2c0 1.4 2.2 3.3 5 3.3s5-1.9 5-3.3V11"/>
+                <path d="M21 9v5"/>
+              </svg>
+            </span>
+            <span>Курсы и образовательные программы</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </div>
+</section>
 {% endblock %}

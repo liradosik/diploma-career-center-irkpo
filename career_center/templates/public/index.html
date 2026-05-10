@@ -1,28 +1,218 @@
 {% extends 'base_public.html' %}
+{% load static %}
+
 {% block title %}Центр карьеры ИРКПО{% endblock %}
+
 {% block content %}
-<section class="hero">
-  <div class="hero-kicker">Цифровая платформа</div>
-  <h1>Единое пространство для портфолио, резюме и карьерного роста студентов</h1>
-  <p>Собирайте достижения, публикуйте резюме, откликайтесь на вакансии и записывайтесь на курсы в современном личном кабинете.</p>
-  <div class="hero-actions">
-    <a class="btn btn-primary" href="{% url 'accounts:login' %}">Войти в систему</a>
-    <a class="btn btn-link" href="{% url 'accounts:login' %}">Начать работу</a>
+<section class="home-hero">
+  <div class="home-hero-content">
+    <h1>
+      Электронное портфолио<br>
+      и <span>карьерные возможности</span><br>
+      студентов
+    </h1>
+
+    <p>
+      Собирайте достижения и проекты, создавайте резюме, находите вакансии,
+      стажировки и образовательные возможности — всё в одном удобном пространстве.
+    </p>
+  </div>
+
+  <div class="home-hero-decor" aria-hidden="true">
+    <span class="home-orbit home-orbit-one"></span>
+    <span class="home-orbit home-orbit-two"></span>
+    <span class="home-sparkle home-sparkle-one">✦</span>
+    <span class="home-sparkle home-sparkle-two">✦</span>
+    <span class="home-dot-grid"></span>
   </div>
 </section>
 
-<section class="section grid grid-3">
-  <article class="card">
-    <h2>Портфолио</h2>
-    <p class="muted">Загружайте сертификаты, проекты, волонтёрские и учебные достижения в одном месте.</p>
-  </article>
-  <article class="card">
-    <h2>Вакансии</h2>
-    <p class="muted">Получайте актуальные предложения практики, стажировки и трудоустройства от работодателей.</p>
-  </article>
-  <article class="card">
-    <h2>Курсы и семинары</h2>
-    <p class="muted">Записывайтесь на мероприятия для развития soft и hard skills и отслеживайте прогресс.</p>
-  </article>
+<section class="home-section home-features-section">
+  <div class="home-section-head">
+    <h2>Возможности платформы</h2>
+  </div>
+
+  <div class="home-feature-grid">
+    <article class="home-feature-card home-card-blue">
+      <div class="home-feature-icon">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M3.5 7.5h6l1.7 2h9.3v8.8a2.2 2.2 0 0 1-2.2 2.2H5.7a2.2 2.2 0 0 1-2.2-2.2V7.5Z"/>
+          <path d="M3.5 7.5V5.7a2.2 2.2 0 0 1 2.2-2.2h3.5l1.8 2h7.3a2.2 2.2 0 0 1 2.2 2.2v1.8"/>
+        </svg>
+      </div>
+      <h3>Электронное портфолио</h3>
+      <p>Добавляйте достижения, проекты, сертификаты, рекомендации и подтверждающие документы.</p>
+    </article>
+
+    <article class="home-feature-card home-card-blue">
+      <div class="home-feature-icon">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M7 3.5h7l3 3v14H7a2 2 0 0 1-2-2v-13a2 2 0 0 1 2-2Z"/>
+          <path d="M14 3.5v4h4"/>
+          <path d="M8.5 11h7"/>
+          <path d="M8.5 14h7"/>
+          <path d="M8.5 17h4"/>
+        </svg>
+      </div>
+      <h3>Конструктор резюме</h3>
+      <p>Собирайте резюме на основе профиля и подтверждённых записей портфолио.</p>
+    </article>
+
+    <article class="home-feature-card home-card-green">
+      <div class="home-feature-icon">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M9 7V5.8A2.3 2.3 0 0 1 11.3 3.5h1.4A2.3 2.3 0 0 1 15 5.8V7"/>
+          <path d="M4.5 8h15v10.3a2.2 2.2 0 0 1-2.2 2.2H6.7a2.2 2.2 0 0 1-2.2-2.2V8Z"/>
+          <path d="M4.5 12.5h15"/>
+          <path d="M10 12.5v1.8h4v-1.8"/>
+        </svg>
+      </div>
+      <h3>Вакансии и стажировки</h3>
+      <p>Просматривайте предложения работодателей и откликайтесь с помощью публичного резюме.</p>
+    </article>
+
+    <article class="home-feature-card home-card-purple">
+      <div class="home-feature-icon">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="m3 9 9-4 9 4-9 4-9-4Z"/>
+          <path d="M7 11v4.2c0 1.4 2.2 3.3 5 3.3s5-1.9 5-3.3V11"/>
+          <path d="M21 9v5"/>
+        </svg>
+      </div>
+      <h3>Курсы и семинары</h3>
+      <p>Записывайтесь на мероприятия, практики и образовательные программы колледжа.</p>
+    </article>
+  </div>
 </section>
+
+<section class="home-section home-process-section">
+  <div class="home-section-head">
+    <h2>Как это работает</h2>
+  </div>
+
+  <div class="home-process">
+    <article class="home-process-item">
+      <span>1</span>
+      <div>
+        <h3>Заполните профиль</h3>
+        <p>В личном кабинете можно указать данные о себе и подготовить основу для карьерного профиля.</p>
+      </div>
+    </article>
+
+    <article class="home-process-arrow" aria-hidden="true">›</article>
+
+    <article class="home-process-item">
+      <span>2</span>
+      <div>
+        <h3>Добавьте достижения</h3>
+        <p>Портфолио помогает хранить проекты, сертификаты, навыки и другие подтверждающие материалы.</p>
+      </div>
+    </article>
+
+    <article class="home-process-arrow" aria-hidden="true">›</article>
+
+    <article class="home-process-item">
+      <span>3</span>
+      <div>
+        <h3>Соберите резюме</h3>
+        <p>Подтверждённые записи можно использовать в публичном резюме для откликов на вакансии.</p>
+      </div>
+    </article>
+  </div>
+</section>
+
+<section class="home-section home-access-section">
+  <div class="home-section-head">
+    <h2>Что доступно студенту</h2>
+  </div>
+
+  <div class="home-access-card">
+    <p class="home-access-intro">
+      В кабинете собраны основные материалы и инструменты, которые помогут построить
+      профессиональный путь: от учёбы и проектов до трудоустройства.
+    </p>
+
+    <div class="home-access-grid">
+      <article>
+        <div class="home-access-icon home-icon-blue">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M3.5 7.5h6l1.7 2h9.3v8.8a2.2 2.2 0 0 1-2.2 2.2H5.7a2.2 2.2 0 0 1-2.2-2.2V7.5Z"/>
+            <path d="M3.5 7.5V5.7a2.2 2.2 0 0 1 2.2-2.2h3.5l1.8 2h7.3a2.2 2.2 0 0 1 2.2 2.2v1.8"/>
+          </svg>
+        </div>
+        <h3>Портфолио</h3>
+        <p>Достижения, проекты, сертификаты и файлы-подтверждения.</p>
+      </article>
+
+      <article>
+        <div class="home-access-icon home-icon-blue">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M7 3.5h7l3 3v14H7a2 2 0 0 1-2-2v-13a2 2 0 0 1 2-2Z"/>
+            <path d="M14 3.5v4h4"/>
+            <path d="M8.5 11h7"/>
+            <path d="M8.5 14h7"/>
+            <path d="M8.5 17h4"/>
+          </svg>
+        </div>
+        <h3>Резюме</h3>
+        <p>Публичная ссылка на резюме на основе подтверждённых записей.</p>
+      </article>
+
+      <article>
+        <div class="home-access-icon home-icon-green">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M9 7V5.8A2.3 2.3 0 0 1 11.3 3.5h1.4A2.3 2.3 0 0 1 15 5.8V7"/>
+            <path d="M4.5 8h15v10.3a2.2 2.2 0 0 1-2.2 2.2H6.7a2.2 2.2 0 0 1-2.2-2.2V8Z"/>
+            <path d="M4.5 12.5h15"/>
+          </svg>
+        </div>
+        <h3>Вакансии</h3>
+        <p>Просмотр предложений и отклики через карьерный профиль.</p>
+      </article>
+
+      <article>
+        <div class="home-access-icon home-icon-purple">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="m3 9 9-4 9 4-9 4-9-4Z"/>
+            <path d="M7 11v4.2c0 1.4 2.2 3.3 5 3.3s5-1.9 5-3.3V11"/>
+          </svg>
+        </div>
+        <h3>Курсы</h3>
+        <p>Запись на мероприятия, семинары, практики и программы колледжа.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="home-cta">
+  <div class="home-cta-emblem">
+    <img src="{% static 'images/irpolog.png' %}" alt="">
+  </div>
+
+  <div class="home-cta-content">
+    <h2>Единое пространство для портфолио, резюме и карьерного сопровождения</h2>
+    <p>
+      Используйте возможности платформы, чтобы собирать достижения и увереннее
+      строить своё профессиональное будущее.
+    </p>
+  </div>
+
+  <a class="home-cta-button" href="{% url 'accounts:login' %}">
+    Войти в личный кабинет
+    <span>→</span>
+  </a>
+</section>
+
+<footer class="home-footer">
+  <div class="home-footer-legal">
+    <p>
+      © 2009–2026 ГБПОУ ИО ИРКПО · Государственное бюджетное профессиональное образовательное учреждение
+      Иркутской области «Иркутский региональный колледж педагогического образования».
+    </p>
+    <p>
+      Сайт содержит материалы, охраняемые авторским правом, и средства индивидуализации.
+      Использование материалов разрешено только с указанием названия сайта и ссылки на irkpo.ru.
+    </p>
+  </div>
+</footer>
 {% endblock %}

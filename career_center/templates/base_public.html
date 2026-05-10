@@ -1,6 +1,6 @@
 {% load static %}
 <!doctype html>
-<html lang="ru">
+<html lang="ru" id="top">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -8,20 +8,30 @@
   <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
-  <div class="page-wrap">
-    <header class="topbar">
-      <div class="container topbar-inner">
-        <div>
-          <div class="brand">Центр карьеры ИРКПО</div>
-          <div class="brand-sub">Электронное портфолио, резюме и карьерные возможности</div>
-        </div>
-        <div class="inline-actions">
-          <a class="btn" href="{% url 'public:home' %}">Главная</a>
-          <a class="btn btn-primary" href="{% url 'accounts:login' %}">Войти</a>
-        </div>
+  <div class="page-wrap public-page-wrap">
+    <header class="public-topbar">
+      <div class="container public-topbar-inner">
+        <a class="public-brand" href="{% url 'public:home' %}" aria-label="Перейти на главную страницу">
+          <span class="public-brand-logo">
+            <img src="{% static 'images/irpolog.png' %}" alt="Логотип ИРКПО">
+          </span>
+
+          <span class="public-brand-text">
+            <span class="public-brand-kicker">ИРКПО</span>
+            <span class="public-brand-title">Центр карьеры</span>
+          </span>
+        </a>
+
+        <nav class="public-nav" aria-label="Основная навигация">
+          <a class="btn public-nav-link" href="{% url 'public:home' %}">Главная</a>
+          {% block public_nav_action %}
+            <a class="btn btn-primary" href="{% url 'accounts:login' %}">Войти</a>
+          {% endblock %}
+        </nav>
       </div>
     </header>
-    <main class="main-content">
+
+    <main class="public-main">
       <div class="container">
         {% block content %}{% endblock %}
       </div>
