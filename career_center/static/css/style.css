@@ -4017,8 +4017,8 @@ input[type="submit"].btn-primary:hover {
 /* === Manual role profile/settings polish === */
 
 .sidebar-main .menu-section {
-  padding-bottom: 12px;
-  margin-bottom: 12px;
+  padding-bottom: 8px;
+  margin-bottom: 8px;
   border-bottom: 1px solid rgba(219, 231, 245, 0.72);
 }
 
@@ -4027,11 +4027,11 @@ input[type="submit"].btn-primary:hover {
 }
 
 .menu-group-title {
-  margin: 10px 0 7px;
+  margin: 8px 0 6px;
 }
 
 .menu a {
-  min-height: 42px;
+  min-height: 38px;
   border-radius: 16px;
 }
 
@@ -4232,16 +4232,10 @@ input[type="submit"].btn-primary:hover {
 .admin-dashboard-hero-clean {
   min-height: 190px;
   display: grid;
-  grid-template-columns: 154px minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
   align-items: center;
   justify-content: start;
   gap: 32px;
-}
-
-.admin-dashboard-hero-avatar {
-  width: 154px;
-  height: 154px;
-  flex: 0 0 154px;
 }
 
 .admin-dashboard-hero-text {
@@ -4303,11 +4297,32 @@ input[type="submit"].btn-primary:hover {
     font-size: 30px;
   }
 
-  .role-settings-actions .btn,
+.role-settings-actions .btn,
   .role-photo-button {
     width: 100%;
     max-width: none;
   }
+}
+
+.role-remove-photo-btn {
+  width: 100%;
+  max-width: 220px;
+  border: 1px solid #fecaca;
+  color: #9f1239;
+  background: #fff1f2;
+}
+
+.curator-contact-card {
+  display: grid;
+  grid-template-columns: 68px 1fr;
+  gap: 14px;
+  align-items: start;
+}
+
+.curator-contact-card .student-avatar-img,
+.curator-contact-card .student-avatar-fallback {
+  width: 68px;
+  height: 68px;
 }
 /* Curator dashboard hero fix */
 

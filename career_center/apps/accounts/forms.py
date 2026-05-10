@@ -44,8 +44,31 @@ class UserStudentForm(forms.ModelForm):
 class UserProfileSettingsForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ('full_name', 'photo')
-        labels = {'full_name': 'ФИО', 'photo': 'Фото'}
+        fields = (
+            'full_name',
+            'photo',
+            'contact_phone',
+            'contact_telegram',
+            'contact_email',
+            'contact_note',
+            'contact_availability',
+        )
+        labels = {
+            'full_name': 'ФИО',
+            'photo': 'Фото',
+            'contact_phone': 'Телефон',
+            'contact_telegram': 'Telegram или ссылка для связи',
+            'contact_email': 'Контактный email',
+            'contact_note': 'Комментарий для студентов',
+            'contact_availability': 'Когда удобно писать',
+        }
+        widgets = {
+            'contact_phone': forms.TextInput(attrs={'placeholder': '+7 (900) 123-45-67'}),
+            'contact_telegram': forms.URLInput(attrs={'placeholder': 'https://t.me/username'}),
+            'contact_email': forms.EmailInput(attrs={'placeholder': 'contact@irkpo.ru'}),
+            'contact_note': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Например: Пишите по вопросам портфолио и учебного статуса'}),
+            'contact_availability': forms.TextInput(attrs={'placeholder': 'Например: По будням с 9:00 до 18:00'}),
+        }
 
 
 
