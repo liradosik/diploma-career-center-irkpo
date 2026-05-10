@@ -1,35 +1,39 @@
 {% extends 'base_public.html' %}
+{% load ui_extras %}
 {% block title %}Публичное резюме{% endblock %}
 {% block content %}
-<section class="hero">
-  <div class="hero-kicker">Публичное резюме</div>
-  <h1>{{ student.full_name }}</h1>
-  {% if resume and resume.title %}<p>{{ resume.title }}</p>{% endif %}
-</section>
-
-{% if has_resume_data %}
-<section class="section grid grid-2">
-  <article class="card">
-    <h2>Контакты</h2>
-    <p class="muted">Email: {{ student.email }}</p>
-    <p class="muted">Телефон: {{ profile.phone|default:'—' }}</p>
-    <p class="muted">Специальность: {{ student.specialty|default:'—' }}</p>
-    <p class="muted">Группа: {{ student.group|default:'—' }}</p>
-  </article>
-  <article class="card">
-    <h2>О себе</h2>
-    {% if about_text %}<p>{{ about_text }}</p>{% else %}<p class="muted">Описание не заполнено.</p>{% endif %}
-  </article>
-</section>
-
-{% if grouped_entries.skills %}<section class="section card"><h2>Навыки</h2>{% for e in grouped_entries.skills %}<div class="list-item"><h3>{{ e.title }}</h3><p>{{ e.description }}</p></div>{% endfor %}</section>{% endif %}
-{% if grouped_entries.projects %}<section class="section card"><h2>Проекты и работы</h2>{% for e in grouped_entries.projects %}<div class="list-item"><h3>{{ e.title }}</h3><p>{{ e.description }}</p></div>{% endfor %}</section>{% endif %}
-{% if grouped_entries.achievements %}<section class="section card"><h2>Достижения</h2>{% for e in grouped_entries.achievements %}<div class="list-item"><h3>{{ e.title }}</h3><p>{{ e.description }}</p></div>{% endfor %}</section>{% endif %}
-{% if grouped_entries.recommendations %}<section class="section card"><h2>Рекомендации</h2>{% for e in grouped_entries.recommendations %}<div class="list-item"><h3>{{ e.title }}</h3><p>{{ e.description }}</p></div>{% endfor %}</section>{% endif %}
+{% if is_unavailable %}
+<section class="section card public-resume-page"><h1>Резюме недоступно</h1><p class="muted">Публичный доступ отключён.</p></section>
 {% else %}
-<section class="section card">
-  <h2>Резюме пока пустое</h2>
-  <p class="muted">Студент ещё не заполнил профиль и не добавил подтверждённые записи портфолио.</p>
+<section class="section public-resume-page">
+  <div class="card public-resume-document">
+    <div class="inline-actions">
+      <strong>Центр карьеры ИРКПО</strong>
+      {% if not is_pdf_mode %}<a class="btn" href="?download=pdf">Скачать PDF</a>{% endif %}
+    </div>
+  </div>
+
+  {% if is_owner_view and not is_pdf_mode %}
+    <div class="card public-resume-owner-panel">Вы просматриваете публичную версию резюме. <a href="/">Вернуться в кабинет</a></div>
+  {% endif %}
+
+  <article class="card public-resume-document resume-document resume-template-{{ resume.template|default:'classic' }}">
+    <header>
+      <h1>{{ student.full_name }}</h1>
+      <p class="resume-subtitle">{{ resume.title }}</p>
+      <p class="resume-contacts">{{ student.email }} · {{ profile.phone|default:'—' }} · {{ profile.city|default:'—' }}</p>
+    </header>
+
+    {% if about_text %}<section class="resume-block"><h3>О себе</h3><p>{{ about_text }}</p></section>{% endif %}
+    {% if 'contacts' in selected_sections %}<section class="resume-block"><h3>Контакты</h3><p>{{ student.email }} · {{ profile.phone|default:'—' }} · {{ profile.city|default:'—' }}</p></section>{% endif %}
+    {% if 'education' in selected_sections %}<section class="resume-block"><h3>Образование</h3><p>{{ student.group|default:'—' }} · {{ student.specialty|default:'—' }}</p></section>{% endif %}
+
+    {% if 'skills' in selected_sections and grouped_entries.skills %}<section class="resume-block"><h3>Навыки</h3>{% for e in grouped_entries.skills %}<p>{{ e.title }}</p>{% endfor %}</section>{% endif %}
+    {% if 'projects' in selected_sections and grouped_entries.projects %}<section class="resume-block"><h3>Проекты и работы</h3>{% for e in grouped_entries.projects %}<div class="list-item"><h4>{{ e.title }}</h4><p>{{ e.description }}</p><div class="public-resume-attachments">{% include 'portfolio/_attachments.html' with attachments=e.attachments.all legacy_file=e.file %}</div></div>{% endfor %}</section>{% endif %}
+    {% if 'achievements' in selected_sections and grouped_entries.achievements %}<section class="resume-block"><h3>Учебные достижения</h3>{% for e in grouped_entries.achievements %}<div class="list-item"><h4>{{ e.title }}</h4><p>{{ e.description }}</p><div class="public-resume-attachments">{% include 'portfolio/_attachments.html' with attachments=e.attachments.all legacy_file=e.file %}</div></div>{% endfor %}</section>{% endif %}
+    {% if 'certificates' in selected_sections and grouped_entries.certificates %}<section class="resume-block"><h3>Сертификаты и курсы</h3>{% for e in grouped_entries.certificates %}<div class="list-item"><h4>{{ e.title }}</h4><p>{{ e.description }}</p><div class="public-resume-attachments">{% include 'portfolio/_attachments.html' with attachments=e.attachments.all legacy_file=e.file %}</div></div>{% endfor %}</section>{% endif %}
+    {% if 'recommendations' in selected_sections and grouped_entries.recommendations %}<section class="resume-block"><h3>Отзывы и рекомендации</h3>{% for e in grouped_entries.recommendations %}<p>{{ e.description }}</p>{% endfor %}</section>{% endif %}
+  </article>
 </section>
 {% endif %}
 {% endblock %}

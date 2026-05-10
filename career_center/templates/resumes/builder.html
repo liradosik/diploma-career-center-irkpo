@@ -2,31 +2,92 @@
 {% load ui_extras %}
 {% block title %}Конструктор резюме{% endblock %}
 {% block content %}
-<section class="hero">
+<section class="hero student-resume-builder">
   <div class="hero-kicker">Конструктор резюме</div>
   <h1>Создание резюме</h1>
-  <p>В публичное резюме попадают подтверждённые куратором записи.</p>
+  <p>Заполните данные, выберите шаблон и разделы. В предпросмотр попадают только подтверждённые записи портфолио.</p>
+  <div class="hero-actions">
+    <button class="btn btn-primary" type="submit" form="resume-settings-form">Сохранить</button>
+    {% if resume and resume.is_public and profile %}<a class="btn" target="_blank" href="{% url 'resumes:public' profile.public_resume_token %}">Открыть публичное резюме</a>{% endif %}
+    {% if profile %}<a class="btn" target="_blank" href="{% url 'resumes:public' profile.public_resume_token %}?download=pdf">Скачать PDF</a>{% endif %}
+  </div>
 </section>
 
-<section class="section grid grid-2">
-  <div class="card">
+<section class="section grid grid-2 student-resume-builder">
+  <div class="card student-resume-settings">
     <h2>Настройки резюме</h2>
-    <form method="post">{% csrf_token %}{{ form.as_p }}<div class="inline-actions"><button class="btn btn-primary" type="submit">Сохранить</button></div></form>
+    <form method="post" id="resume-settings-form">{% csrf_token %}
+      <p>{{ form.title.label_tag }} {{ form.title }}</p>
+      <p>{{ form.about.label_tag }} {{ form.about }}</p>
+      <p>{{ form.is_public.label_tag }} {{ form.is_public }}</p>
+      <p class="student-resume-template-choice">{{ form.template.label_tag }} {{ form.template }}</p>
+      <h3>Разделы резюме</h3>
+      <div class="student-resume-section-list" data-preview="sections">{{ form.selected_sections }}</div>
+    </form>
   </div>
-  <div class="card">
-    <h2>Предпросмотр</h2>
-    {% if has_resume_data %}
-      <div class="list-item">
-        <h3>{{ request.user.full_name|default:'Имя не заполнено' }}</h3>
-        {% if resume.title %}<p class="muted">{{ resume.title }}</p>{% endif %}
-        {% if about_text %}<p>{{ about_text }}</p>{% else %}<p class="muted">Раздел «О себе» пока пуст.</p>{% endif %}
-      </div>
-      {% for e in entries %}
-        <div class="list-item"><h3>{{ e.title }}</h3><p class="muted">{{ PORTFOLIO_TYPE_LABELS|dict_get:e.type }}</p><p>{{ e.description|truncatechars:120 }}</p></div>
-      {% empty %}<p class="muted">Нет подтверждённых записей для публикации.</p>{% endfor %}
-    {% else %}
-      <p class="muted">Пока нет данных для резюме. Заполните профиль и добавьте записи портфолио.</p>
-    {% endif %}
+
+  <div class="card student-resume-preview">
+    <h2>Предпросмотр резюме</h2>
+    <article class="resume-document resume-template-{{ resume.template|default:'classic' }}" data-preview-document>
+      <header>
+        <h1 data-preview-title>{{ resume.title|default:'Студент' }}</h1>
+        <p class="resume-subtitle" data-preview-position>{{ resume.title|default:'Желаемая должность не указана' }}</p>
+        <p class="resume-contacts">{{ request.user.full_name }} · {{ request.user.email }} · {{ profile.phone|default:'—' }} · {{ profile.city|default:'—' }}</p>
+      </header>
+
+      <section class="resume-block" data-section="about">
+        <h3>О себе</h3>
+        <p data-preview-about>{{ about_text|default:'Добавьте краткую информацию о себе.' }}</p>
+      </section>
+
+      <section class="resume-block" data-section="contacts"><h3>Контакты</h3><p>{{ request.user.email }} · {{ profile.phone|default:'—' }} · {{ profile.city|default:'—' }}</p></section>
+      <section class="resume-block" data-section="education"><h3>Образование</h3><p>{{ request.user.group|default:'—' }} · {{ request.user.specialty|default:'—' }}</p></section>
+      <section class="resume-block" data-section="projects"><h3>Проекты и работы</h3>{% for e in grouped_entries.projects %}<p><strong>{{ e.title }}</strong> — {{ e.description|truncatechars:120 }}</p>{% empty %}<p class="muted">Нет подтверждённых проектов.</p>{% endfor %}</section>
+      <section class="resume-block" data-section="achievements"><h3>Учебные достижения</h3>{% for e in grouped_entries.achievements %}<p>{{ e.title }}</p>{% empty %}<p class="muted">Нет подтверждённых достижений.</p>{% endfor %}</section>
+      <section class="resume-block" data-section="certificates"><h3>Сертификаты и курсы</h3>{% for e in grouped_entries.certificates %}<p>{{ e.title }}</p>{% empty %}<p class="muted">Нет подтверждённых сертификатов и курсов.</p>{% endfor %}</section>
+      <section class="resume-block" data-section="skills"><h3>Навыки</h3>{% for e in grouped_entries.skills %}<p>{{ e.title }}</p>{% empty %}<p class="muted">Нет подтверждённых навыков.</p>{% endfor %}</section>
+      <section class="resume-block" data-section="recommendations"><h3>Отзывы и рекомендации</h3>{% for e in grouped_entries.recommendations %}<p>{{ e.title }}</p>{% empty %}<p class="muted">Нет подтверждённых рекомендаций.</p>{% endfor %}</section>
+    </article>
   </div>
 </section>
+
+<script>
+(function(){
+  const form = document.getElementById('resume-settings-form');
+  if (!form) return;
+  const doc = document.querySelector('[data-preview-document]');
+  const titleInput = form.querySelector('[data-preview="title"]');
+  const aboutInput = form.querySelector('[data-preview="about"]');
+  const templateInput = form.querySelector('[data-preview="template"]');
+  const titleTarget = document.querySelector('[data-preview-title]');
+  const positionTarget = document.querySelector('[data-preview-position]');
+  const aboutTarget = document.querySelector('[data-preview-about]');
+  const checkboxes = form.querySelectorAll('input[name="selected_sections"]');
+
+  function updateSections(){
+    const selected = new Set(Array.from(checkboxes).filter(c => c.checked).map(c => c.value));
+    document.querySelectorAll('.resume-block[data-section]').forEach(section => {
+      const key = section.getAttribute('data-section');
+      if (key === 'about') return;
+      section.style.display = selected.has(key) ? '' : 'none';
+    });
+  }
+  function updateText(){
+    const title = (titleInput.value || '').trim();
+    titleTarget.textContent = title || 'Студент';
+    positionTarget.textContent = title || 'Желаемая должность не указана';
+    const about = (aboutInput.value || '').trim();
+    aboutTarget.textContent = about || 'Добавьте краткую информацию о себе.';
+  }
+  function updateTemplate(){
+    const tpl = templateInput.value || 'classic';
+    doc.classList.remove('resume-template-classic','resume-template-compact','resume-template-modern','resume-template-academic');
+    doc.classList.add('resume-template-' + tpl);
+  }
+
+  form.addEventListener('input', updateText);
+  form.addEventListener('change', function(){ updateSections(); updateTemplate(); });
+  updateText(); updateSections(); updateTemplate();
+})();
+</script>
 {% endblock %}

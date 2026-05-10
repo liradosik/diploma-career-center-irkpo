@@ -33,6 +33,7 @@
         </div>
 
         <p>{{ e.description|truncatechars:240 }}</p>
+        {% include 'portfolio/_attachments.html' with attachments=e.attachments.all legacy_file=e.file %}
 
         {% if e.reviewed_at %}<p class="muted">Проверено: {{ e.reviewed_at|date:'d.m.Y H:i' }}</p>{% endif %}
         {% if e.curator_comment %}<p class="muted">Комментарий куратора: {{ e.curator_comment }}</p>{% endif %}
