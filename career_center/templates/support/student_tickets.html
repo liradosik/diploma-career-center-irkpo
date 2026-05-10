@@ -4,7 +4,7 @@
 
 {% block content %}
 <section class="support-page">
-  <div class="page-heading"><h1>Техподдержка</h1></div>
+  <div class="page-heading"><h1>{{ support_title|default:"Техподдержка" }}</h1></div>
   <div class="card support-ticket-form">
     <h2>Создать обращение</h2>
     <form method="post">

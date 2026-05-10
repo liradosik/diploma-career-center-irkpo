@@ -311,6 +311,26 @@ class SupportTicketCreateForm(forms.ModelForm):
         }
 
 
+
+
+class PublicSupportTicketCreateForm(forms.ModelForm):
+    class Meta:
+        model = SupportTicket
+        fields = ('public_full_name', 'public_email', 'public_contact', 'requester_type', 'category', 'subject', 'message')
+        labels = {
+            'public_full_name': 'ФИО',
+            'public_email': 'Email',
+            'public_contact': 'Телефон или другой контакт',
+            'requester_type': 'Кто обращается',
+            'category': 'Категория',
+            'subject': 'Тема',
+            'message': 'Описание проблемы',
+        }
+        widgets = {
+            'message': forms.Textarea(attrs={'rows': 5}),
+            'public_contact': forms.TextInput(attrs={'placeholder': '+7 (900) 123-45-67 / Telegram'}),
+        }
+
 class SupportTicketAdminUpdateForm(forms.ModelForm):
     class Meta:
         model = SupportTicket

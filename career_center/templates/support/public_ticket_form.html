@@ -1,0 +1,15 @@
+{% extends 'base_auth.html' %}
+{% block title %}Обращение в техподдержку{% endblock %}
+{% block auth_content %}
+<h1>Обращение в техподдержку</h1>
+<p class="muted">Используйте форму, если у вас не получается войти в систему.</p>
+<div class="section card form-card">
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <div class="inline-actions">
+      <button class="btn btn-primary" type="submit">Отправить обращение</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

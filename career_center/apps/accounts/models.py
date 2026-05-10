@@ -148,7 +148,19 @@ class SupportTicket(models.Model):
         RESUME = 'resume', 'Проблема с резюме'
         COURSES = 'courses', 'Проблема с курсом или записью'
         VACANCIES = 'vacancies', 'Проблема с вакансией или откликом'
+        NO_ACCOUNT = 'no_account', 'Нет аккаунта'
+        WRONG_PASSWORD = 'wrong_password', 'Неверный пароль'
         OTHER = 'other', 'Другое'
+
+
+    class RequesterType(models.TextChoices):
+        STUDENT = 'student', 'Студент'
+        CURATOR = 'curator', 'Куратор'
+        UNKNOWN = 'unknown', 'Другое'
+
+    class Source(models.TextChoices):
+        ACCOUNT = 'account', 'Личный кабинет'
+        PUBLIC = 'public', 'Публичная форма'
 
     class Status(models.TextChoices):
         NEW = 'new', 'Новое'
@@ -156,8 +168,15 @@ class SupportTicket(models.Model):
         RESOLVED = 'resolved', 'Решено'
         CLOSED = 'closed', 'Закрыто'
 
-    student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='support_tickets')
+    student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='support_tickets', null=True, blank=True)
+    requester = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='requested_support_tickets', null=True, blank=True)
     category = models.CharField(max_length=32, choices=Category.choices, default=Category.OTHER)
+
+    requester_type = models.CharField(max_length=16, choices=RequesterType.choices, default=RequesterType.STUDENT)
+    source = models.CharField(max_length=16, choices=Source.choices, default=Source.ACCOUNT)
+    public_full_name = models.CharField(max_length=255, blank=True)
+    public_email = models.EmailField(blank=True)
+    public_contact = models.CharField(max_length=255, blank=True)
     subject = models.CharField(max_length=255)
     message = models.TextField()
     status = models.CharField(max_length=32, choices=Status.choices, default=Status.NEW)
@@ -172,8 +191,22 @@ class SupportTicket(models.Model):
             models.Index(fields=['student', 'status'], name='accounts_ticket_st_idx'),
             models.Index(fields=['status', '-created_at'], name='accounts_ticket_sc_idx'),
             models.Index(fields=['category', 'status'], name='accounts_ticket_cs_idx'),
+            models.Index(fields=['source', 'status'], name='accounts_ticket_ss_idx'),
+            models.Index(fields=['requester_type', 'status'], name='accounts_ticket_rs_idx'),
         ]
 
+
+    @property
+    def author_label(self):
+        if self.requester_id:
+            role_label = self.requester.get_role_display()
+            return f"{self.requester.full_name} ({role_label})"
+        if self.public_full_name:
+            return f"{self.public_full_name} (без входа)"
+        if self.student_id:
+            return f"{self.student.full_name} (Студент)"
+        return 'Не указан'
+
     def __str__(self):
-        return f'{self.student.full_name}: {self.subject}'
+        return f'{self.author_label}: {self.subject}'
 
