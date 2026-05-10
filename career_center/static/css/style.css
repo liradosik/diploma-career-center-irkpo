@@ -4014,3 +4014,344 @@ input[type="submit"].btn-primary:hover {
   .role-settings-layout{grid-template-columns:1fr}
   .role-photo-preview{width:112px;height:112px}
 }
+/* === Manual role profile/settings polish === */
+
+.sidebar-main .menu-section {
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid rgba(219, 231, 245, 0.72);
+}
+
+.sidebar-main .menu-section:last-child {
+  border-bottom: 0;
+}
+
+.menu-group-title {
+  margin: 10px 0 7px;
+}
+
+.menu a {
+  min-height: 42px;
+  border-radius: 16px;
+}
+
+.role-settings-page {
+  display: grid;
+  gap: 22px;
+}
+
+.role-settings-hero {
+  display: block;
+}
+
+.role-settings-shell {
+  margin-top: 0;
+}
+
+.role-settings-form {
+  display: grid;
+  grid-template-columns: 310px minmax(0, 1fr);
+  gap: 22px;
+  align-items: start;
+}
+
+.role-settings-photo-card,
+.role-settings-main-card {
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: #fff;
+  box-shadow: var(--shadow-sm);
+}
+
+.role-settings-photo-card {
+  position: sticky;
+  top: 28px;
+  display: grid;
+  justify-items: center;
+  gap: 16px;
+  padding: 28px 22px;
+  text-align: center;
+}
+
+.role-settings-main-card {
+  padding: 28px;
+}
+
+.role-avatar-preview {
+  width: 154px;
+  height: 154px;
+  overflow: hidden;
+  border-radius: 50%;
+  border: 1px solid #d7e6fa;
+  background: linear-gradient(135deg, #eef6ff, #f8fbff);
+  box-shadow: 0 18px 38px rgba(30, 102, 208, 0.10);
+}
+
+.role-avatar-img,
+.role-avatar-fallback {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.role-avatar-img {
+  object-fit: cover;
+}
+
+.role-avatar-fallback {
+  color: #fff;
+  background: linear-gradient(135deg, var(--primary), var(--primary-2));
+  font-size: 38px;
+  font-weight: 700;
+}
+
+.role-photo-actions {
+  display: grid;
+  gap: 10px;
+  justify-items: center;
+  width: 100%;
+}
+
+.role-photo-button {
+  width: 100%;
+  max-width: 220px;
+}
+
+.role-photo-note {
+  max-width: 230px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.role-remove-photo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 0;
+  color: #7a4b16;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.role-remove-photo input {
+  width: 16px;
+  height: 16px;
+  min-height: 16px;
+  padding: 0;
+}
+
+.role-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+.role-card-head h2 {
+  margin: 0 0 6px;
+}
+
+.role-card-head p {
+  color: var(--muted);
+}
+
+.role-form-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.role-field-full {
+  grid-column: 1 / -1;
+}
+
+.role-profile-form,
+.role-settings-main-card {
+  min-width: 0;
+}
+
+.role-settings-main-card input[type="text"],
+.role-settings-main-card input[type="email"],
+.role-settings-main-card input[type="file"],
+.role-settings-main-card input:not([type]),
+.role-settings-main-card textarea,
+.role-settings-main-card select {
+  min-height: 52px;
+  border-color: #cfe0f5;
+  border-radius: 18px;
+  background: #fbfdff;
+}
+
+.role-settings-main-card label {
+  color: #334155;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.role-cropper-card {
+  margin-top: 20px;
+}
+
+.role-form-errors {
+  margin-top: 16px;
+  padding: 14px 16px;
+  border: 1px solid #f5caca;
+  border-radius: 16px;
+  background: #fff7f7;
+  color: #9f1f1f;
+}
+
+.role-settings-actions {
+  margin-top: 22px;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.role-settings-actions .btn {
+  min-width: 210px;
+}
+
+/* Прячем настоящий file input, чтобы Django не растягивал интерфейс */
+.role-settings-form input[type="file"] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  min-height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Admin dashboard hero fix */
+
+.admin-dashboard-hero-clean {
+  min-height: 190px;
+  display: grid;
+  grid-template-columns: 154px minmax(0, 1fr);
+  align-items: center;
+  justify-content: start;
+  gap: 32px;
+}
+
+.admin-dashboard-hero-avatar {
+  width: 154px;
+  height: 154px;
+  flex: 0 0 154px;
+}
+
+.admin-dashboard-hero-text {
+  min-width: 0;
+}
+
+.admin-dashboard-hero-text h1 {
+  margin-bottom: 10px;
+}
+
+.admin-dashboard-hero-text p {
+  max-width: 780px;
+}
+
+/* Чтобы старый класс Codex больше не ломал hero */
+.role-dashboard-hero {
+  align-items: center;
+}
+
+.role-dashboard-avatar {
+  flex-shrink: 0;
+}
+
+@media (max-width: 1050px) {
+  .role-settings-form,
+  .admin-dashboard-hero-clean {
+    grid-template-columns: 1fr;
+  }
+
+  .role-settings-photo-card {
+    position: static;
+    justify-items: start;
+    text-align: left;
+  }
+
+  .role-photo-actions {
+    justify-items: start;
+  }
+
+  .admin-dashboard-hero-avatar {
+    width: 128px;
+    height: 128px;
+  }
+}
+
+@media (max-width: 760px) {
+  .role-settings-main-card,
+  .role-settings-photo-card {
+    padding: 18px;
+  }
+
+  .role-avatar-preview,
+  .admin-dashboard-hero-avatar {
+    width: 112px;
+    height: 112px;
+  }
+
+  .role-avatar-fallback {
+    font-size: 30px;
+  }
+
+  .role-settings-actions .btn,
+  .role-photo-button {
+    width: 100%;
+    max-width: none;
+  }
+}
+/* Curator dashboard hero fix */
+
+.curator-dashboard-hero-clean {
+  min-height: 190px;
+  display: grid;
+  grid-template-columns: 154px minmax(0, 1fr);
+  align-items: center;
+  justify-content: start;
+  gap: 32px;
+}
+
+.curator-dashboard-hero-avatar {
+  width: 154px;
+  height: 154px;
+  flex: 0 0 154px;
+}
+
+.curator-dashboard-hero-text {
+  min-width: 0;
+}
+
+.curator-dashboard-hero-text h1 {
+  margin-bottom: 10px;
+}
+
+.curator-dashboard-hero-text p {
+  max-width: 780px;
+}
+
+@media (max-width: 1050px) {
+  .curator-dashboard-hero-clean {
+    grid-template-columns: 1fr;
+  }
+
+  .curator-dashboard-hero-avatar {
+    width: 128px;
+    height: 128px;
+  }
+}
+
+@media (max-width: 760px) {
+  .curator-dashboard-hero-avatar {
+    width: 112px;
+    height: 112px;
+  }
+}

@@ -1,8 +1,17 @@
 {% extends 'base_dashboard.html' %}
+{% load ui_extras %}
 {% block title %}Кабинет куратора{% endblock %}
 {% block content %}
-<section class="hero curator-hero">
-  <div>
+<section class="hero curator-dashboard-hero-clean">
+  <div class="curator-dashboard-hero-avatar">
+    {% if request.user.photo %}
+      <img class="role-avatar-img" src="{{ request.user.photo.url }}" alt="{{ request.user.full_name }}">
+    {% else %}
+      <div class="role-avatar-fallback">{{ request.user.full_name|initials }}</div>
+    {% endif %}
+  </div>
+
+  <div class="curator-dashboard-hero-text">
     <div class="hero-kicker">Кабинет куратора</div>
     <h1>Кабинет куратора</h1>
     <p>Контроль учебного статуса студентов, активности и записей портфолио на проверке.</p>

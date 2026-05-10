@@ -1,42 +1,92 @@
 {% extends 'base_dashboard.html' %}
 {% load ui_extras %}
 {% load static %}
+
 {% block title %}{{ profile_title }}{% endblock %}
+
 {% block content %}
-<section class="hero role-dashboard-hero">
-  <div>
-    <div class="hero-kicker">Профиль</div>
-    <h1>{{ profile_title }}</h1>
-    <p>Обновите ФИО и аватар. Изменения применятся к вашему аккаунту в системе.</p>
-  </div>
-</section>
-
-<section class="section card role-settings-card">
-  <form method="post" enctype="multipart/form-data" class="role-settings-layout student-photo-upload" data-avatar-form>
-    {% csrf_token %}
-    <div class="role-photo-panel">
-      <div class="role-photo-preview">
-        {% if request.user.photo %}<img class="student-avatar-img" src="{{ request.user.photo.url }}" alt="Фото профиля">{% else %}<div class="student-avatar-fallback">{{ request.user.full_name|initials }}</div>{% endif %}
-      </div>
-      <label class="btn" for="{{ user_form.photo.id_for_label }}">Выбрать фото</label>
-      {{ user_form.photo }}
-      {% if request.user.photo %}<label class="role-remove-photo"><input type="checkbox" name="remove_photo" value="1"> Удалить текущее фото</label>{% endif %}
-      <p class="muted">Рекомендуется квадратное фото. Поддерживаются JPG и PNG.</p>
+<div class="role-settings-page">
+  <section class="hero role-settings-hero">
+    <div>
+      <div class="hero-kicker">Профиль</div>
+      <h1>{{ profile_title }}</h1>
+      <p>Настройте отображение аккаунта: ФИО и аватар будут видны в кабинетах, списках и карточках пользователей.</p>
     </div>
+  </section>
 
-    <div class="role-profile-form">
-      <h2>Личные данные</h2>
-      <p>{{ user_form.full_name.label_tag }} {{ user_form.full_name }}</p>
-      <div class="student-cropper-wrap" data-cropper-wrap hidden>
-        <h3>Настройте аватар</h3>
-        <p class="muted">Перемещайте и масштабируйте фото. Будет сохранён квадратный фрагмент.</p>
-        <img src="" alt="Предпросмотр обрезки" data-cropper-image>
+  <section class="section role-settings-shell">
+    <form method="post" enctype="multipart/form-data" class="role-settings-form student-photo-upload" data-avatar-form>
+      {% csrf_token %}
+
+      <aside class="role-settings-photo-card">
+        <div class="role-avatar-preview">
+          {% if request.user.photo %}
+            <img class="role-avatar-img" src="{{ request.user.photo.url }}" alt="Фото профиля">
+          {% else %}
+            <div class="role-avatar-fallback">{{ request.user.full_name|initials }}</div>
+          {% endif %}
+        </div>
+
+        <div class="role-photo-actions">
+          <label class="btn btn-link role-photo-button" for="{{ user_form.photo.id_for_label }}">Выбрать фото</label>
+
+          <input
+            type="file"
+            name="{{ user_form.photo.html_name }}"
+            id="{{ user_form.photo.id_for_label }}"
+            accept="image/png,image/jpeg,image/jpg"
+          >
+
+          {% if request.user.photo %}
+            <label class="role-remove-photo">
+              <input type="checkbox" name="remove_photo" value="1">
+              <span>Удалить текущее фото</span>
+            </label>
+          {% endif %}
+        </div>
+
+        <p class="role-photo-note">
+          Фото будет сохранено как круглый аватар. После выбора можно передвинуть и приблизить изображение.
+        </p>
+      </aside>
+
+      <div class="role-settings-main-card">
+        <div class="role-card-head">
+          <div>
+            <h2>Личные данные</h2>
+            <p>Эта информация используется внутри системы.</p>
+          </div>
+        </div>
+
+        <div class="role-form-grid">
+          <div class="form-field role-field-full">
+            {{ user_form.full_name.label_tag }}
+            {{ user_form.full_name }}
+          </div>
+        </div>
+
+        {% if user_form.errors %}
+          <div class="role-form-errors">
+            {{ user_form.errors }}
+          </div>
+        {% endif %}
+
+        <div class="student-cropper-wrap role-cropper-card" data-cropper-wrap hidden>
+          <h3>Настройте аватар</h3>
+          <p class="muted">Перемещайте и масштабируйте фото. Будет сохранён квадратный фрагмент.</p>
+          <img src="" alt="Предпросмотр обрезки" data-cropper-image>
+        </div>
+
+        <input type="hidden" name="cropped_photo_data" data-cropped-photo>
+
+        <div class="role-settings-actions">
+          <button class="btn btn-primary" type="submit">Сохранить изменения</button>
+        </div>
       </div>
-      <input type="hidden" name="cropped_photo_data" data-cropped-photo>
-      <button class="btn btn-primary" type="submit">Сохранить</button>
-    </div>
-  </form>
-</section>
+    </form>
+  </section>
+</div>
+
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.css">
 <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.js"></script>
 <script src="{% static 'js/student-avatar-cropper.js' %}"></script>
