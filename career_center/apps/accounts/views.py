@@ -1181,6 +1181,11 @@ def profile_edit(request):
         from .models import StudentProfile
         profile = StudentProfile.objects.create(user=request.user)
 
+    if request.method == 'POST' and request.POST.get('action') == 'remove_photo':
+        apply_user_photo_update(request, request.user)
+        messages.success(request, 'Фото удалено.')
+        return redirect('accounts:profile_edit')
+
     if request.method == 'POST':
         user_form = UserStudentForm(request.POST, request.FILES, instance=request.user)
         profile_form = StudentProfileForm(request.POST, instance=profile)

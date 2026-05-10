@@ -4324,6 +4324,48 @@ input[type="submit"].btn-primary:hover {
   width: 68px;
   height: 68px;
 }
+
+.avatar-modal[hidden] { display: none !important; }
+.avatar-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: grid;
+  place-items: center;
+}
+.avatar-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+}
+.avatar-modal-card {
+  position: relative;
+  width: min(92vw, 720px);
+  max-height: 90vh;
+  overflow: auto;
+  background: #fff;
+  border: 1px solid #bfdbfe;
+  border-radius: 18px;
+  padding: 18px;
+}
+.avatar-modal-cropper {
+  margin-top: 10px;
+  max-height: 60vh;
+  overflow: hidden;
+  border-radius: 14px;
+  border: 1px solid #dbeafe;
+  background: #f8fbff;
+}
+.avatar-modal-cropper img {
+  display: block;
+  max-width: 100%;
+}
+.avatar-modal-actions {
+  margin-top: 14px;
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
 /* Curator dashboard hero fix */
 
 .curator-dashboard-hero-clean {
