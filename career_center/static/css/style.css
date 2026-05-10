@@ -3997,3 +3997,20 @@ input[type="submit"].btn-primary:hover {
 .student-course-places{border:1px solid #bfdbfe;background:#f8fbff}
 .student-course-registration{border:1px solid #dbeafe}
 .student-course-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+.role-settings-card{padding:22px;border:1px solid #dbeafe}
+.role-settings-layout{display:grid;grid-template-columns:260px 1fr;gap:22px;align-items:start}
+.role-photo-panel{padding:16px;border:1px solid #dbeafe;background:#f8fbff;border-radius:16px;display:flex;flex-direction:column;gap:12px}
+.role-photo-preview{width:132px;height:132px;border-radius:999px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#eaf2ff;border:1px solid #bfdbfe}
+.role-photo-preview .student-avatar-img{width:100%;height:100%;object-fit:cover}
+.role-photo-preview .student-avatar-fallback{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:34px}
+.role-remove-photo{display:flex;align-items:center;gap:8px;color:#334155}
+.role-profile-form h2{margin-top:0}
+.role-profile-form p{margin-bottom:14px}
+.role-dashboard-hero{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.role-dashboard-avatar{width:88px;height:88px;font-size:30px;flex:0 0 88px}
+
+@media (max-width: 900px){
+  .role-settings-layout{grid-template-columns:1fr}
+  .role-photo-preview{width:112px;height:112px}
+}

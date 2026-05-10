@@ -3,22 +3,30 @@
 {% load static %}
 {% block title %}{{ profile_title }}{% endblock %}
 {% block content %}
-<div class="student-settings-layout">
-  <section class="hero student-hero"><h1>{{ profile_title }}</h1></section>
-  <section class="card student-settings-card">
-    <h2>Личные данные</h2>
-    <form method="post" enctype="multipart/form-data" class="student-photo-upload" data-avatar-form>{% csrf_token %}
-      <p>{{ user_form.full_name.label_tag }} {{ user_form.full_name }}</p>
-      <div class="student-photo-card">
-        <div class="student-avatar-preview">
-          {% if request.user.photo %}<img class="student-avatar-img" src="{{ request.user.photo.url }}" alt="Фото профиля">{% else %}<div class="student-avatar-fallback">{{ request.user.full_name|initials }}</div>{% endif %}
-        </div>
-        <div class="student-photo-actions">
-          <label class="btn" for="{{ user_form.photo.id_for_label }}">Выбрать фото</label>
-          {{ user_form.photo }}
-          {% if request.user.photo %}<label><input type="checkbox" name="remove_photo" value="1"> Удалить фото</label>{% endif %}
-        </div>
+<section class="hero role-dashboard-hero">
+  <div>
+    <div class="hero-kicker">Профиль</div>
+    <h1>{{ profile_title }}</h1>
+    <p>Обновите ФИО и аватар. Изменения применятся к вашему аккаунту в системе.</p>
+  </div>
+</section>
+
+<section class="section card role-settings-card">
+  <form method="post" enctype="multipart/form-data" class="role-settings-layout student-photo-upload" data-avatar-form>
+    {% csrf_token %}
+    <div class="role-photo-panel">
+      <div class="role-photo-preview">
+        {% if request.user.photo %}<img class="student-avatar-img" src="{{ request.user.photo.url }}" alt="Фото профиля">{% else %}<div class="student-avatar-fallback">{{ request.user.full_name|initials }}</div>{% endif %}
       </div>
+      <label class="btn" for="{{ user_form.photo.id_for_label }}">Выбрать фото</label>
+      {{ user_form.photo }}
+      {% if request.user.photo %}<label class="role-remove-photo"><input type="checkbox" name="remove_photo" value="1"> Удалить текущее фото</label>{% endif %}
+      <p class="muted">Рекомендуется квадратное фото. Поддерживаются JPG и PNG.</p>
+    </div>
+
+    <div class="role-profile-form">
+      <h2>Личные данные</h2>
+      <p>{{ user_form.full_name.label_tag }} {{ user_form.full_name }}</p>
       <div class="student-cropper-wrap" data-cropper-wrap hidden>
         <h3>Настройте аватар</h3>
         <p class="muted">Перемещайте и масштабируйте фото. Будет сохранён квадратный фрагмент.</p>
@@ -26,9 +34,9 @@
       </div>
       <input type="hidden" name="cropped_photo_data" data-cropped-photo>
       <button class="btn btn-primary" type="submit">Сохранить</button>
-    </form>
-  </section>
-</div>
+    </div>
+  </form>
+</section>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.css">
 <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.js"></script>
 <script src="{% static 'js/student-avatar-cropper.js' %}"></script>
