@@ -3991,3 +3991,9 @@ input[type="submit"].btn-primary:hover {
 .student-vacancy-contact-card{border:1px solid #bfdbfe;background:#f8fbff}
 .student-response-card{border:1px solid #bfdbfe;background:#f8fbff}
 .student-response-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+.student-course-list .student-course-card{margin-bottom:14px;border:1px solid #dbeafe;border-radius:14px}
+.student-course-meta .badge{background:#eff6ff;color:#1e3a8a}
+.student-course-places{border:1px solid #bfdbfe;background:#f8fbff}
+.student-course-registration{border:1px solid #dbeafe}
+.student-course-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}

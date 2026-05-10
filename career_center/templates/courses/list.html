@@ -2,38 +2,46 @@
 {% load ui_extras %}
 {% block title %}Курсы и семинары{% endblock %}
 {% block content %}
-<section class="hero">
+<section class="hero student-course-list">
   <div class="hero-kicker">Обучение и развитие</div>
   <h1>Курсы, семинары и практики</h1>
-  <p>Выбирайте образовательные события и записывайтесь в один клик.</p>
+  <p>Выбирайте мероприятия, отслеживайте статус записи и управляйте участием.</p>
 </section>
 
-<section class="section card">
-  <h2>Доступные события</h2>
-  {% for c in courses %}
-    <article class="list-item">
-      <h3>{{ c.title }}</h3>
-      <p class="muted">{{ c.get_kind_display }} • {{ c.get_format_type_display }} • {{ c.date }}</p>
-      <p>{{ c.description|truncatechars:180 }}</p>
-      <form method="post" action="{% url 'courses:register' c.pk %}">
-        {% csrf_token %}
-        <div class="inline-actions">
-          <span class="badge badge-active">Идёт набор</span>
-          {% with reg=registration_map|dict_get:c.id %}
-            {% if reg and reg.status == 'registered' %}
-              <button class="btn btn-link" formaction="{% url 'courses:cancel_registration' reg.id %}" type="submit">Отменить запись</button>
-            {% elif reg and reg.status == 'cancelled' %}
-              <span class="badge">Запись отменена</span>
-              <button class="btn btn-primary" type="submit">Записаться снова</button>
-            {% else %}
-              <button class="btn btn-primary" type="submit">Записаться</button>
-            {% endif %}
-          {% endwith %}
-        </div>
-      </form>
-    </article>
-  {% empty %}
-    <p class="muted">Активных мероприятий пока нет.</p>
-  {% endfor %}
+<section class="section card student-course-list">
+  <form method="get" class="grid grid-2">
+    <p class="full"><label for="q">Поиск</label><input id="q" type="text" name="q" value="{{ request.GET.q }}" placeholder="Название, организация, описание"></p>
+    <p><label for="kind">Тип</label><select id="kind" name="kind"><option value="">Все</option>{% for value,label in KIND_CHOICES %}<option value="{{ value }}" {% if kind_filter == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></p>
+    <p><label for="format">Формат</label><select id="format" name="format"><option value="">Все</option>{% for value,label in FORMAT_CHOICES %}<option value="{{ value }}" {% if format_filter == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></p>
+    <p><label for="reg_status">Статус</label><select id="reg_status" name="reg_status"><option value="">Все</option><option value="registered" {% if registration_filter == 'registered' %}selected{% endif %}>Вы записаны</option><option value="cancelled" {% if registration_filter == 'cancelled' %}selected{% endif %}>Запись отменена</option><option value="open" {% if registration_filter == 'open' %}selected{% endif %}>Идёт набор</option><option value="full" {% if registration_filter == 'full' %}selected{% endif %}>Мест нет</option></select></p>
+    <div class="inline-actions full"><button class="btn btn-primary" type="submit">Применить</button><a class="btn" href="{% url 'courses:list' %}">Сбросить</a></div>
+  </form>
+</section>
+
+<section class="section student-course-list">
+{% for c in courses %}
+  <article class="card student-course-card">
+    <h3>{{ c.title }}</h3>
+    <div class="student-course-meta inline-actions">
+      <span class="badge">{{ c.get_kind_display }}</span>
+      <span class="badge">{{ c.get_format_type_display }}</span>
+      {% if c.date %}<span class="badge">{{ c.date }}</span>{% endif %}
+    </div>
+    {% if c.organization %}<p class="muted">Организация: {{ c.organization }}</p>{% endif %}
+    <p>{{ c.description|truncatechars:170 }}</p>
+    {% if c.format_type == 'offline' %}<p class="student-course-places muted">Мест: {{ c.occupied_places_count }} / {{ c.places }} · Осталось: {{ c.available_places_count }}</p>{% endif %}
+    <div class="student-course-registration inline-actions">
+      {% with reg=registration_map|dict_get:c.id %}
+        {% if reg and reg.status == 'registered' %}<span class="badge badge-approved">Вы записаны</span>
+        {% elif reg and reg.status == 'cancelled' %}<span class="badge">Запись отменена</span>
+        {% elif c.format_type == 'offline' and c.available_places_count <= 0 %}<span class="badge badge-rejected">Мест нет</span>
+        {% else %}<span class="badge badge-active">Идёт набор</span>{% endif %}
+      {% endwith %}
+    </div>
+    <div class="student-course-actions inline-actions"><a class="btn" href="{% url 'courses:detail' c.pk %}">Подробнее</a></div>
+  </article>
+{% empty %}
+  <section class="card"><p class="muted">Подходящих мероприятий не найдено.</p></section>
+{% endfor %}
 </section>
 {% endblock %}
