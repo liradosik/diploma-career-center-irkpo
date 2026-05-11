@@ -57,7 +57,7 @@ class UserProfileSettingsForm(forms.ModelForm):
             'full_name': 'ФИО',
             'photo': 'Фото',
             'contact_phone': 'Телефон',
-            'contact_telegram': 'Telegram или ссылка для связи',
+            'contact_telegram': 'ВКонтакте или ссылка для связи',
             'contact_email': 'Контактный email',
             'contact_note': 'Комментарий для студентов',
             'contact_availability': 'Когда удобно писать',
@@ -114,7 +114,7 @@ class AdminStudentCreateForm(forms.ModelForm):
             'study_group': 'Учебная группа',
         }
         widgets = {
-            'full_name': forms.TextInput(attrs={'placeholder': 'Например, Дашинова Валерия Михайловна'}),
+            'full_name': forms.TextInput(attrs={'placeholder': 'Например, Шадрина Нонна Ивановна'}),
             'email': forms.EmailInput(attrs={'placeholder': 'Например, student@irkpo.ru'}),
         }
 
@@ -328,7 +328,7 @@ class PublicSupportTicketCreateForm(forms.ModelForm):
         }
         widgets = {
             'message': forms.Textarea(attrs={'rows': 5}),
-            'public_contact': forms.TextInput(attrs={'placeholder': '+7 (900) 123-45-67 / Telegram'}),
+            'public_contact': forms.TextInput(attrs={'placeholder': '+7 (900) 123-45-67 / ВКонтакте'}),
         }
 
 class SupportTicketAdminUpdateForm(forms.ModelForm):

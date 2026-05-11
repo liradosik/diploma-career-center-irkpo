@@ -5892,3 +5892,341 @@ html {
 .login-help a:hover {
   text-decoration: underline;
 }
+/* === Public support page === */
+
+.public-support-page {
+  min-height: calc(100vh - 82px);
+  display: flex;
+  align-items: center;
+  padding: 54px 0 70px;
+}
+
+.public-support-card {
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(390px, 0.86fr);
+  overflow: hidden;
+  border: 1px solid #dbe7f5;
+  border-radius: 28px;
+  background: #ffffff;
+  box-shadow: 0 22px 60px rgba(25, 66, 120, 0.12);
+}
+
+.public-support-form-panel {
+  min-width: 0;
+  padding: 54px 54px 58px;
+  background:
+    radial-gradient(circle at 8% 8%, rgba(30, 102, 208, 0.045), transparent 28%),
+    #ffffff;
+}
+
+.public-support-form-inner {
+  width: 100%;
+}
+
+.public-support-kicker {
+  margin-bottom: 14px;
+  color: #1e66d0;
+  font-size: 13px;
+  font-weight: 650;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.public-support-form-panel h1 {
+  margin: 0 0 14px;
+  color: #1d3148;
+  font-size: clamp(34px, 3.5vw, 48px);
+  line-height: 1.12;
+  letter-spacing: -0.025em;
+  font-weight: 650;
+}
+
+.public-support-lead {
+  max-width: 640px;
+  margin-bottom: 30px;
+  color: #667891;
+  font-size: 17px;
+  line-height: 1.6;
+}
+
+.public-support-form {
+  display: grid;
+  gap: 22px;
+}
+
+.public-support-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px 20px;
+}
+
+.public-support-field {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.public-support-field-wide {
+  grid-column: 1 / -1;
+}
+
+.public-support-field label {
+  margin: 0;
+  color: #1d3148;
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.public-support-field input,
+.public-support-field select,
+.public-support-field textarea {
+  min-height: 54px;
+  border: 1px solid #d6e3f4;
+  border-radius: 15px;
+  background: #fbfdff;
+  color: #1d3148;
+  padding: 14px 16px;
+  font-size: 16px;
+}
+
+.public-support-field textarea {
+  min-height: 150px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.public-support-field input::placeholder,
+.public-support-field textarea::placeholder {
+  color: #8a9bb3;
+}
+
+.public-support-field input:focus,
+.public-support-field select:focus,
+.public-support-field textarea:focus {
+  border-color: #8ebcff;
+  box-shadow: 0 0 0 4px rgba(47, 127, 232, 0.12);
+}
+
+.public-support-submit {
+  width: fit-content;
+  min-width: 230px;
+  min-height: 56px;
+  border-radius: 16px;
+  font-size: 16px;
+  box-shadow: 0 16px 34px rgba(30, 102, 208, 0.22);
+}
+
+.public-support-errors,
+.public-support-field-errors {
+  padding: 12px 14px;
+  border: 1px solid #f3c4c4;
+  border-radius: 14px;
+  background: #fff7f7;
+  color: #a43a34;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.public-support-errors ul,
+.public-support-field-errors ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.public-support-messages {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 22px;
+}
+
+.public-support-message {
+  padding: 14px 16px;
+  border-radius: 16px;
+  border: 1px solid #dbe7f5;
+  background: #f8fbff;
+  color: #425872;
+  font-weight: 500;
+}
+
+.public-support-message-success {
+  border-color: rgba(27, 156, 98, 0.22);
+  background: rgba(27, 156, 98, 0.08);
+  color: #21744c;
+}
+
+.public-support-info-panel {
+  position: relative;
+  min-height: 690px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  padding: 58px;
+  color: #ffffff;
+  background:
+    radial-gradient(circle at 82% 11%, rgba(255, 255, 255, 0.18), transparent 27%),
+    radial-gradient(circle at 8% 92%, rgba(255, 255, 255, 0.16), transparent 24%),
+    linear-gradient(145deg, #9cc9ff 0%, #3f8ff0 48%, #1f6ed8 100%);
+}
+
+.public-support-bg {
+  position: absolute;
+  display: block;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.public-support-bg-one {
+  width: 360px;
+  height: 360px;
+  right: -88px;
+  top: -96px;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.public-support-bg-two {
+  width: 260px;
+  height: 260px;
+  left: -98px;
+  bottom: -78px;
+  background: rgba(255, 255, 255, 0.11);
+}
+
+.public-support-dots {
+  position: absolute;
+  right: 66px;
+  bottom: 58px;
+  width: 118px;
+  height: 94px;
+  opacity: 0.26;
+  background-image: radial-gradient(#ffffff 1.1px, transparent 1.1px);
+  background-size: 13px 13px;
+}
+
+.public-support-info-content {
+  position: relative;
+  z-index: 2;
+  max-width: 520px;
+}
+
+.public-support-info-badge {
+  width: fit-content;
+  margin-bottom: 18px;
+  padding: 8px 13px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.public-support-info-content h2 {
+  margin: 0 0 18px;
+  color: #ffffff;
+  font-size: clamp(32px, 3.8vw, 46px);
+  line-height: 1.12;
+  letter-spacing: -0.025em;
+  font-weight: 650;
+}
+
+.public-support-info-content > p {
+  max-width: 500px;
+  margin-bottom: 28px;
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 17px;
+  line-height: 1.62;
+}
+
+.public-support-tips {
+  display: grid;
+  gap: 14px;
+}
+
+.public-support-tips article {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+  align-items: start;
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.11);
+  backdrop-filter: blur(4px);
+}
+
+.public-support-tips h3 {
+  margin: 0 0 4px;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 650;
+}
+
+.public-support-tips p {
+  color: rgba(255, 255, 255, 0.84);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.public-support-note {
+  margin-top: 22px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+@media (max-width: 1180px) {
+  .public-support-card {
+    grid-template-columns: 1fr;
+  }
+
+  .public-support-info-panel {
+    min-height: auto;
+    padding: 42px 54px;
+  }
+}
+
+@media (max-width: 760px) {
+  .public-support-page {
+    min-height: auto;
+    padding: 32px 0 48px;
+  }
+
+  .public-support-card {
+    border-radius: 24px;
+  }
+
+  .public-support-form-panel,
+  .public-support-info-panel {
+    padding: 32px 22px;
+  }
+
+  .public-support-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .public-support-field-wide {
+    grid-column: auto;
+  }
+
+  .public-support-form-panel h1,
+  .public-support-info-content h2 {
+    font-size: clamp(30px, 9vw, 40px);
+  }
+
+  .public-support-lead,
+  .public-support-info-content > p {
+    font-size: 16px;
+  }
+
+  .public-support-info-panel {
+    display: none;
+  }
+
+  .public-support-submit {
+    width: 100%;
+  }
+}

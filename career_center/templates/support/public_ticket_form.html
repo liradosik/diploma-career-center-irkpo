@@ -1,15 +1,151 @@
-{% extends 'base_auth.html' %}
+{% extends 'base_public.html' %}
+
 {% block title %}Обращение в техподдержку{% endblock %}
-{% block auth_content %}
-<h1>Обращение в техподдержку</h1>
-<p class="muted">Используйте форму, если у вас не получается войти в систему.</p>
-<div class="section card form-card">
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <div class="inline-actions">
-      <button class="btn btn-primary" type="submit">Отправить обращение</button>
+
+{% block public_nav_action %}
+  <a class="btn btn-primary" href="{% url 'accounts:login' %}">Войти</a>
+{% endblock %}
+
+{% block content %}
+<section class="public-support-page">
+  <div class="public-support-card">
+    <div class="public-support-form-panel">
+      <div class="public-support-form-inner">
+        <div class="public-support-kicker">Техподдержка</div>
+
+        <h1>Обращение в техподдержку</h1>
+
+        <p class="public-support-lead">
+          Заполните форму, если не получается войти в систему,
+          нет доступа к личному кабинету или возник вопрос по аккаунту.
+        </p>
+
+        {% if messages %}
+          <div class="public-support-messages">
+            {% for message in messages %}
+              <div class="public-support-message public-support-message-{{ message.tags }}">
+                {{ message }}
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        <form method="post" class="public-support-form">
+          {% csrf_token %}
+
+          {% if form.non_field_errors %}
+            <div class="public-support-errors">
+              {{ form.non_field_errors }}
+            </div>
+          {% endif %}
+
+          <div class="public-support-grid">
+            <div class="public-support-field">
+              <label for="{{ form.public_full_name.id_for_label }}">ФИО</label>
+              {{ form.public_full_name }}
+              {% if form.public_full_name.errors %}
+                <div class="public-support-field-errors">{{ form.public_full_name.errors }}</div>
+              {% endif %}
+            </div>
+
+            <div class="public-support-field">
+              <label for="{{ form.public_email.id_for_label }}">Email</label>
+              {{ form.public_email }}
+              {% if form.public_email.errors %}
+                <div class="public-support-field-errors">{{ form.public_email.errors }}</div>
+              {% endif %}
+            </div>
+
+            <div class="public-support-field">
+              <label for="{{ form.public_contact.id_for_label }}">Телефон или другой контакт</label>
+              {{ form.public_contact }}
+              {% if form.public_contact.errors %}
+                <div class="public-support-field-errors">{{ form.public_contact.errors }}</div>
+              {% endif %}
+            </div>
+
+            <div class="public-support-field">
+              <label for="{{ form.requester_type.id_for_label }}">Кто обращается</label>
+              {{ form.requester_type }}
+              {% if form.requester_type.errors %}
+                <div class="public-support-field-errors">{{ form.requester_type.errors }}</div>
+              {% endif %}
+            </div>
+
+            <div class="public-support-field">
+              <label for="{{ form.category.id_for_label }}">Категория</label>
+              {{ form.category }}
+              {% if form.category.errors %}
+                <div class="public-support-field-errors">{{ form.category.errors }}</div>
+              {% endif %}
+            </div>
+
+            <div class="public-support-field">
+              <label for="{{ form.subject.id_for_label }}">Тема</label>
+              {{ form.subject }}
+              {% if form.subject.errors %}
+                <div class="public-support-field-errors">{{ form.subject.errors }}</div>
+              {% endif %}
+            </div>
+
+            <div class="public-support-field public-support-field-wide">
+              <label for="{{ form.message.id_for_label }}">Описание проблемы</label>
+              {{ form.message }}
+              {% if form.message.errors %}
+                <div class="public-support-field-errors">{{ form.message.errors }}</div>
+              {% endif %}
+            </div>
+          </div>
+
+          <button class="btn btn-primary public-support-submit" type="submit">
+            Отправить обращение
+          </button>
+        </form>
+      </div>
     </div>
-  </form>
+
+    <aside class="public-support-info-panel" aria-label="Информация о техподдержке">
+      <div class="public-support-bg public-support-bg-one"></div>
+      <div class="public-support-bg public-support-bg-two"></div>
+      <div class="public-support-dots"></div>
+
+      <div class="public-support-info-content">
+
+        <h2>Мы на связи и готовы помочь</h2>
+
+        <p>
+          Опишите проблему спокойно и подробно. Администратор посмотрит обращение
+          и свяжется с вами по указанным контактам.
+        </p>
+
+        <div class="public-support-tips">
+  <article>
+    <div>
+      <h3>Когда писать</h3>
+      <p>Если не получается войти, аккаунт не найден или пароль не подходит.</p>
+    </div>
+  </article>
+
+  <article>
+    <div>
+      <h3>Что указать</h3>
+      <p>ФИО, группу или роль, email и краткое описание ситуации.</p>
+    </div>
+  </article>
+
+  <article>
+    <div>
+      <h3>Что дальше</h3>
+      <p>Обращение попадёт администратору, после этого с вами свяжутся.</p>
+    </div>
+  </article>
 </div>
+
+        <div class="public-support-note">
+          Данные из формы используются только для обработки обращения.
+        </div>
+      </div>
+    </aside>
+  </div>
+</section>
 {% endblock %}
