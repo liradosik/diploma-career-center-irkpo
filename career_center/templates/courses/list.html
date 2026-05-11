@@ -1,47 +1,193 @@
 {% extends 'base_dashboard.html' %}
 {% load ui_extras %}
+
 {% block title %}Курсы и семинары{% endblock %}
+
 {% block content %}
-<section class="hero student-course-list">
-  <div class="hero-kicker">Обучение и развитие</div>
-  <h1>Курсы, семинары и практики</h1>
-  <p>Выбирайте мероприятия, отслеживайте статус записи и управляйте участием.</p>
-</section>
+<div class="student-courses-page-v2">
 
-<section class="section card student-course-list">
-  <form method="get" class="grid grid-2">
-    <p class="full"><label for="q">Поиск</label><input id="q" type="text" name="q" value="{{ request.GET.q }}" placeholder="Название, организация, описание"></p>
-    <p><label for="kind">Тип</label><select id="kind" name="kind"><option value="">Все</option>{% for value,label in KIND_CHOICES %}<option value="{{ value }}" {% if kind_filter == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></p>
-    <p><label for="format">Формат</label><select id="format" name="format"><option value="">Все</option>{% for value,label in FORMAT_CHOICES %}<option value="{{ value }}" {% if format_filter == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></p>
-    <p><label for="reg_status">Статус</label><select id="reg_status" name="reg_status"><option value="">Все</option><option value="registered" {% if registration_filter == 'registered' %}selected{% endif %}>Вы записаны</option><option value="cancelled" {% if registration_filter == 'cancelled' %}selected{% endif %}>Запись отменена</option><option value="open" {% if registration_filter == 'open' %}selected{% endif %}>Идёт набор</option><option value="full" {% if registration_filter == 'full' %}selected{% endif %}>Мест нет</option></select></p>
-    <div class="inline-actions full"><button class="btn btn-primary" type="submit">Применить</button><a class="btn" href="{% url 'courses:list' %}">Сбросить</a></div>
-  </form>
-</section>
-
-<section class="section student-course-list">
-{% for c in courses %}
-  <article class="card student-course-card">
-    <h3>{{ c.title }}</h3>
-    <div class="student-course-meta inline-actions">
-      <span class="badge">{{ c.get_kind_display }}</span>
-      <span class="badge">{{ c.get_format_type_display }}</span>
-      {% if c.date %}<span class="badge">{{ c.date }}</span>{% endif %}
+  <section class="hero student-courses-hero-v2">
+    <div class="student-courses-hero-main">
+      <div class="hero-kicker">Обучение и развитие</div>
+      <h1>Курсы, семинары и практики</h1>
+      <p>Выбирайте мероприятия, отслеживайте статус записи и управляйте участием.</p>
     </div>
-    {% if c.organization %}<p class="muted">Организация: {{ c.organization }}</p>{% endif %}
-    <p>{{ c.description|truncatechars:170 }}</p>
-    {% if c.format_type == 'offline' %}<p class="student-course-places muted">Мест: {{ c.occupied_places_count }} / {{ c.places }} · Осталось: {{ c.available_places_count }}</p>{% endif %}
-    <div class="student-course-registration inline-actions">
+
+    <div class="student-vacancies-hero-art" aria-hidden="true">
+      <span class="vacancies-decor-circle vacancies-decor-circle-one"></span>
+      <span class="vacancies-decor-circle vacancies-decor-circle-three"></span>
+
+      <span class="vacancies-decor-star vacancies-decor-star-one">✦</span>
+      <span class="vacancies-decor-star vacancies-decor-star-two">✧</span>
+      <span class="vacancies-decor-star vacancies-decor-star-three">✦</span>
+
+
+    </div>
+  </section>
+
+  <section class="card student-courses-filter-card-v2">
+    <form method="get" class="student-courses-filters-v2">
+      <div class="student-courses-filter-field student-courses-filter-search">
+        <label for="q">Поиск</label>
+        <div class="student-courses-search-box">
+          <i class="bi bi-search"></i>
+          <input
+            id="q"
+            type="search"
+            name="q"
+            value="{{ request.GET.q }}"
+            placeholder="Название, организация, описание"
+          >
+        </div>
+      </div>
+
+      <div class="student-courses-filter-field">
+        <label for="kind">Тип</label>
+        <select id="kind" name="kind">
+          <option value="">Все</option>
+          {% for value,label in KIND_CHOICES %}
+            <option value="{{ value }}" {% if kind_filter == value %}selected{% endif %}>
+              {{ label }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="student-courses-filter-field">
+        <label for="format">Формат</label>
+        <select id="format" name="format">
+          <option value="">Все</option>
+          {% for value,label in FORMAT_CHOICES %}
+            <option value="{{ value }}" {% if format_filter == value %}selected{% endif %}>
+              {{ label }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="student-courses-filter-field">
+        <label for="reg_status">Статус записи</label>
+        <select id="reg_status" name="reg_status">
+          <option value="">Все</option>
+          <option value="registered" {% if registration_filter == 'registered' %}selected{% endif %}>Вы записаны</option>
+          <option value="cancelled" {% if registration_filter == 'cancelled' %}selected{% endif %}>Запись отменена</option>
+          <option value="open" {% if registration_filter == 'open' %}selected{% endif %}>Идёт набор</option>
+          <option value="full" {% if registration_filter == 'full' %}selected{% endif %}>Мест нет</option>
+        </select>
+      </div>
+
+      <div class="student-courses-filter-actions">
+        <button class="btn btn-primary" type="submit">
+          <i class="bi bi-funnel"></i>
+          Применить
+        </button>
+
+        <a class="btn student-courses-reset-btn" href="{% url 'courses:list' %}">
+          <i class="bi bi-arrow-clockwise"></i>
+          Сбросить
+        </a>
+      </div>
+    </form>
+  </section>
+
+  <section class="student-courses-list-v2">
+    {% for c in courses %}
       {% with reg=registration_map|dict_get:c.id %}
-        {% if reg and reg.status == 'registered' %}<span class="badge badge-approved">Вы записаны</span>
-        {% elif reg and reg.status == 'cancelled' %}<span class="badge">Запись отменена</span>
-        {% elif c.format_type == 'offline' and c.available_places_count <= 0 %}<span class="badge badge-rejected">Мест нет</span>
-        {% else %}<span class="badge badge-active">Идёт набор</span>{% endif %}
+        <article class="card student-course-card-v2">
+          <div class="student-course-icon {% cycle 'is-blue' 'is-purple' 'is-green' 'is-orange' %}">
+            {% if c.kind == 'course' %}
+              <i class="bi bi-journal-bookmark"></i>
+            {% elif c.kind == 'seminar' %}
+              <i class="bi bi-easel"></i>
+            {% else %}
+              <i class="bi bi-briefcase"></i>
+            {% endif %}
+          </div>
+
+          <div class="student-course-main-v2">
+            <div class="student-course-title-row-v2">
+              <div>
+                <h2>{{ c.title }}</h2>
+                {% if c.organization %}
+                  <p class="student-course-organization">{{ c.organization }}</p>
+                {% endif %}
+              </div>
+
+              {% if reg and reg.status == 'registered' %}
+                <span class="student-course-status-badge is-registered">
+                  <i class="bi bi-check2"></i>
+                  Вы записаны
+                </span>
+              {% elif reg and reg.status == 'cancelled' %}
+                <span class="student-course-status-badge is-cancelled">
+                  Запись отменена
+                </span>
+              {% elif c.format_type == 'offline' and c.available_places_count <= 0 %}
+                <span class="student-course-status-badge is-full">
+                  Мест нет
+                </span>
+              {% else %}
+                <span class="student-course-status-badge is-open">
+                  Идёт набор
+                </span>
+              {% endif %}
+            </div>
+
+            <div class="student-course-tags-v2">
+              <span>{{ c.get_kind_display }}</span>
+              <span>{{ c.get_format_type_display }}</span>
+              {% if c.date %}
+                <span>{{ c.date|date:"d.m.Y" }}</span>
+              {% endif %}
+            </div>
+
+            <p class="student-course-description-v2">
+              {{ c.description|truncatechars:170 }}
+            </p>
+
+            {% if c.format_type == 'offline' %}
+              <div class="student-course-places-line-v2">
+                <i class="bi bi-people"></i>
+                <span>Занято {{ c.occupied_places_count }} из {{ c.places }}</span>
+                <span>Осталось мест: {{ c.available_places_count }}</span>
+              </div>
+            {% endif %}
+
+            <div class="student-course-actions-v2">
+              <a class="btn" href="{% url 'courses:detail' c.pk %}">
+                Подробнее
+              </a>
+            </div>
+          </div>
+
+          <aside class="student-course-side-v2">
+            <div class="student-course-date-card-v2">
+              <i class="bi bi-calendar3"></i>
+              <span>Дата</span>
+              <strong>{% if c.date %}{{ c.date|date:"d.m.Y" }}{% else %}Не указана{% endif %}</strong>
+            </div>
+
+            <div class="student-course-format-card-v2">
+              <span>{{ c.get_format_type_display }}</span>
+            </div>
+          </aside>
+        </article>
       {% endwith %}
-    </div>
-    <div class="student-course-actions inline-actions"><a class="btn" href="{% url 'courses:detail' c.pk %}">Подробнее</a></div>
-  </article>
-{% empty %}
-  <section class="card empty-state"><p class="muted">Подходящих мероприятий не найдено.</p></section>
-{% endfor %}
-</section>
+    {% empty %}
+      <section class="card student-courses-empty-v2">
+        <div class="student-courses-empty-icon">
+          <i class="bi bi-search"></i>
+        </div>
+
+        <h2>Мероприятий не найдено</h2>
+        <p>Попробуйте изменить поиск, тип, формат или статус записи.</p>
+
+        <a class="btn btn-primary" href="{% url 'courses:list' %}">
+          Сбросить фильтры
+        </a>
+      </section>
+    {% endfor %}
+  </section>
+
+</div>
 {% endblock %}

@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 
 from apps.accounts.decorators import role_required
@@ -10,26 +11,45 @@ from .models import Vacancy, VacancyResponse
 @role_required(User.Role.STUDENT)
 def vacancy_list(request):
     vacancies = Vacancy.objects.filter(status=Vacancy.Status.ACTIVE)
+
     q = (request.GET.get('q') or '').strip()
     format_filter = (request.GET.get('format') or '').strip()
     employment_filter = (request.GET.get('employment') or '').strip()
     direction_filter = (request.GET.get('direction') or '').strip()
+
     if q:
-        vacancies = vacancies.filter(title__icontains=q)
+        vacancies = vacancies.filter(
+            Q(title__icontains=q)
+            | Q(company__icontains=q)
+            | Q(description__icontains=q)
+            | Q(direction__icontains=q)
+        )
+
     if format_filter:
         vacancies = vacancies.filter(format_type=format_filter)
+
     if employment_filter:
         vacancies = vacancies.filter(employment_type=employment_filter)
+
     if direction_filter:
         vacancies = vacancies.filter(direction=direction_filter)
+
+    active_vacancies = Vacancy.objects.filter(status=Vacancy.Status.ACTIVE)
+
+    responded_vacancy_ids = set(
+        VacancyResponse.objects.filter(student=request.user).values_list('vacancy_id', flat=True)
+    )
+
     return render(request, 'vacancies/list.html', {
         'vacancies': vacancies.order_by('-created_at'),
+        'q': q,
         'format_filter': format_filter,
         'employment_filter': employment_filter,
         'direction_filter': direction_filter,
-        'format_options': Vacancy.objects.filter(status=Vacancy.Status.ACTIVE).values_list('format_type', flat=True).distinct(),
-        'employment_options': Vacancy.objects.filter(status=Vacancy.Status.ACTIVE).values_list('employment_type', flat=True).distinct(),
-        'direction_options': Vacancy.objects.filter(status=Vacancy.Status.ACTIVE).values_list('direction', flat=True).distinct(),
+        'format_options': active_vacancies.values_list('format_type', flat=True).distinct().order_by('format_type'),
+        'employment_options': active_vacancies.values_list('employment_type', flat=True).distinct().order_by('employment_type'),
+        'direction_options': active_vacancies.values_list('direction', flat=True).distinct().order_by('direction'),
+        'responded_vacancy_ids': responded_vacancy_ids,
     })
 
 

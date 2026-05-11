@@ -1,43 +1,270 @@
 {% extends 'base_dashboard.html' %}
+
 {% block title %}{{ vacancy.title }}{% endblock %}
+
 {% block content %}
-<section class="hero student-vacancy-detail">
-  <div class="hero-kicker">Карточка вакансии</div>
-  <h1>{{ vacancy.title }}</h1>
-  <p>{{ vacancy.company }}</p>
-  <div class="inline-actions">
-    <span class="badge">{{ vacancy.format_type }}</span>
-    <span class="badge">{{ vacancy.employment_type }}</span>
-    <span class="badge">{{ vacancy.direction }}</span>
+<div class="student-vacancy-detail-page-v2">
+
+  <nav class="student-vacancy-breadcrumbs-v2" aria-label="Навигация">
+    <a href="{% url 'vacancies:list' %}">Вакансии</a>
+    <span>•</span>
+    <span>{{ vacancy.title }}</span>
+  </nav>
+
+  <section class="hero student-vacancy-detail-hero-v2 student-vacancy-detail-hero-clean">
+  <div class="student-vacancy-detail-hero-main">
+    <div class="student-vacancy-detail-tags-v2">
+      <span>{{ vacancy.employment_type }}</span>
+      <span>{{ vacancy.format_type }}</span>
+      <span>{{ vacancy.direction }}</span>
+    </div>
+
+    <h1>{{ vacancy.title }}</h1>
+
+    <p class="student-vacancy-detail-company">
+      {{ vacancy.company }}
+    </p>
+
+    <div class="student-vacancy-detail-actions-v2">
+      {% if response %}
+        <span class="student-vacancy-detail-responded">
+          <i class="bi bi-check2-circle"></i>
+          Вы уже откликнулись
+        </span>
+      {% else %}
+        <form method="post" action="{% url 'vacancies:respond' vacancy.pk %}">
+          {% csrf_token %}
+          <button class="btn btn-primary" type="submit">
+            <i class="bi bi-send"></i>
+            Откликнуться
+          </button>
+        </form>
+      {% endif %}
+    </div>
   </div>
-  {% if not response %}<form method="post" action="{% url 'vacancies:respond' vacancy.pk %}">{% csrf_token %}<button class="btn btn-primary" type="submit">Откликнуться</button></form>{% endif %}
-</section>
 
-<section class="section card student-vacancy-detail">
-  {% if vacancy.description %}<div class="list-item"><h3>Описание</h3><p>{{ vacancy.description }}</p></div>{% endif %}
-  {% if vacancy.responsibilities %}<div class="list-item"><h3>Обязанности</h3><p>{{ vacancy.responsibilities }}</p></div>{% endif %}
-  {% if vacancy.requirements %}<div class="list-item"><h3>Требования</h3><p>{{ vacancy.requirements }}</p></div>{% endif %}
-  {% if vacancy.conditions %}<div class="list-item"><h3>Условия</h3><p>{{ vacancy.conditions }}</p></div>{% endif %}
-</section>
+  <div class="student-vacancy-detail-hero-art vacancy-detail-soft-decor" aria-hidden="true">
+    <span class="vacancy-soft-star vacancy-soft-star-one">✦</span>
+    <span class="vacancy-soft-star vacancy-soft-star-two">✧</span>
+    <span class="vacancy-soft-star vacancy-soft-star-three">✦</span>
+    <span class="vacancy-soft-star vacancy-soft-star-four">✧</span>
 
-<section class="section card student-vacancy-contact-card">
-  <h2>Контакты работодателя</h2>
-  <p>{{ vacancy.contacts }}</p>
-</section>
+    <span class="vacancy-soft-dot vacancy-soft-dot-one"></span>
+    <span class="vacancy-soft-dot vacancy-soft-dot-two"></span>
+    <span class="vacancy-soft-dot vacancy-soft-dot-three"></span>
 
-{% if response %}
-<section class="section card student-response-card">
-  {% if just_responded %}<h2>Отклик сохранён. Свяжитесь с работодателем.</h2>{% else %}<h2>Вы уже откликнулись на эту вакансию. Контакты работодателя доступны ниже.</h2>{% endif %}
-  <div class="student-response-actions inline-actions">
-    {% if resume_public_url %}
-      <a class="btn" target="_blank" href="{{ resume_public_url }}">Открыть публичное резюме</a>
-      <button class="btn" type="button" onclick="navigator.clipboard.writeText('{{ resume_public_url }}')">Скопировать ссылку на резюме</button>
-      <a class="btn" target="_blank" href="{{ resume_pdf_url }}">Скачать PDF</a>
-    {% else %}
-      <p class="muted">Публичное резюме не опубликовано. Вы можете включить его в конструкторе резюме.</p>
-      <a class="btn btn-primary" href="{% url 'resumes:builder' %}">Перейти в конструктор резюме</a>
-    {% endif %}
+    <span class="vacancy-soft-line vacancy-soft-line-one"></span>
+    <span class="vacancy-soft-line vacancy-soft-line-two"></span>
   </div>
 </section>
-{% endif %}
+
+  <div class="student-vacancy-detail-layout-v2">
+    <main class="student-vacancy-detail-main-v2">
+
+      {% if vacancy.description %}
+        <section class="card student-vacancy-detail-section-v2">
+          <span class="student-vacancy-detail-section-icon">
+            <i class="bi bi-card-text"></i>
+          </span>
+
+          <div>
+            <h2>Описание</h2>
+            <p>{{ vacancy.description|linebreaksbr }}</p>
+          </div>
+        </section>
+      {% endif %}
+
+      {% if vacancy.responsibilities %}
+        <section class="card student-vacancy-detail-section-v2">
+          <span class="student-vacancy-detail-section-icon">
+            <i class="bi bi-clipboard-check"></i>
+          </span>
+
+          <div>
+            <h2>Обязанности</h2>
+            <div class="student-vacancy-detail-text">
+              {{ vacancy.responsibilities|linebreaksbr }}
+            </div>
+          </div>
+        </section>
+      {% endif %}
+
+      {% if vacancy.requirements %}
+        <section class="card student-vacancy-detail-section-v2">
+          <span class="student-vacancy-detail-section-icon">
+            <i class="bi bi-mortarboard"></i>
+          </span>
+
+          <div>
+            <h2>Требования</h2>
+            <div class="student-vacancy-detail-text">
+              {{ vacancy.requirements|linebreaksbr }}
+            </div>
+          </div>
+        </section>
+      {% endif %}
+
+      {% if vacancy.conditions %}
+        <section class="card student-vacancy-detail-section-v2">
+          <span class="student-vacancy-detail-section-icon">
+            <i class="bi bi-stars"></i>
+          </span>
+
+          <div>
+            <h2>Условия</h2>
+            <div class="student-vacancy-detail-text">
+              {{ vacancy.conditions|linebreaksbr }}
+            </div>
+          </div>
+        </section>
+      {% endif %}
+
+      <section class="card student-vacancy-detail-bottom-actions-v2 vacancy-response-card-clean">
+  {% if response %}
+    <div class="vacancy-response-clean-content">
+      <div class="vacancy-response-clean-title">
+        <span class="student-vacancy-response-icon">
+          <i class="bi bi-check2-circle"></i>
+        </span>
+
+        {% if just_responded %}
+          <h2>Отклик сохранён</h2>
+        {% else %}
+          <h2>Вы уже откликнулись на эту вакансию</h2>
+        {% endif %}
+      </div>
+
+      <p>Контакты работодателя доступны в информационном блоке справа.</p>
+
+      <div class="student-vacancy-detail-bottom-buttons-v2">
+        {% if resume_public_url %}
+          <button class="btn" type="button" onclick="navigator.clipboard.writeText('{{ resume_public_url }}')">
+            <i class="bi bi-link-45deg"></i>
+            Скопировать ссылку на резюме
+          </button>
+
+          <a class="btn" target="_blank" href="{{ resume_pdf_url }}">
+            <i class="bi bi-file-earmark-pdf"></i>
+            Скачать PDF
+          </a>
+        {% else %}
+          <a class="btn btn-primary" href="{% url 'resumes:builder' %}">
+            Перейти в конструктор резюме
+          </a>
+        {% endif %}
+      </div>
+    </div>
+  {% else %}
+    <div class="vacancy-response-clean-content">
+      <div class="vacancy-response-clean-title">
+        <span class="student-vacancy-response-icon">
+          <i class="bi bi-send"></i>
+        </span>
+
+        <h2>Готовы отправить отклик?</h2>
+      </div>
+
+      <p>Проверьте данные и отправьте отклик работодателю.</p>
+
+      <div class="student-vacancy-detail-bottom-buttons-v2">
+        <form method="post" action="{% url 'vacancies:respond' vacancy.pk %}">
+          {% csrf_token %}
+          <button class="btn btn-primary" type="submit">
+            Откликнуться
+          </button>
+        </form>
+      </div>
+    </div>
+  {% endif %}
+</section>
+
+    </main>
+
+    <aside class="student-vacancy-detail-side-v2">
+      <section class="card student-vacancy-info-card-v2">
+        <h2>Информация</h2>
+
+        <div class="student-vacancy-info-list-v2">
+          <div class="student-vacancy-info-item-v2">
+            <span class="student-vacancy-info-icon">
+              <i class="bi bi-building"></i>
+            </span>
+            <div>
+              <span>Компания</span>
+              <strong>{{ vacancy.company }}</strong>
+            </div>
+          </div>
+
+          <div class="student-vacancy-info-item-v2">
+            <span class="student-vacancy-info-icon">
+              <i class="bi bi-display"></i>
+            </span>
+            <div>
+              <span>Формат</span>
+              <strong>{{ vacancy.format_type }}</strong>
+            </div>
+          </div>
+
+          <div class="student-vacancy-info-item-v2">
+            <span class="student-vacancy-info-icon">
+              <i class="bi bi-briefcase"></i>
+            </span>
+            <div>
+              <span>Тип занятости</span>
+              <strong>{{ vacancy.employment_type }}</strong>
+            </div>
+          </div>
+
+          <div class="student-vacancy-info-item-v2">
+            <span class="student-vacancy-info-icon">
+              <i class="bi bi-diagram-3"></i>
+            </span>
+            <div>
+              <span>Направление</span>
+              <strong>{{ vacancy.direction }}</strong>
+            </div>
+          </div>
+
+          <div class="student-vacancy-info-item-v2">
+            <span class="student-vacancy-info-icon">
+              <i class="bi bi-envelope"></i>
+            </span>
+            <div>
+              <span>Контакты</span>
+              <strong>{{ vacancy.contacts }}</strong>
+            </div>
+          </div>
+
+          <div class="student-vacancy-info-item-v2">
+            <span class="student-vacancy-info-icon">
+              <i class="bi bi-calendar3"></i>
+            </span>
+            <div>
+              <span>Опубликовано</span>
+              <strong>{{ vacancy.created_at|date:"d.m.Y" }}</strong>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card student-vacancy-how-card-v2">
+        <span class="student-vacancy-how-icon">
+          <i class="bi bi-rocket-takeoff"></i>
+        </span>
+
+        <h2>Как откликнуться</h2>
+        <p>
+          Подготовьте резюме, убедитесь, что в портфолио есть подходящие работы, и отправьте отклик.
+          Работодатель сможет связаться с вами по указанным контактам.
+        </p>
+
+        <div class="student-vacancy-how-note-v2">
+          <i class="bi bi-info-circle"></i>
+          <span>Советуем заранее обновить публичное резюме и проверить контакты в профиле.</span>
+        </div>
+      </section>
+    </aside>
+  </div>
+
+</div>
 {% endblock %}

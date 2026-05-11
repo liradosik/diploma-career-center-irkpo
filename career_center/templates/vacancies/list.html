@@ -1,40 +1,186 @@
 {% extends 'base_dashboard.html' %}
+
 {% block title %}Вакансии{% endblock %}
+
 {% block content %}
-<section class="hero student-vacancy-list">
-  <div class="hero-kicker">Раздел занятости</div>
-  <h1>Вакансии и стажировки</h1>
-  <p>Подберите предложение по формату, типу занятости и карьерному направлению.</p>
-</section>
+<div class="student-vacancies-page-v2">
 
-<section class="section card student-vacancy-list">
-  <form method="get" class="grid grid-2">
-    <p class="full"><label for="q">Поиск</label><input id="q" type="text" name="q" value="{{ request.GET.q }}" placeholder="Например: дизайнер, junior, стажировка"></p>
-    <p><label for="employment">Тип занятости</label><select id="employment" name="employment"><option value="">Все</option>{% for option in employment_options %}<option value="{{ option }}" {% if employment_filter == option %}selected{% endif %}>{{ option }}</option>{% endfor %}</select></p>
-    <p><label for="format">Формат</label><select id="format" name="format"><option value="">Все</option>{% for option in format_options %}<option value="{{ option }}" {% if format_filter == option %}selected{% endif %}>{{ option }}</option>{% endfor %}</select></p>
-    <p><label for="direction">Направление</label><select id="direction" name="direction"><option value="">Все</option>{% for option in direction_options %}<option value="{{ option }}" {% if direction_filter == option %}selected{% endif %}>{{ option }}</option>{% endfor %}</select></p>
-    <div class="inline-actions full"><button class="btn btn-primary" type="submit">Применить</button><a class="btn" href="{% url 'vacancies:list' %}">Сбросить</a></div>
-  </form>
-</section>
+  <section class="hero student-vacancies-hero-v2">
+    <div class="student-vacancies-hero-main">
+      <div class="hero-kicker">Раздел возможностей</div>
+      <h1>Вакансии и стажировки</h1>
+      <p>Подберите предложение по формату, типу занятости и карьерному направлению.</p>
+    </div>
 
-<section class="section student-vacancy-list">
-  {% for v in vacancies %}
-    <article class="card student-vacancy-card">
-      <h3>{{ v.title }}</h3>
-      <p class="muted">{{ v.company }}</p>
-      <div class="inline-actions">
-        <span class="badge">{{ v.format_type }}</span>
-        <span class="badge">{{ v.employment_type }}</span>
-        <span class="badge">{{ v.direction }}</span>
+    <div class="student-vacancies-hero-art" aria-hidden="true">
+      <span class="vacancies-decor-circle vacancies-decor-circle-one"></span>
+      <span class="vacancies-decor-circle vacancies-decor-circle-two"></span>
+      <span class="vacancies-decor-circle vacancies-decor-circle-three"></span>
+
+      <span class="vacancies-decor-star vacancies-decor-star-one">✦</span>
+      <span class="vacancies-decor-star vacancies-decor-star-two">✧</span>
+      <span class="vacancies-decor-star vacancies-decor-star-three">✦</span>
+
+      <span class="vacancies-decor-dot vacancies-decor-dot-one"></span>
+      <span class="vacancies-decor-dot vacancies-decor-dot-two"></span>
+    </div>
+  </section>
+
+  <section class="card student-vacancies-filter-card-v2">
+    <form method="get" class="student-vacancies-filters-v2">
+      <div class="student-vacancies-filter-field student-vacancies-filter-search">
+        <label for="q">Поиск</label>
+        <div class="student-vacancies-search-box">
+          <i class="bi bi-search"></i>
+          <input
+            id="q"
+            type="search"
+            name="q"
+            value="{{ q }}"
+            placeholder="Например: дизайнер, junior, стажировка"
+          >
+        </div>
       </div>
-      <p>{{ v.description|truncatechars:180 }}</p>
-      <div class="inline-actions">
-        <a class="btn" href="{% url 'vacancies:detail' v.pk %}">Подробнее</a>
-        <form method="post" action="{% url 'vacancies:respond' v.pk %}">{% csrf_token %}<button class="btn btn-primary" type="submit">Откликнуться</button></form>
+
+      <div class="student-vacancies-filter-field">
+        <label for="employment">Тип занятости</label>
+        <select id="employment" name="employment">
+          <option value="">Все</option>
+          {% for option in employment_options %}
+            <option value="{{ option }}" {% if employment_filter == option %}selected{% endif %}>
+              {{ option }}
+            </option>
+          {% endfor %}
+        </select>
       </div>
-    </article>
-  {% empty %}
-    <section class="card empty-state"><p class="muted">По текущим фильтрам вакансий не найдено.</p></section>
-  {% endfor %}
-</section>
+
+      <div class="student-vacancies-filter-field">
+        <label for="format">Формат</label>
+        <select id="format" name="format">
+          <option value="">Все</option>
+          {% for option in format_options %}
+            <option value="{{ option }}" {% if format_filter == option %}selected{% endif %}>
+              {{ option }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="student-vacancies-filter-field">
+        <label for="direction">Направление</label>
+        <select id="direction" name="direction">
+          <option value="">Все</option>
+          {% for option in direction_options %}
+            <option value="{{ option }}" {% if direction_filter == option %}selected{% endif %}>
+              {{ option }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="student-vacancies-filter-actions">
+        <button class="btn btn-primary" type="submit">
+          <i class="bi bi-funnel"></i>
+          Применить
+        </button>
+
+        <a class="btn student-vacancies-reset-btn" href="{% url 'vacancies:list' %}">
+          <i class="bi bi-arrow-clockwise"></i>
+          Сбросить
+        </a>
+      </div>
+    </form>
+  </section>
+
+  <section class="student-vacancies-list-v2">
+    {% for v in vacancies %}
+      <article class="card student-vacancy-card-v2">
+        <div class="student-vacancy-icon {% cycle 'is-blue' 'is-green' 'is-orange' 'is-purple' %}">
+          {% if 'дизайн' in v.direction|lower or 'design' in v.direction|lower %}
+            <i class="bi bi-palette"></i>
+          {% elif 'it' in v.direction|lower or 'разработ' in v.title|lower or 'програм' in v.direction|lower %}
+            <i class="bi bi-code-slash"></i>
+          {% elif 'аналит' in v.title|lower %}
+            <i class="bi bi-bar-chart"></i>
+          {% else %}
+            <i class="bi bi-briefcase"></i>
+          {% endif %}
+        </div>
+
+        <div class="student-vacancy-main-v2">
+          <div class="student-vacancy-title-row-v2">
+            <div>
+              <h2>{{ v.title }}</h2>
+              <p class="student-vacancy-company">{{ v.company }}</p>
+            </div>
+
+            <span class="student-vacancy-new-badge">Новая</span>
+          </div>
+
+          <div class="student-vacancy-tags-v2">
+            <span>{{ v.format_type }}</span>
+            <span>{{ v.employment_type }}</span>
+            <span>{{ v.direction }}</span>
+          </div>
+
+          <p class="student-vacancy-description-v2">
+            {{ v.description|truncatechars:170 }}
+          </p>
+
+          <div class="student-vacancy-actions-v2">
+            <a class="btn" href="{% url 'vacancies:detail' v.pk %}">
+              Подробнее
+            </a>
+
+            {% if v.id in responded_vacancy_ids %}
+              <span class="student-vacancy-responded-badge">
+                <i class="bi bi-check2"></i>
+                Вы откликнулись
+              </span>
+            {% else %}
+              <form method="post" action="{% url 'vacancies:respond' v.pk %}">
+                {% csrf_token %}
+                <button class="btn btn-primary" type="submit">
+                  Откликнуться
+                </button>
+              </form>
+            {% endif %}
+          </div>
+        </div>
+
+        <aside class="student-vacancy-side-v2">
+          <button class="student-vacancy-save-btn" type="button" title="Сохранить вакансию">
+            <i class="bi bi-bookmark"></i>
+          </button>
+
+          <div class="student-vacancy-side-meta">
+            <p>
+              <i class="bi bi-geo-alt"></i>
+              <span>{{ v.format_type }}</span>
+            </p>
+
+            <p>
+              <span>Опубликовано</span>
+              <strong>{{ v.created_at|date:"d.m.Y" }}</strong>
+            </p>
+          </div>
+        </aside>
+      </article>
+    {% empty %}
+      <section class="card student-vacancies-empty-v2">
+        <div class="student-vacancies-empty-icon">
+          <i class="bi bi-search"></i>
+        </div>
+
+        <h2>Вакансий не найдено</h2>
+        <p>Попробуйте изменить поиск, формат, тип занятости или направление.</p>
+
+        <a class="btn btn-primary" href="{% url 'vacancies:list' %}">
+          Сбросить фильтры
+        </a>
+      </section>
+    {% endfor %}
+  </section>
+
+</div>
 {% endblock %}

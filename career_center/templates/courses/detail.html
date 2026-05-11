@@ -1,54 +1,302 @@
 {% extends 'base_dashboard.html' %}
+
 {% block title %}{{ course.title }}{% endblock %}
+
 {% block content %}
-<section class="hero student-course-detail">
-  <div class="hero-kicker">Карточка мероприятия</div>
-  <h1>{{ course.title }}</h1>
-  <div class="student-course-meta inline-actions">
-    <span class="badge">{{ course.get_kind_display }}</span>
-    <span class="badge">{{ course.get_format_type_display }}</span>
-    <span class="badge badge-active">Идёт набор</span>
+<div class="student-course-detail-page-v2">
+
+  <nav class="student-course-breadcrumbs-v2" aria-label="Навигация">
+    <a href="{% url 'courses:list' %}">Курсы и семинары</a>
+    <span>•</span>
+    <span>{{ course.title }}</span>
+  </nav>
+
+  <section class="hero student-course-detail-hero-v2">
+    <div class="student-course-detail-hero-main">
+      <div class="student-course-detail-tags-v2">
+        <span>{{ course.get_kind_display }}</span>
+        <span>{{ course.get_format_type_display }}</span>
+
+        {% if registration and registration.status == 'registered' %}
+          <span class="is-success">Вы записаны</span>
+        {% elif registration and registration.status == 'cancelled' %}
+          <span class="is-muted">Запись отменена</span>
+        {% elif course.format_type == 'offline' and course.available_places_count <= 0 %}
+          <span class="is-danger">Мест нет</span>
+        {% else %}
+          <span class="is-success">Идёт набор</span>
+        {% endif %}
+      </div>
+
+      <h1>{{ course.title }}</h1>
+
+      {% if course.organization %}
+        <p class="student-course-detail-company">
+          {{ course.organization }}
+        </p>
+      {% endif %}
+
+      <div class="student-course-detail-actions-v2">
+        {% if registration and registration.status == 'registered' %}
+          <span class="student-course-detail-registered">
+            <i class="bi bi-check2-circle"></i>
+            Вы записаны
+          </span>
+        {% elif course.format_type == 'offline' and course.available_places_count <= 0 %}
+          <span class="student-course-detail-full">
+            <i class="bi bi-x-circle"></i>
+            Запись недоступна
+          </span>
+        {% elif registration and registration.status == 'cancelled' %}
+          <form method="post" action="{% url 'courses:register' course.id %}">
+            {% csrf_token %}
+            <button class="btn btn-primary" type="submit">
+              <i class="bi bi-arrow-clockwise"></i>
+              Записаться снова
+            </button>
+          </form>
+        {% else %}
+          <form method="post" action="{% url 'courses:register' course.id %}">
+            {% csrf_token %}
+            <button class="btn btn-primary" type="submit">
+              <i class="bi bi-send"></i>
+              Записаться
+            </button>
+          </form>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="student-course-detail-hero-art" aria-hidden="true">
+      <span class="course-detail-soft-star course-detail-soft-star-one">✦</span>
+      <span class="course-detail-soft-star course-detail-soft-star-two">✧</span>
+      <span class="course-detail-soft-star course-detail-soft-star-three">✦</span>
+      <span class="course-detail-soft-dot course-detail-soft-dot-one"></span>
+      <span class="course-detail-soft-dot course-detail-soft-dot-two"></span>
+      <span class="course-detail-soft-line course-detail-soft-line-one"></span>
+      <span class="course-detail-soft-line course-detail-soft-line-two"></span>
+    </div>
+  </section>
+
+  <div class="student-course-detail-layout-v2">
+    <main class="student-course-detail-main-v2">
+
+      {% if course.description %}
+        <section class="card student-course-detail-section-v2">
+          <span class="student-course-detail-section-icon">
+            <i class="bi bi-card-text"></i>
+          </span>
+
+          <div>
+            <h2>Описание</h2>
+            <p>{{ course.description|linebreaksbr }}</p>
+          </div>
+        </section>
+      {% endif %}
+
+      <section class="card student-course-detail-section-v2">
+        <span class="student-course-detail-section-icon">
+          <i class="bi bi-building"></i>
+        </span>
+
+        <div>
+          <h2>Организация</h2>
+          <p>{{ course.organization }}</p>
+        </div>
+      </section>
+
+      <section class="card student-course-detail-section-v2">
+        <span class="student-course-detail-section-icon">
+          <i class="bi bi-calendar3"></i>
+        </span>
+
+        <div>
+          <h2>Дата</h2>
+          <p>{{ course.date|date:"d.m.Y" }}</p>
+        </div>
+      </section>
+
+      {% if course.contacts %}
+        <section class="card student-course-detail-section-v2">
+          <span class="student-course-detail-section-icon">
+            <i class="bi bi-envelope"></i>
+          </span>
+
+          <div>
+            <h2>Контакты</h2>
+            <p>{{ course.contacts }}</p>
+          </div>
+        </section>
+      {% endif %}
+
+      <section class="card student-course-response-card-clean">
+        <div class="student-course-response-clean-content">
+          <div class="student-course-response-clean-title">
+            {% if registration and registration.status == 'registered' %}
+              <span class="student-course-response-icon is-success">
+                <i class="bi bi-check2-circle"></i>
+              </span>
+              <h2>Вы записаны на это мероприятие</h2>
+            {% elif registration and registration.status == 'cancelled' %}
+              <span class="student-course-response-icon">
+                <i class="bi bi-arrow-counterclockwise"></i>
+              </span>
+              <h2>Запись отменена</h2>
+            {% elif course.format_type == 'offline' and course.available_places_count <= 0 %}
+              <span class="student-course-response-icon is-danger">
+                <i class="bi bi-x-circle"></i>
+              </span>
+              <h2>Свободных мест нет</h2>
+            {% else %}
+              <span class="student-course-response-icon">
+                <i class="bi bi-send"></i>
+              </span>
+              <h2>Можно записаться на мероприятие</h2>
+            {% endif %}
+          </div>
+
+          {% if registration and registration.status == 'registered' %}
+            <p>Вы можете отменить запись, если больше не планируете участвовать.</p>
+          {% elif registration and registration.status == 'cancelled' %}
+            <p>Вы отменили запись, но можете записаться снова, если набор ещё доступен.</p>
+          {% elif course.format_type == 'offline' and course.available_places_count <= 0 %}
+            <p>На очное мероприятие закончились свободные места.</p>
+          {% else %}
+            <p>Проверьте дату, формат и контакты организатора перед записью.</p>
+          {% endif %}
+
+          <div class="student-course-detail-bottom-buttons-v2">
+            {% if registration and registration.status == 'registered' %}
+              <form method="post" action="{% url 'courses:cancel_registration' registration.id %}">
+                {% csrf_token %}
+                <button class="btn btn-link" type="submit">
+                  <i class="bi bi-x-circle"></i>
+                  Отменить запись
+                </button>
+              </form>
+            {% elif course.format_type == 'offline' and course.available_places_count <= 0 %}
+              <button class="btn" type="button" disabled>
+                Запись недоступна
+              </button>
+            {% elif registration and registration.status == 'cancelled' %}
+              <form method="post" action="{% url 'courses:register' course.id %}">
+                {% csrf_token %}
+                <button class="btn btn-primary" type="submit">
+                  Записаться снова
+                </button>
+              </form>
+            {% else %}
+              <form method="post" action="{% url 'courses:register' course.id %}">
+                {% csrf_token %}
+                <button class="btn btn-primary" type="submit">
+                  Записаться
+                </button>
+              </form>
+            {% endif %}
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <aside class="student-course-detail-side-v2">
+      <section class="card student-course-info-card-v2">
+        <h2>Информация</h2>
+
+        <div class="student-course-info-list-v2">
+          <div class="student-course-info-item-v2">
+            <span class="student-course-info-icon">
+              <i class="bi bi-mortarboard"></i>
+            </span>
+            <div>
+              <span>Тип</span>
+              <strong>{{ course.get_kind_display }}</strong>
+            </div>
+          </div>
+
+          <div class="student-course-info-item-v2">
+            <span class="student-course-info-icon">
+              <i class="bi bi-display"></i>
+            </span>
+            <div>
+              <span>Формат</span>
+              <strong>{{ course.get_format_type_display }}</strong>
+            </div>
+          </div>
+
+          <div class="student-course-info-item-v2">
+            <span class="student-course-info-icon">
+              <i class="bi bi-building"></i>
+            </span>
+            <div>
+              <span>Организация</span>
+              <strong>{{ course.organization }}</strong>
+            </div>
+          </div>
+
+          <div class="student-course-info-item-v2">
+            <span class="student-course-info-icon">
+              <i class="bi bi-calendar3"></i>
+            </span>
+            <div>
+              <span>Дата</span>
+              <strong>{{ course.date|date:"d.m.Y" }}</strong>
+            </div>
+          </div>
+
+          <div class="student-course-info-item-v2">
+            <span class="student-course-info-icon">
+              <i class="bi bi-envelope"></i>
+            </span>
+            <div>
+              <span>Контакты</span>
+              <strong>{{ course.contacts }}</strong>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {% if course.format_type == 'offline' %}
+        <section class="card student-course-places-card-v2">
+          <h2>Места</h2>
+
+          <div class="student-course-places-meter-v2">
+            <div>
+              <span style="width: {% widthratio course.occupied_places_count course.places 100 %}%"></span>
+            </div>
+          </div>
+
+          <div class="student-course-places-grid-v2">
+            <article>
+              <span>Занято</span>
+              <strong>{{ course.occupied_places_count }} из {{ course.places }}</strong>
+            </article>
+
+            <article>
+              <span>Свободно</span>
+              <strong>{{ course.available_places_count }}</strong>
+            </article>
+          </div>
+
+          {% if course.available_places_count <= 0 and not registration %}
+            <span class="student-course-status-badge is-full">Мест нет</span>
+          {% endif %}
+        </section>
+      {% endif %}
+
+      <section class="card student-course-how-card-v2">
+        <span class="student-course-how-icon">
+          <i class="bi bi-info-circle"></i>
+        </span>
+
+        <h2>Как участвовать</h2>
+        <p>
+          Запишитесь на мероприятие и проверьте контакты организатора. Если планы изменятся,
+          запись можно отменить на этой странице.
+        </p>
+      </section>
+    </aside>
   </div>
-</section>
 
-<section class="section card student-course-detail">
-  {% if course.description %}<div class="list-item"><h3>Описание</h3><p>{{ course.description }}</p></div>{% endif %}
-  {% if course.organization %}<div class="list-item"><h3>Организация</h3><p>{{ course.organization }}</p></div>{% endif %}
-  {% if course.date %}<div class="list-item"><h3>Дата</h3><p>{{ course.date }}</p></div>{% endif %}
-  {% if course.contacts %}<div class="list-item"><h3>Контакты</h3><p>{{ course.contacts }}</p></div>{% endif %}
-</section>
-
-{% if course.format_type == 'offline' %}
-<section class="section card student-course-places">
-  <h2>Места</h2>
-  <p>Занято: {{ course.occupied_places_count }} из {{ course.places }}</p>
-  <p>Осталось мест: {{ course.available_places_count }}</p>
-  {% if course.available_places_count <= 0 and not registration %}<span class="badge badge-rejected">Мест нет</span>{% endif %}
-</section>
-{% endif %}
-
-<section class="section card student-course-registration">
-  <h2>Статус записи</h2>
-  {% if registration and registration.status == 'registered' %}
-    <p class="badge badge-approved">Вы записаны</p>
-  {% elif registration and registration.status == 'cancelled' %}
-    <p class="badge">Запись отменена</p>
-  {% elif course.format_type == 'offline' and course.available_places_count <= 0 %}
-    <p class="badge badge-rejected">Мест нет</p>
-  {% else %}
-    <p class="badge badge-active">Идёт набор</p>
-  {% endif %}
-
-  <div class="student-course-actions inline-actions">
-    {% if registration and registration.status == 'registered' %}
-      <form method="post" action="{% url 'courses:cancel_registration' registration.id %}">{% csrf_token %}<button class="btn btn-link" type="submit">Отменить запись</button></form>
-    {% elif course.format_type == 'offline' and course.available_places_count <= 0 %}
-      <button class="btn" type="button" disabled>Запись недоступна</button>
-    {% elif registration and registration.status == 'cancelled' %}
-      <form method="post" action="{% url 'courses:register' course.id %}">{% csrf_token %}<button class="btn btn-primary" type="submit">Записаться снова</button></form>
-    {% else %}
-      <form method="post" action="{% url 'courses:register' course.id %}">{% csrf_token %}<button class="btn btn-primary" type="submit">Записаться</button></form>
-    {% endif %}
-  </div>
-</section>
+</div>
 {% endblock %}
