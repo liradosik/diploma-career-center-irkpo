@@ -1,34 +1,357 @@
 {% extends 'base_dashboard.html' %}
-{% block title %}{% if entry %}Редактирование записи{% else %}Новая запись{% endif %}{% endblock %}
-{% block content %}
-<section class="hero student-portfolio-hero">
-  <div class="hero-kicker">Портфолио</div>
-  <h1>{% if entry %}Редактирование записи{% else %}Добавление записи{% endif %}</h1>
-  <p>Добавьте проекты, достижения, сертификаты, отзывы и другие материалы.</p>
-</section>
-<section class="section card student-portfolio-form-card">
-  <form method="post" enctype="multipart/form-data" class="student-portfolio-form">
-    {% csrf_token %}
-    {{ form.as_p }}
+{% load ui_extras %}
 
-    {% if entry %}
-      <div class="student-portfolio-existing-files">
-        <h3>Текущие вложения</h3>
-        {% if existing_attachments %}
-          {% for attachment in existing_attachments %}
-            <label class="student-portfolio-file-row">
-              <input type="checkbox" name="delete_attachments" value="{{ attachment.id }}">
-              <a href="{{ attachment.file.url }}" target="_blank">{{ attachment.filename }}</a>
-              <span class="muted">Удалить</span>
-            </label>
-          {% endfor %}
+{% block title %}{% if entry %}Редактирование записи{% else %}Новая запись{% endif %}{% endblock %}
+
+{% block content %}
+<div class="portfolio-entry-page-v2">
+
+  <section class="hero portfolio-entry-hero-v2">
+    <div class="portfolio-entry-hero-main">
+      <div class="hero-kicker">Портфолио</div>
+
+      <h1>
+        {% if entry %}
+          Редактирование записи
         {% else %}
-          <p class="muted">Вложений пока нет.</p>
+          Добавление записи
+        {% endif %}
+      </h1>
+
+      <p>
+        {% if entry %}
+          Обновите информацию, вложения и описание записи перед повторной отправкой на проверку.
+        {% else %}
+          Добавьте проекты, достижения, сертификаты, отзывы и другие материалы.
+        {% endif %}
+      </p>
+    </div>
+
+    <div class="portfolio-entry-hero-art" aria-hidden="true">
+      <span class="portfolio-entry-orbit portfolio-entry-orbit-one"></span>
+      <span class="portfolio-entry-orbit portfolio-entry-orbit-two"></span>
+      <span class="portfolio-entry-star portfolio-entry-star-one">✦</span>
+      <span class="portfolio-entry-star portfolio-entry-star-two">✧</span>
+    </div>
+  </section>
+
+  <section class="section card portfolio-entry-form-card-v2">
+    <form method="post" enctype="multipart/form-data" class="portfolio-entry-form-v2">
+      {% csrf_token %}
+
+      {% if form.non_field_errors %}
+        <div class="portfolio-entry-errors">
+          {{ form.non_field_errors }}
+        </div>
+      {% endif %}
+
+      <div class="portfolio-entry-field portfolio-entry-field-full">
+        <label for="{{ form.type.id_for_label }}">
+          <i class="bi bi-folder2-open"></i>
+          {{ form.type.label }}
+        </label>
+        {{ form.type }}
+        {% if form.type.errors %}
+          <div class="portfolio-entry-field-error">{{ form.type.errors }}</div>
         {% endif %}
       </div>
-    {% endif %}
 
-    <div class="inline-actions"><button class="btn btn-primary" type="submit">Сохранить</button></div>
-  </form>
-</section>
+      <div class="portfolio-entry-field portfolio-entry-field-full">
+        <label for="{{ form.title.id_for_label }}">
+          <i class="bi bi-pencil"></i>
+          {{ form.title.label }}
+        </label>
+        {{ form.title }}
+        {% if form.title.errors %}
+          <div class="portfolio-entry-field-error">{{ form.title.errors }}</div>
+        {% endif %}
+      </div>
+
+      <div class="portfolio-entry-field portfolio-entry-field-full">
+        <label for="{{ form.description.id_for_label }}">
+          <i class="bi bi-file-earmark-text"></i>
+          {{ form.description.label }}
+        </label>
+        {{ form.description }}
+        {% if form.description.errors %}
+          <div class="portfolio-entry-field-error">{{ form.description.errors }}</div>
+        {% endif %}
+      </div>
+
+      <div class="portfolio-entry-two-columns">
+        <div class="portfolio-entry-field">
+          <label for="{{ form.date.id_for_label }}">
+            <i class="bi bi-calendar3"></i>
+            {{ form.date.label }}
+          </label>
+          {{ form.date }}
+          {% if form.date.errors %}
+            <div class="portfolio-entry-field-error">{{ form.date.errors }}</div>
+          {% endif %}
+        </div>
+
+        <div class="portfolio-entry-field">
+          <label for="{{ form.link.id_for_label }}">
+            <i class="bi bi-link-45deg"></i>
+            Ссылка <span>(необязательно)</span>
+          </label>
+          {{ form.link }}
+          {% if form.link.errors %}
+            <div class="portfolio-entry-field-error">{{ form.link.errors }}</div>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="portfolio-entry-field portfolio-entry-field-full portfolio-entry-upload-field">
+        <label for="{{ form.attachments.id_for_label }}">
+          <i class="bi bi-paperclip"></i>
+          {{ form.attachments.label }}
+        </label>
+
+        <div class="portfolio-entry-upload-box" data-portfolio-dropzone>
+  <input
+    type="file"
+    name="{{ form.attachments.html_name }}"
+    id="{{ form.attachments.id_for_label }}"
+    multiple
+    accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.zip"
+    data-portfolio-file-input
+  >
+
+  <div class="portfolio-entry-upload-content">
+    <span class="portfolio-entry-upload-icon">
+      <i class="bi bi-cloud-arrow-up"></i>
+    </span>
+
+    <div>
+      <p>
+        Перетащите файлы сюда или
+        <label for="{{ form.attachments.id_for_label }}" class="portfolio-entry-upload-button">
+          выбрать файлы
+        </label>
+      </p>
+      <span>Поддерживаются: PDF, JPG/JPEG, PNG, DOC/DOCX, ZIP</span>
+      <span>Можно прикрепить несколько файлов</span>
+    </div>
+  </div>
+</div>
+
+<div class="portfolio-entry-selected-list" data-portfolio-selected-list hidden></div>
+
+        {% if form.attachments.errors %}
+          <div class="portfolio-entry-field-error">{{ form.attachments.errors }}</div>
+        {% endif %}
+      </div>
+
+      {% if entry %}
+        <div class="portfolio-entry-existing-files-v2">
+          <div class="portfolio-entry-existing-head">
+            <div>
+              <h3>
+                <i class="bi bi-archive"></i>
+                Текущие вложения
+              </h3>
+              <p class="muted">Отметьте файлы, которые нужно удалить после сохранения.</p>
+            </div>
+
+            {% if existing_attachments %}
+              <span class="badge">{{ existing_attachments|length }}</span>
+            {% endif %}
+          </div>
+
+          {% if existing_attachments %}
+            <div class="portfolio-entry-existing-list">
+              {% for attachment in existing_attachments %}
+                <label class="portfolio-entry-existing-file">
+                  <span class="portfolio-entry-existing-file-icon">
+                    {% if attachment.filename|is_image_file %}
+                      <img src="{{ attachment.file.url }}" alt="{{ attachment.filename }}">
+                    {% else %}
+                      <i class="bi bi-file-earmark-text"></i>
+                    {% endif %}
+                  </span>
+
+                  <span class="portfolio-entry-existing-file-main">
+                    <strong>{{ attachment.filename }}</strong>
+                    <a href="{{ attachment.file.url }}" target="_blank" rel="noopener">
+                      {% if attachment.filename|is_image_file %}
+                        Открыть
+                      {% else %}
+                        Скачать
+                      {% endif %}
+                    </a>
+                  </span>
+
+                  <span class="portfolio-entry-existing-delete">
+                    <input type="checkbox" name="delete_attachments" value="{{ attachment.id }}">
+                    <span>Удалить</span>
+                  </span>
+                </label>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="portfolio-entry-empty-files">
+              <i class="bi bi-folder2"></i>
+              <span>Вложений пока нет.</span>
+            </div>
+          {% endif %}
+        </div>
+      {% endif %}
+
+      <div class="portfolio-entry-bottom-bar">
+        <div class="portfolio-entry-note">
+          <i class="bi bi-info-circle"></i>
+          <div>
+            {% if entry %}
+              <strong>После сохранения запись будет отправлена на повторную проверку.</strong>
+              <p>Куратор увидит обновлённые данные и вложения.</p>
+            {% else %}
+              <strong>Новая запись будет автоматически отправлена на проверку куратору.</strong>
+              <p>После одобрения она станет видимой в вашем портфолио.</p>
+            {% endif %}
+          </div>
+        </div>
+
+        <button class="btn btn-primary portfolio-entry-save-btn" type="submit">
+          <i class="bi bi-floppy"></i>
+          {% if entry %}
+            Сохранить изменения
+          {% else %}
+            Сохранить запись
+          {% endif %}
+        </button>
+      </div>
+    </form>
+  </section>
+
+</div>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const dropzone = document.querySelector('[data-portfolio-dropzone]');
+    const input = document.querySelector('[data-portfolio-file-input]');
+    const selectedList = document.querySelector('[data-portfolio-selected-list]');
+
+    if (!dropzone || !input || !selectedList) {
+      return;
+    }
+
+    function formatFileSize(bytes) {
+      if (!bytes && bytes !== 0) {
+        return '';
+      }
+
+      if (bytes < 1024) {
+        return bytes + ' Б';
+      }
+
+      if (bytes < 1024 * 1024) {
+        return Math.round(bytes / 1024) + ' КБ';
+      }
+
+      return (bytes / (1024 * 1024)).toFixed(1) + ' МБ';
+    }
+
+    function getFileIcon(fileName) {
+      const lowerName = fileName.toLowerCase();
+
+      if (lowerName.match(/\.(jpg|jpeg|png)$/)) {
+        return 'bi-file-earmark-image';
+      }
+
+      if (lowerName.endsWith('.pdf')) {
+        return 'bi-file-earmark-pdf';
+      }
+
+      if (lowerName.match(/\.(doc|docx)$/)) {
+        return 'bi-file-earmark-word';
+      }
+
+      if (lowerName.endsWith('.zip')) {
+        return 'bi-file-earmark-zip';
+      }
+
+      return 'bi-file-earmark-text';
+    }
+
+    function renderSelectedFiles(files) {
+      const fileArray = Array.from(files || []);
+
+      if (fileArray.length === 0) {
+        selectedList.hidden = true;
+        selectedList.innerHTML = '';
+        return;
+      }
+
+      selectedList.hidden = false;
+
+      const items = fileArray.map(function (file) {
+        return `
+          <div class="portfolio-entry-selected-file">
+            <span class="portfolio-entry-selected-file-icon">
+              <i class="bi ${getFileIcon(file.name)}"></i>
+            </span>
+
+            <span class="portfolio-entry-selected-file-main">
+              <strong>${file.name}</strong>
+              <small>${formatFileSize(file.size)}</small>
+            </span>
+
+            <span class="portfolio-entry-selected-file-status">
+              Выбран
+            </span>
+          </div>
+        `;
+      }).join('');
+
+      selectedList.innerHTML = `
+        <div class="portfolio-entry-selected-head">
+          <strong>Выбранные файлы</strong>
+          <span>${fileArray.length}</span>
+        </div>
+        ${items}
+      `;
+    }
+
+    function setInputFiles(files) {
+      const dataTransfer = new DataTransfer();
+
+      Array.from(files || []).forEach(function (file) {
+        dataTransfer.items.add(file);
+      });
+
+      input.files = dataTransfer.files;
+      renderSelectedFiles(input.files);
+    }
+
+    ['dragenter', 'dragover'].forEach(function (eventName) {
+      dropzone.addEventListener(eventName, function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        dropzone.classList.add('is-dragover');
+      });
+    });
+
+    ['dragleave', 'drop'].forEach(function (eventName) {
+      dropzone.addEventListener(eventName, function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        dropzone.classList.remove('is-dragover');
+      });
+    });
+
+    dropzone.addEventListener('drop', function (event) {
+      const files = event.dataTransfer.files;
+
+      if (!files || files.length === 0) {
+        return;
+      }
+
+      setInputFiles(files);
+    });
+
+    input.addEventListener('change', function () {
+      renderSelectedFiles(input.files);
+    });
+  });
+</script>
 {% endblock %}

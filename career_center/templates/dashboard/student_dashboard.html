@@ -1,45 +1,304 @@
 {% extends 'base_dashboard.html' %}
 {% load ui_extras %}
+
 {% block title %}Кабинет студента{% endblock %}
+
 {% block content %}
-<div class="student-dashboard">
-<section class="hero student-hero">
-  <h1>Здравствуйте, {{ request.user.full_name }}</h1>
-  <p>Группа: {{ request.user.group|default:'—' }} • Специальность: {{ request.user.specialty|default:'—' }} • Курс: {{ current_course|default:'—' }}</p>
-  <div class="hero-actions"><a class="btn btn-primary" href="{% url 'portfolio:create' %}">Добавить достижение</a><a class="btn" href="{% url 'resumes:builder' %}">Конструктор резюме</a></div>
+<div class="student-dashboard student-dashboard-polished">
+
+  <section class="hero student-hero student-hero-clean">
+  <div class="student-hero-main">
+    <h1>Здравствуйте, {{ request.user.full_name }}</h1>
+
+    <p>
+      Группа: {{ request.user.group|default:'—' }}
+      <span>•</span>
+      Специальность: {{ request.user.specialty|default:'—' }}
+      <span>•</span>
+      Курс: {{ current_course|default:'—' }}
+    </p>
+  </div>
+
+  <div class="student-hero-art" aria-hidden="true">
+    <div class="student-hero-art-glow"></div>
+
+    <div class="student-hero-art-circle student-hero-art-circle-lg"></div>
+    <div class="student-hero-art-circle student-hero-art-circle-md"></div>
+    <div class="student-hero-art-circle student-hero-art-circle-sm"></div>
+
+    <span class="student-hero-art-star star-1">✦</span>
+    <span class="student-hero-art-star star-2">✦</span>
+    <span class="student-hero-art-star star-3">✧</span>
+  </div>
 </section>
-<section class="student-preview-grid">
-  <article class="card student-profile-card">
-    <h2>Профиль</h2>
-    {% if request.user.photo %}<img class="student-avatar-img" src="{{ request.user.photo.url }}" alt="Фото">{% else %}<div class="student-avatar-fallback">{{ request.user.full_name|initials }}</div>{% endif %}
-    <p><strong>{{ request.user.full_name }}</strong></p><p class="muted">{{ request.user.email }}</p><p class="muted">{{ request.user.group|default:'—' }} • {{ request.user.specialty|default:'—' }}</p><a class="btn" href="{% url 'accounts:profile_edit' %}">Настройки</a>
-  </article>
-  <article class="card student-resume-status"><h2>Резюме</h2><p class="student-status-badge {% if resume_is_public %}badge-approved{% else %}badge-pending{% endif %}">{% if resume_is_public %}Опубликовано{% else %}Не опубликовано{% endif %}</p><div class="inline-actions"><a class="btn" href="{% url 'resumes:builder' %}">Конструктор резюме</a>{% if resume_is_public %}<a class="btn" href="{{ resume_public_url }}" target="_blank">Открыть публичное резюме</a><button class="btn" type="button" onclick="navigator.clipboard.writeText('{{ resume_public_url }}')">Скопировать ссылку</button>{% endif %}</div></article>
-</section>
-<section class="card student-preview-card">
-  <h2>Ваш куратор</h2>
+
+  <section class="student-preview-grid student-top-grid">
+    <article class="card student-profile-card student-profile-card-clean">
+      <div class="student-card-title">
+        <span class="student-section-icon">
+          <i class="bi bi-person"></i>
+        </span>
+        <h2>Профиль</h2>
+      </div>
+
+      <div class="student-profile-body">
+        {% if request.user.photo %}
+          <img class="student-avatar-img" src="{{ request.user.photo.url }}" alt="Фото">
+        {% else %}
+          <div class="student-avatar-fallback">{{ request.user.full_name|initials }}</div>
+        {% endif %}
+
+        <div class="student-profile-info">
+          <p><strong>{{ request.user.full_name }}</strong></p>
+          <p class="muted">{{ request.user.email }}</p>
+          <p class="muted">{{ request.user.group|default:'—' }} • {{ request.user.specialty|default:'—' }}</p>
+        </div>
+      </div>
+
+      <a class="btn btn-link student-profile-settings" href="{% url 'accounts:profile_edit' %}">
+        <i class="bi bi-gear"></i>
+        Настройки
+      </a>
+    </article>
+
+    <article class="card student-resume-status student-resume-card-clean">
+      <div class="student-card-head">
+        <div class="student-card-title">
+          <span class="student-section-icon">
+            <i class="bi bi-file-earmark-person"></i>
+          </span>
+          <h2>Резюме</h2>
+        </div>
+
+        <span class="student-status-badge {% if resume_is_public %}badge-approved{% else %}badge-pending{% endif %}">
+          {% if resume_is_public %}
+            Опубликовано
+          {% else %}
+            Не опубликовано
+          {% endif %}
+        </span>
+      </div>
+
+      <div class="student-resume-actions">
+        {% if resume_is_public %}
+          <a class="student-action-row" href="{{ resume_public_url }}" target="_blank" rel="noopener">
+            <span class="student-action-icon"><i class="bi bi-box-arrow-up-right"></i></span>
+            <span>Открыть публичное резюме</span>
+            <i class="bi bi-chevron-right"></i>
+          </a>
+
+          <button class="student-action-row" type="button" onclick="navigator.clipboard.writeText('{{ resume_public_url }}')">
+            <span class="student-action-icon"><i class="bi bi-link-45deg"></i></span>
+            <span>Скопировать ссылку</span>
+            <i class="bi bi-chevron-right"></i>
+          </button>
+        {% else %}
+          <a class="student-action-row" href="{% url 'resumes:builder' %}">
+            <span class="student-action-icon"><i class="bi bi-pencil-square"></i></span>
+            <span>Заполнить и опубликовать резюме</span>
+            <i class="bi bi-chevron-right"></i>
+          </a>
+        {% endif %}
+
+        <a class="student-resume-edit-link" href="{% url 'resumes:builder' %}">
+          <i class="bi bi-pencil"></i>
+          Изменить в конструкторе
+        </a>
+      </div>
+    </article>
+  </section>
+
+  <section class="student-stats-grid student-stats-grid-clean">
+    <article class="student-stat-card">
+      <span class="student-stat-icon"><i class="bi bi-file-earmark-text"></i></span>
+      <div>Всего записей</div>
+      <strong>{{ portfolio_total }}</strong>
+    </article>
+
+    <article class="student-stat-card">
+      <span class="student-stat-icon is-warning"><i class="bi bi-clock"></i></span>
+      <div>Ожидают проверки</div>
+      <strong>{{ portfolio_pending }}</strong>
+    </article>
+
+    <article class="student-stat-card">
+      <span class="student-stat-icon is-success"><i class="bi bi-check-circle"></i></span>
+      <div>Подтверждено</div>
+      <strong>{{ portfolio_approved }}</strong>
+    </article>
+
+    <article class="student-stat-card">
+      <span class="student-stat-icon is-danger"><i class="bi bi-x-circle"></i></span>
+      <div>Отклонено</div>
+      <strong>{{ portfolio_rejected }}</strong>
+    </article>
+
+    <article class="student-stat-card">
+      <span class="student-stat-icon is-purple"><i class="bi bi-mortarboard"></i></span>
+      <div>Записан на курсы</div>
+      <strong>{{ registered_courses_count }}</strong>
+    </article>
+  </section>
+
+  <section class="student-preview-grid student-lists-grid">
+    <article class="card student-preview-card student-list-card">
+      <div class="student-card-head">
+        <h2>Последние записи портфолио</h2>
+        <a class="btn btn-link" href="{% url 'portfolio:list' %}">Все записи</a>
+      </div>
+
+      <div class="student-preview-list">
+        {% for entry in recent_entries %}
+          <div class="student-preview-item student-entry-row">
+            <div class="student-entry-icon">
+              {% if entry.type == 'academic' or entry.type == 'education' or entry.type == 'study' %}
+                <i class="bi bi-trophy"></i>
+              {% elif entry.type == 'project' or entry.type == 'projects' or entry.type == 'works' %}
+                <i class="bi bi-folder2-open"></i>
+              {% elif entry.type == 'skill' or entry.type == 'skills' %}
+                <i class="bi bi-stars"></i>
+              {% elif entry.type == 'certificate' or entry.type == 'certificates' or entry.type == 'courses' %}
+                <i class="bi bi-award"></i>
+              {% elif entry.type == 'social' or entry.type == 'creative' or entry.type == 'activity' %}
+                <i class="bi bi-people"></i>
+              {% elif entry.type == 'review' or entry.type == 'reviews' or entry.type == 'recommendations' %}
+                <i class="bi bi-chat-quote"></i>
+              {% elif entry.type == 'sport' or entry.type == 'sports' %}
+                <i class="bi bi-lightning-charge"></i>
+              {% else %}
+                <i class="bi bi-file-earmark-text"></i>
+              {% endif %}
+            </div>
+
+            <div class="student-entry-main">
+              <strong>{{ entry.title }}</strong>
+              <p class="muted">
+                {{ PORTFOLIO_TYPE_LABELS|dict_get:entry.type }} • {{ entry.date }}
+              </p>
+            </div>
+
+            <div class="student-entry-status">
+              {% if entry.status == 'pending' %}
+                <span class="badge badge-pending">Ожидает проверки</span>
+              {% endif %}
+              {% if entry.status == 'approved' %}
+                <span class="badge badge-approved">Подтверждено</span>
+              {% endif %}
+              {% if entry.status == 'rejected' %}
+                <span class="badge badge-rejected">Отклонено</span>
+              {% endif %}
+            </div>
+          </div>
+        {% empty %}
+          <p class="muted student-empty-line">Пока нет достижений. Добавьте первую запись.</p>
+        {% endfor %}
+      </div>
+    </article>
+
+    <article class="card student-preview-card student-list-card">
+      <div class="student-card-head">
+        <h2>Мои курсы и мероприятия</h2>
+        <a class="btn btn-link" href="{% url 'courses:list' %}">Все курсы</a>
+      </div>
+
+      <div class="student-preview-list">
+        {% for reg in registrations|slice:':4' %}
+          <div class="student-preview-item student-entry-row">
+            <div class="student-entry-icon">
+              {% if reg.course.kind == 'course' %}
+                <i class="bi bi-journal-bookmark"></i>
+              {% elif reg.course.kind == 'seminar' %}
+                <i class="bi bi-easel"></i>
+              {% elif reg.course.kind == 'practice' %}
+                <i class="bi bi-briefcase"></i>
+              {% elif reg.course.kind == 'webinar' %}
+                <i class="bi bi-camera-video"></i>
+              {% else %}
+                <i class="bi bi-calendar-event"></i>
+              {% endif %}
+            </div>
+
+            <div class="student-entry-main">
+              <strong>{{ reg.course.title }}</strong>
+              <p class="muted">
+                {{ reg.course.get_kind_display }} • {{ reg.course.date }} • {{ reg.course.get_format_type_display }}
+              </p>
+            </div>
+
+            <div class="student-entry-status">
+              <span class="badge">{{ reg.get_status_display }}</span>
+            </div>
+          </div>
+        {% empty %}
+          <p class="muted student-empty-line">Пока нет записей на курсы и семинары.</p>
+        {% endfor %}
+      </div>
+    </article>
+  </section>
+
+  <section class="card student-preview-card student-curator-card">
+  <div class="student-card-title">
+    <span class="student-section-icon">
+      <i class="bi bi-person-badge"></i>
+    </span>
+    <h2>Ваш куратор</h2>
+  </div>
+
   {% if curator %}
-    <div class="curator-contact-card">
-      {% if curator.photo %}
-        <img class="student-avatar-img" src="{{ curator.photo.url }}" alt="{{ curator.full_name }}">
-      {% else %}
-        <div class="student-avatar-fallback">{{ curator.full_name|initials }}</div>
-      {% endif %}
-      <div>
-        <p><strong>{{ curator.full_name }}</strong></p>
-        <p class="muted">{{ curator.contact_email|default:curator.email }}</p>
-        {% if curator.contact_phone %}<p class="muted">Телефон: {{ curator.contact_phone }}</p>{% endif %}
-        {% if curator.contact_telegram %}<p><a href="{{ curator.contact_telegram }}" target="_blank" rel="noopener">Связаться в Telegram</a></p>{% endif %}
-        {% if curator.contact_availability %}<p class="muted">Когда удобно писать: {{ curator.contact_availability }}</p>{% endif %}
-        {% if curator.contact_note %}<p>{{ curator.contact_note }}</p>{% endif %}
+    <div class="curator-contact-card curator-contact-card-simple">
+      <div class="curator-contact-main">
+        {% if curator.photo %}
+          <img class="student-avatar-img" src="{{ curator.photo.url }}" alt="{{ curator.full_name }}">
+        {% else %}
+          <div class="student-avatar-fallback">{{ curator.full_name|initials }}</div>
+        {% endif %}
+
+        <div class="curator-contact-text">
+          <p><strong>{{ curator.full_name }}</strong></p>
+
+          <p class="muted">
+            <i class="bi bi-envelope"></i>
+            {{ curator.contact_email|default:curator.email }}
+          </p>
+
+          {% if curator.contact_phone %}
+            <p class="muted">
+              <i class="bi bi-telephone"></i>
+              {{ curator.contact_phone }}
+            </p>
+          {% endif %}
+
+          {% if curator.contact_telegram %}
+            <p>
+              <a class="curator-telegram-link" href="{{ curator.contact_telegram }}" target="_blank" rel="noopener">
+                <i class="bi bi-send"></i>
+                Связаться в мессенджер
+              </a>
+            </p>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="curator-contact-extra">
+        {% if curator.contact_availability %}
+          <p class="muted">
+            <i class="bi bi-calendar3"></i>
+            <span>{{ curator.contact_availability }}</span>
+          </p>
+        {% endif %}
+
+        {% if curator.contact_note %}
+          <p class="muted">
+            <i class="bi bi-chat-left-text"></i>
+            <span>{{ curator.contact_note }}</span>
+          </p>
+        {% endif %}
       </div>
     </div>
   {% else %}
-    <p class="muted">Куратор группы пока не назначен.</p>
+    <p class="muted student-empty-line">Куратор группы пока не назначен.</p>
   {% endif %}
 </section>
-<section class="student-stats-grid"><article class="student-stat-card"><div>Всего записей</div><strong>{{ portfolio_total }}</strong></article><article class="student-stat-card"><div>Ожидают проверки</div><strong>{{ portfolio_pending }}</strong></article><article class="student-stat-card"><div>Подтверждено</div><strong>{{ portfolio_approved }}</strong></article><article class="student-stat-card"><div>Отклонено</div><strong>{{ portfolio_rejected }}</strong></article><article class="student-stat-card"><div>Записан на курсы</div><strong>{{ registered_courses_count }}</strong></article></section>
-<section class="card student-preview-card"><h2>Последние записи портфолио <a class="btn btn-link" href="{% url 'portfolio:list' %}">Все записи</a></h2><div class="student-preview-list">{% for entry in recent_entries %}<div class="student-preview-item"><strong>{{ entry.title }}</strong><p class="muted">{{ PORTFOLIO_TYPE_LABELS|dict_get:entry.type }} • {{ entry.date }}</p>{% if entry.status == 'pending' %}<span class="badge badge-pending">Ожидает проверки</span>{% endif %}{% if entry.status == 'approved' %}<span class="badge badge-approved">Подтверждено</span>{% endif %}{% if entry.status == 'rejected' %}<span class="badge badge-rejected">Отклонено</span>{% endif %}</div>{% empty %}<p class="muted">Пока нет достижений. Добавьте первую запись.</p>{% endfor %}</div></section>
-<section class="card student-preview-card"><h2>Мои курсы и мероприятия <a class="btn btn-link" href="{% url 'courses:list' %}">Все курсы</a></h2><div class="student-preview-list">{% for reg in registrations|slice:':3' %}<div class="student-preview-item"><strong>{{ reg.course.title }}</strong><p class="muted">{{ reg.course.get_kind_display }} • {{ reg.course.date }} • {{ reg.course.get_format_type_display }}</p><span class="badge">{{ reg.get_status_display }}</span></div>{% empty %}<p class="muted">Пока нет записей на курсы и семинары.</p>{% endfor %}</div></section>
+
 </div>
 {% endblock %}

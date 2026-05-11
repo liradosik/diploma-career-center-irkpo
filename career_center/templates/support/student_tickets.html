@@ -3,31 +3,186 @@
 {% block title %}Техподдержка{% endblock %}
 
 {% block content %}
-<section class="support-page">
-  <div class="page-heading"><h1>{{ support_title|default:"Техподдержка" }}</h1></div>
-  <div class="card support-ticket-form">
-    <h2>Создать обращение</h2>
-    <form method="post">
-      {% csrf_token %}
-      {{ form.as_p }}
-      <button class="btn-primary" type="submit">Создать обращение</button>
-    </form>
-  </div>
-  <div class="support-ticket-list">
-    {% for ticket in tickets %}
-      <article class="card support-ticket-card">
-        <div class="support-ticket-head">
-          <span class="support-ticket-status status-{{ ticket.status }}">{{ ticket.get_status_display }}</span>
-          <span class="muted">{{ ticket.created_at|date:'d.m.Y H:i' }}</span>
+<section class="support-page support-page-v2">
+
+  <section class="support-hero-v2">
+    <div class="support-hero-content">
+      <div class="hero-kicker">Сервис</div>
+      <h1>{{ support_title|default:"Техподдержка" }}</h1>
+      <p>
+        Если возникли вопросы или проблемы при работе с платформой, создайте обращение.
+        Администратор увидит его в панели управления и сможет ответить.
+      </p>
+    </div>
+
+    <div class="support-hero-decor" aria-hidden="true">
+      <span class="support-decor-circle support-decor-circle-one"></span>
+      <span class="support-decor-circle support-decor-circle-two"></span>
+      <span class="support-decor-star support-decor-star-one">✦</span>
+      <span class="support-decor-star support-decor-star-two">✧</span>
+      <span class="support-decor-star support-decor-star-three">✦</span>
+      <span class="support-decor-dot support-decor-dot-one"></span>
+      <span class="support-decor-dot support-decor-dot-two"></span>
+    </div>
+  </section>
+
+  <section class="support-info-grid-v2">
+    <article class="support-info-card-v2">
+      <span class="support-info-icon support-info-icon-blue">
+        <i class="bi bi-clock"></i>
+      </span>
+      <div>
+        <h3>Время ответа</h3>
+        <strong>в течение 24 часов</strong>
+        <p>В рабочие дни с 9:00 до 18:00</p>
+      </div>
+    </article>
+
+    <article class="support-info-card-v2">
+      <span class="support-info-icon support-info-icon-orange">
+        <i class="bi bi-book"></i>
+      </span>
+      <div>
+        <h3>База знаний</h3>
+        <strong>Частые вопросы</strong>
+        <p>Ответы на популярные вопросы находятся ниже.</p>
+      </div>
+    </article>
+  </section>
+
+  <section class="support-main-grid-v2">
+    <article class="card support-ticket-form support-ticket-form-v2">
+      <div class="support-card-head-v2">
+        <div>
+          <h2>Создать обращение</h2>
+          <p>Опишите проблему подробно, чтобы администратор быстрее помог.</p>
         </div>
-        <h3>{{ ticket.subject }}</h3>
-        <p><strong>Категория:</strong> {{ ticket.get_category_display }}</p>
-        <p>{{ ticket.message|linebreaksbr }}</p>
-        {% if ticket.admin_response %}<div class="support-ticket-response"><strong>Ответ администратора:</strong><p>{{ ticket.admin_response|linebreaksbr }}</p></div>{% endif %}
-      </article>
-    {% empty %}
-      <p class="muted">У вас пока нет обращений.</p>
-    {% endfor %}
-  </div>
+      </div>
+
+      <form method="post" class="support-form-v2">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+          <div class="support-form-errors">
+            {{ form.non_field_errors }}
+          </div>
+        {% endif %}
+
+        <div class="support-field-v2">
+          <label for="{{ form.category.id_for_label }}">
+            <i class="bi bi-grid"></i>
+            {{ form.category.label }}
+          </label>
+          {{ form.category }}
+          {% if form.category.errors %}
+            <div class="support-field-error-v2">{{ form.category.errors }}</div>
+          {% endif %}
+        </div>
+
+        <div class="support-field-v2">
+          <label for="{{ form.subject.id_for_label }}">
+            <i class="bi bi-pencil"></i>
+            {{ form.subject.label }}
+          </label>
+          {{ form.subject }}
+          {% if form.subject.errors %}
+            <div class="support-field-error-v2">{{ form.subject.errors }}</div>
+          {% endif %}
+        </div>
+
+        <div class="support-field-v2">
+          <label for="{{ form.message.id_for_label }}">
+            <i class="bi bi-chat-left-text"></i>
+            {{ form.message.label }}
+          </label>
+          {{ form.message }}
+          {% if form.message.errors %}
+            <div class="support-field-error-v2">{{ form.message.errors }}</div>
+          {% endif %}
+        </div>
+
+        <div class="support-submit-row-v2">
+          <button class="btn btn-primary" type="submit">
+            <i class="bi bi-send"></i>
+            Отправить обращение
+          </button>
+        </div>
+      </form>
+    </article>
+
+    <article class="card support-ticket-list-card-v2">
+      <div class="support-card-head-v2 support-card-head-row-v2">
+        <div>
+          <h2>Мои обращения</h2>
+          <p>История ваших вопросов и ответов администратора.</p>
+        </div>
+
+        <span class="support-count-badge">{{ tickets|length }}</span>
+      </div>
+
+      <div class="support-ticket-list support-ticket-list-v2">
+        {% for ticket in tickets %}
+          <article class="support-ticket-card-v2">
+            <div class="support-ticket-dot status-dot-{{ ticket.status }}"></div>
+
+            <div class="support-ticket-main-v2">
+              <div class="support-ticket-title-row-v2">
+                <h3>{{ ticket.subject }}</h3>
+                <span class="support-category-pill">{{ ticket.get_category_display }}</span>
+              </div>
+
+              <p class="support-ticket-message-v2">
+                {{ ticket.message|truncatechars:120 }}
+              </p>
+
+              {% if ticket.admin_response %}
+                <div class="support-ticket-response-v2">
+                  <i class="bi bi-reply"></i>
+                  <div>
+                    <strong>Ответ администратора</strong>
+                    <p>{{ ticket.admin_response|linebreaksbr }}</p>
+                  </div>
+                </div>
+              {% endif %}
+            </div>
+
+            <div class="support-ticket-side-v2">
+              <span class="support-ticket-status status-{{ ticket.status }}">
+                {{ ticket.get_status_display }}
+              </span>
+              <span class="support-ticket-date">{{ ticket.created_at|date:'d.m.Y H:i' }}</span>
+            </div>
+          </article>
+        {% empty %}
+          <div class="support-empty-v2">
+            <span>
+              <i class="bi bi-chat-square-text"></i>
+            </span>
+            <h3>Обращений пока нет</h3>
+            <p>Создайте первое обращение, если возник вопрос по портфолио, резюме, курсам или входу в аккаунт.</p>
+          </div>
+        {% endfor %}
+      </div>
+    </article>
+  </section>
+
+  <section class="support-knowledge-v2">
+    <div class="support-knowledge-icon">
+      <i class="bi bi-book"></i>
+    </div>
+
+    <div>
+      <h2>Не нашли ответ на свой вопрос?</h2>
+      <p>
+        Перед отправкой обращения можно проверить частые вопросы: возможно, ответ уже есть в базе знаний.
+      </p>
+    </div>
+
+    <a class="btn btn-link" href="#">
+      Перейти к базе знаний
+      <i class="bi bi-arrow-right"></i>
+    </a>
+  </section>
+
 </section>
 {% endblock %}

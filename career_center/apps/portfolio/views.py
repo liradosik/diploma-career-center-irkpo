@@ -27,29 +27,54 @@ SECTION_DEFINITIONS = OrderedDict(
 @role_required(User.Role.STUDENT)
 def list_entries(request):
     base_qs = PortfolioEntry.objects.filter(student=request.user).prefetch_related('attachments')
-    entries = base_qs.order_by('-date')
-    selected_type = request.GET.get('type', '')
-    if selected_type:
-        if selected_type in SECTION_DEFINITIONS:
-            entries = entries.filter(type__in=SECTION_DEFINITIONS[selected_type][1])
-        else:
-            entries = entries.filter(type=selected_type)
 
-    section_cards = []
-    for code, (title, types) in SECTION_DEFINITIONS.items():
-        section_cards.append({'code': code, 'title': title, 'count': base_qs.filter(type__in=types).count(), 'types': types})
+    search_query = request.GET.get('q', '').strip()
+    selected_type = request.GET.get('type', '').strip()
+    selected_status = request.GET.get('status', '').strip()
+    selected_sort = request.GET.get('sort', 'newest').strip() or 'newest'
 
-    profile = getattr(request.user, 'profile', None)
-    resume = getattr(request.user, 'resume_settings', None)
-    resume_public_url = request.build_absolute_uri(f"/resumes/public/{profile.public_resume_token}/") if profile else ''
-    can_share = bool(resume and resume.is_public and profile)
+    entries = base_qs
+
+    if search_query:
+        entries = entries.filter(
+            Q(title__icontains=search_query)
+            | Q(description__icontains=search_query)
+            | Q(link__icontains=search_query)
+            | Q(file__icontains=search_query)
+            | Q(attachments__file__icontains=search_query)
+        ).distinct()
+
+    type_values = {code for code, _label in PortfolioEntryForm.TYPE_CHOICES}
+    if selected_type in type_values:
+        entries = entries.filter(type=selected_type)
+
+    status_values = {code for code, _label in PortfolioEntry.Status.choices}
+    if selected_status in status_values:
+        entries = entries.filter(status=selected_status)
+
+    if selected_sort == 'oldest':
+        entries = entries.order_by('date', 'title')
+    elif selected_sort == 'title':
+        entries = entries.order_by('title', '-date')
+    else:
+        selected_sort = 'newest'
+        entries = entries.order_by('-date', '-created_at')
+
+    portfolio_total = base_qs.count()
+    portfolio_pending = base_qs.filter(status=PortfolioEntry.Status.PENDING).count()
+    portfolio_approved = base_qs.filter(status=PortfolioEntry.Status.APPROVED).count()
 
     return render(request, 'portfolio/list.html', {
         'entries': entries,
-        'section_cards': section_cards,
         'selected_type': selected_type,
-        'can_share': can_share,
-        'resume_public_url': resume_public_url,
+        'selected_status': selected_status,
+        'selected_sort': selected_sort,
+        'search_query': search_query,
+        'type_choices': PortfolioEntryForm.TYPE_CHOICES,
+        'status_choices': PortfolioEntry.Status.choices,
+        'portfolio_total': portfolio_total,
+        'portfolio_pending': portfolio_pending,
+        'portfolio_approved': portfolio_approved,
     })
 
 

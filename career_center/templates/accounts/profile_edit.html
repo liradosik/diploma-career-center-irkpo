@@ -1,36 +1,154 @@
 {% extends 'base_dashboard.html' %}
 {% load ui_extras %}
 {% load static %}
+
 {% block title %}Настройки{% endblock %}
+
 {% block content %}
-<div class="student-settings-layout">
-  <section class="hero student-hero"><h1>Настройки профиля</h1></section>
-  <section class="card student-settings-card">
-    <h2>Личные данные</h2>
-    <form method="post" enctype="multipart/form-data" class="student-photo-upload" data-avatar-form>{% csrf_token %}
-      <p>{{ user_form.full_name.label_tag }} {{ user_form.full_name }}</p>
-      <div class="student-photo-card">
-        <div class="student-avatar-preview">
-          {% if request.user.photo %}<img class="student-avatar-img" src="{{ request.user.photo.url }}" alt="Фото профиля">{% else %}<div class="student-avatar-fallback">{{ request.user.full_name|initials }}</div>{% endif %}
+<div class="student-settings-layout student-settings-v2">
+
+  <section class="hero student-settings-hero-clean">
+    <div>
+      <h1>Настройки профиля</h1>
+      <p>Обновите личные данные, фото и контактную информацию.</p>
+    </div>
+  </section>
+
+  <section class="card student-settings-card student-settings-personal-card">
+    <div class="student-settings-card-head">
+      <span class="student-settings-section-icon">
+        <i class="bi bi-person-fill"></i>
+      </span>
+      <div>
+        <h2>Личные данные</h2>
+        <p>Эти данные используются в личном кабинете и портфолио.</p>
+      </div>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" class="student-photo-upload student-settings-form" data-avatar-form>
+      {% csrf_token %}
+
+      <div class="student-settings-field student-settings-field-full">
+        {{ user_form.full_name.label_tag }}
+        {{ user_form.full_name }}
+      </div>
+
+      <div class="student-settings-main-grid">
+        <div class="student-settings-photo-area">
+          <div class="student-avatar-preview student-settings-avatar-preview">
+            {% if request.user.photo %}
+              <img class="student-avatar-img" src="{{ request.user.photo.url }}" alt="Фото профиля">
+            {% else %}
+              <div class="student-avatar-fallback">{{ request.user.full_name|initials }}</div>
+            {% endif %}
+          </div>
+
+          <div class="student-settings-photo-actions">
+            <span class="student-settings-photo-label">Фото профиля</span>
+
+            <label class="btn btn-link student-settings-photo-btn" for="{{ user_form.photo.id_for_label }}">
+  <i class="bi bi-upload"></i>
+  Изменить фото
+</label>
+
+<input
+  type="file"
+  name="{{ user_form.photo.html_name }}"
+  id="{{ user_form.photo.id_for_label }}"
+  accept="image/png,image/jpeg,image/jpg"
+>
+
+{% if request.user.photo %}
+  <button class="student-settings-remove-photo" type="submit" name="action" value="remove_photo" onclick="return confirm('Удалить текущее фото?')">
+    <i class="bi bi-trash"></i>
+    Удалить фото
+  </button>
+{% endif %}
+          </div>
         </div>
-        <div class="student-photo-actions">
-          <label class="btn" for="{{ user_form.photo.id_for_label }}">Выбрать фото</label>
-          {{ user_form.photo }}
-          {% if request.user.photo %}
-            <button class="btn role-remove-photo-btn" type="submit" name="action" value="remove_photo" onclick="return confirm('Удалить текущее фото?')">Удалить фото</button>
-          {% endif %}
+
+        <div class="student-settings-contact-grid">
+          <div class="student-settings-field">
+            {{ profile_form.phone.label_tag }}
+            {{ profile_form.phone }}
+          </div>
+
+          <div class="student-settings-field">
+            {{ profile_form.city.label_tag }}
+            {{ profile_form.city }}
+          </div>
         </div>
       </div>
+
+      <div class="student-settings-field student-settings-field-full">
+        {{ profile_form.about.label_tag }}
+        {{ profile_form.about }}
+      </div>
+
       <input type="hidden" name="cropped_photo_data" data-cropped-photo>
-      <p>{{ profile_form.phone.label_tag }} {{ profile_form.phone }}</p>
-      <p>{{ profile_form.city.label_tag }} {{ profile_form.city }}</p>
-      <p>{{ profile_form.about.label_tag }} {{ profile_form.about }}</p>
-      <button class="btn btn-primary" type="submit">Сохранить</button>
+
+      <div class="student-settings-actions">
+        <button class="btn btn-primary" type="submit">
+          <i class="bi bi-check2"></i>
+          Сохранить
+        </button>
+      </div>
     </form>
   </section>
-  <section class="card student-settings-card"><h2>Учебная информация</h2>{{ academic_form.as_p }}<p><strong>Курс:</strong> {{ current_course|default:'—' }}</p></section>
-  <section class="card student-settings-card"><h2>Публичное резюме</h2><p class="student-status-badge {% if resume and resume.is_public %}badge-approved{% else %}badge-pending{% endif %}">{% if resume and resume.is_public %}Включено{% else %}Выключено{% endif %}</p>{% if resume_public_url %}<p class="muted">{{ resume_public_url }}</p>{% endif %}<div class="inline-actions"><a class="btn" href="{% url 'resumes:builder' %}">Конструктор резюме</a>{% if resume and resume.is_public %}<a class="btn" target="_blank" href="{{ resume_public_url }}">Открыть публичное резюме</a><button class="btn" type="button" onclick="navigator.clipboard.writeText('{{ resume_public_url }}')">Скопировать ссылку</button>{% endif %}</div></section>
+
+  <section class="card student-settings-card student-academic-readonly-card">
+    <div class="student-settings-card-head">
+      <span class="student-settings-section-icon">
+        <i class="bi bi-mortarboard-fill"></i>
+      </span>
+      <div>
+        <h2>Учебная информация</h2>
+        <p>Эти данные заполняются администрацией и недоступны для редактирования студентом.</p>
+      </div>
+    </div>
+
+    <div class="student-academic-readonly-grid">
+      <div class="student-academic-readonly-item">
+        <span>Группа</span>
+        <strong>{{ request.user.group|default:'—' }}</strong>
+      </div>
+
+      <div class="student-academic-readonly-item student-academic-readonly-wide">
+        <span>Специальность</span>
+        <strong>{{ request.user.specialty|default:'—' }}</strong>
+      </div>
+
+      <div class="student-academic-readonly-item">
+        <span>Год поступления</span>
+        <strong>
+          {% if request.user.admission_year %}
+            {{ request.user.admission_year }}
+          {% else %}
+            —
+          {% endif %}
+        </strong>
+      </div>
+
+      <div class="student-academic-readonly-item">
+        <span>Учебный статус</span>
+        <strong>
+          {% if request.user.get_academic_status_display %}
+            {{ request.user.get_academic_status_display }}
+          {% else %}
+            —
+          {% endif %}
+        </strong>
+      </div>
+
+      <div class="student-academic-readonly-item">
+        <span>Курс</span>
+        <strong>{{ current_course|default:'—' }}</strong>
+      </div>
+    </div>
+  </section>
+
 </div>
+
 <div class="avatar-modal" data-avatar-modal hidden>
   <div class="avatar-modal-backdrop" data-avatar-cancel></div>
   <div class="avatar-modal-card" role="dialog" aria-modal="true" aria-label="Настройте аватар">
@@ -45,6 +163,7 @@
     </div>
   </div>
 </div>
+
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.css">
 <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.js"></script>
 <script src="{% static 'js/student-avatar-cropper.js' %}"></script>

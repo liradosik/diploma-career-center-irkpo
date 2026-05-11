@@ -1,58 +1,195 @@
 {% extends 'base_dashboard.html' %}
 {% load ui_extras %}
+
 {% block title %}Портфолио{% endblock %}
+
 {% block content %}
-<section class="hero student-portfolio-hero">
-  <div class="hero-kicker">Электронное портфолио</div>
-  <h1>Моё портфолио</h1>
-  <p>Управляйте записями, вложениями и статусами проверки в одном месте.</p>
-  <div class="hero-actions">
-    <a class="btn btn-primary" href="{% url 'portfolio:create' %}">Добавить запись</a>
-    {% if can_share %}
-      <a class="btn" href="{{ resume_public_url }}" target="_blank">Открыть публичное резюме</a>
-      <button class="btn" type="button" onclick="navigator.clipboard.writeText('{{ resume_public_url }}')">Скопировать ссылку</button>
-    {% else %}
-      <a class="btn" href="{% url 'resumes:builder' %}">Поделиться портфолио</a>
-    {% endif %}
-  </div>
-  {% if not can_share %}<p class="muted">Публичная ссылка появится после включения публикации в конструкторе резюме.</p>{% endif %}
-</section>
+<div class="student-portfolio-page student-portfolio-v2">
 
-<section class="section card student-portfolio-sections">
-  <h2>Разделы портфолио</h2>
-  <div class="grid grid-2">
-    {% for sec in section_cards %}
-      <article class="student-portfolio-section-card">
-        <h3>{{ sec.title }}</h3>
-        <p class="muted">Записей: {{ sec.count }}</p>
-        <a class="btn btn-link" href="?type={{ sec.code }}">Открыть</a>
-      </article>
-    {% endfor %}
-  </div>
-</section>
+  <section class="hero student-portfolio-hero-v2">
+    <div class="student-portfolio-hero-main">
+      <div class="hero-kicker">Электронное портфолио</div>
+      <h1>Моё портфолио</h1>
+      <p>Собирайте достижения, проекты, навыки и документы в одном месте. Используйте фильтры, чтобы быстро найти нужную запись.</p>
 
-<section class="section card student-portfolio-list-card">
-  <h2>Записи</h2>
-  {% for entry in entries %}
-    <article class="student-portfolio-entry-card">
-      <h3>{{ entry.title }}</h3>
-      <p class="muted">{{ PORTFOLIO_TYPE_LABELS|dict_get:entry.type }} • {{ entry.date }}</p>
-      <p>{{ entry.description|truncatechars:220 }}</p>
-      {% if entry.link %}<p class="muted">Ссылка: <a class="student-portfolio-link" href="{{ entry.link }}" target="_blank">{{ entry.link }}</a></p>{% endif %}
-      {% if entry.curator_comment %}<p class="muted">Комментарий куратора: {{ entry.curator_comment }}</p>{% endif %}
-
-      {% include 'portfolio/_attachments.html' with attachments=entry.attachments.all legacy_file=entry.file %}
-
-      <div class="inline-actions">
-        {% if entry.status == 'pending' %}<span class="badge badge-pending">Ожидает проверки</span>{% endif %}
-        {% if entry.status == 'approved' %}<span class="badge badge-approved">Подтверждено</span>{% endif %}
-        {% if entry.status == 'rejected' %}<span class="badge badge-rejected">Отклонено</span>{% endif %}
-        <a class="btn" href="{% url 'portfolio:edit' entry.pk %}">Редактировать</a>
-        <form method="post" action="{% url 'portfolio:delete' entry.pk %}" onsubmit="return confirm('Удалить запись?');">{% csrf_token %}<button class="btn btn-danger" type="submit">Удалить</button></form>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="{% url 'portfolio:create' %}">
+          <i class="bi bi-plus-lg"></i>
+          Добавить запись
+        </a>
       </div>
-    </article>
-  {% empty %}
-    <p class="muted">Записей пока нет. Добавьте первое достижение.</p>
-  {% endfor %}
-</section>
+    </div>
+
+    <div class="student-portfolio-hero-art" aria-hidden="true">
+      <span class="portfolio-orbit portfolio-orbit-one"></span>
+      <span class="portfolio-orbit portfolio-orbit-two"></span>
+      <span class="portfolio-star portfolio-star-one">✦</span>
+      <span class="portfolio-star portfolio-star-two">✧</span>
+    </div>
+  </section>
+
+  <section class="section card student-portfolio-list-card-v2">
+    <div class="student-portfolio-list-head">
+      <div>
+        <h2>Мои записи</h2>
+        <p class="muted">
+          Всего: {{ portfolio_total|default:entries|length }}
+          {% if portfolio_pending is not None %} · На проверке: {{ portfolio_pending }}{% endif %}
+          {% if portfolio_approved is not None %} · Подтверждено: {{ portfolio_approved }}{% endif %}
+        </p>
+      </div>
+    </div>
+
+    <form class="student-portfolio-filters" method="get">
+      <div class="student-portfolio-search">
+        <i class="bi bi-search"></i>
+        <input
+          type="search"
+          name="q"
+          value="{{ search_query }}"
+          placeholder="Поиск по записям"
+        >
+      </div>
+
+      <select name="type" aria-label="Раздел портфолио">
+        <option value="">Все разделы</option>
+        {% for code, label in type_choices %}
+          <option value="{{ code }}" {% if selected_type == code %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+
+      <select name="status" aria-label="Статус проверки">
+        <option value="">Все статусы</option>
+        {% for code, label in status_choices %}
+          <option value="{{ code }}" {% if selected_status == code %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+
+      <select name="sort" aria-label="Сортировка">
+        <option value="newest" {% if selected_sort == 'newest' %}selected{% endif %}>Сначала новые</option>
+        <option value="oldest" {% if selected_sort == 'oldest' %}selected{% endif %}>Сначала старые</option>
+        <option value="title" {% if selected_sort == 'title' %}selected{% endif %}>По названию</option>
+      </select>
+
+      <button class="btn btn-link" type="submit">
+        <i class="bi bi-funnel"></i>
+        Применить
+      </button>
+
+      {% if search_query or selected_type or selected_status or selected_sort != 'newest' %}
+        <a class="btn student-portfolio-reset" href="{% url 'portfolio:list' %}">
+          <i class="bi bi-x-lg"></i>
+          Сбросить
+        </a>
+      {% endif %}
+    </form>
+
+    <div class="student-portfolio-entry-list-v2">
+      {% for entry in entries %}
+        <article class="student-portfolio-entry-card-v2">
+          <div class="student-portfolio-entry-icon student-portfolio-entry-icon-{{ entry.type }}">
+            {% if entry.type == 'academic' %}
+              <i class="bi bi-trophy"></i>
+            {% elif entry.type == 'project' %}
+              <i class="bi bi-briefcase"></i>
+            {% elif entry.type == 'skill' %}
+              <i class="bi bi-stars"></i>
+            {% elif entry.type == 'recommendation' %}
+              <i class="bi bi-chat-quote"></i>
+            {% elif entry.type == 'creative' %}
+              <i class="bi bi-palette"></i>
+            {% elif entry.type == 'sport' %}
+              <i class="bi bi-lightning-charge"></i>
+            {% elif entry.type == 'social' %}
+              <i class="bi bi-people"></i>
+            {% else %}
+              <i class="bi bi-file-earmark-text"></i>
+            {% endif %}
+          </div>
+
+          <div class="student-portfolio-entry-main">
+            <div class="student-portfolio-entry-title-row">
+              <div>
+                <h3>{{ entry.title }}</h3>
+                <p class="muted">
+                  {{ PORTFOLIO_TYPE_LABELS|dict_get:entry.type }} · {{ entry.date }}
+                </p>
+              </div>
+
+              <div class="student-portfolio-entry-status-mobile">
+                {% if entry.status == 'pending' %}
+                  <span class="badge badge-pending">Ожидает проверки</span>
+                {% elif entry.status == 'approved' %}
+                  <span class="badge badge-approved">Подтверждено</span>
+                {% elif entry.status == 'rejected' %}
+                  <span class="badge badge-rejected">Отклонено</span>
+                {% endif %}
+              </div>
+            </div>
+
+            <p class="student-portfolio-entry-description">
+              {{ entry.description|truncatechars:180 }}
+            </p>
+
+            {% if entry.link %}
+              <a class="student-portfolio-entry-link" href="{{ entry.link }}" target="_blank" rel="noopener">
+                <i class="bi bi-link-45deg"></i>
+                {{ entry.link }}
+              </a>
+            {% endif %}
+
+            {% if entry.curator_comment %}
+              <div class="student-portfolio-curator-comment">
+                <i class="bi bi-chat-left-text"></i>
+                <span>Комментарий куратора: {{ entry.curator_comment }}</span>
+              </div>
+            {% endif %}
+
+            <div class="student-portfolio-entry-files">
+              {% include 'portfolio/_attachments.html' with attachments=entry.attachments.all legacy_file=entry.file %}
+            </div>
+          </div>
+
+          <div class="student-portfolio-entry-side">
+            {% if entry.status == 'pending' %}
+              <span class="badge badge-pending">Ожидает проверки</span>
+            {% elif entry.status == 'approved' %}
+              <span class="badge badge-approved">Подтверждено</span>
+            {% elif entry.status == 'rejected' %}
+              <span class="badge badge-rejected">Отклонено</span>
+            {% endif %}
+
+            <div class="student-portfolio-entry-actions">
+              <a class="btn btn-link" href="{% url 'portfolio:edit' entry.pk %}">
+                <i class="bi bi-pencil"></i>
+                Редактировать
+              </a>
+
+              <form method="post" action="{% url 'portfolio:delete' entry.pk %}" onsubmit="return confirm('Удалить запись?');">
+                {% csrf_token %}
+                <button class="btn btn-danger" type="submit">
+                  <i class="bi bi-trash"></i>
+                  Удалить
+                </button>
+              </form>
+            </div>
+          </div>
+        </article>
+      {% empty %}
+        <div class="student-portfolio-empty">
+          <div class="student-portfolio-empty-icon">
+            <i class="bi bi-folder-plus"></i>
+          </div>
+          <h3>Записей пока нет</h3>
+          <p>Добавьте первое достижение, проект, сертификат или рекомендацию.</p>
+          <a class="btn btn-primary" href="{% url 'portfolio:create' %}">
+            <i class="bi bi-plus-lg"></i>
+            Добавить запись
+          </a>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+
+</div>
 {% endblock %}
