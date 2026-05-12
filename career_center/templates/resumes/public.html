@@ -19,18 +19,14 @@
 {% else %}
 <section class="public-resume-page-v4 resume-template-{{ resume_template|default:'classic' }} resume-font-{{ resume_font_size|default:'standard' }} {% if is_pdf_mode %}is-pdf-mode{% endif %}">
   <article class="public-resume-hero-v4">
-    {% if student_photo_url %}
-    <img class="public-resume-photo-v4" src="{{ student_photo_url }}" alt="Фото {{ student.full_name|default:'студента' }}">
-    {% else %}
-    <div class="public-resume-avatar-v4">
-      {% if profile.photo %}
-      <img src="{{ profile.photo.url }}" alt="Фото {{ student.full_name|default:'студента' }}">
-      {% elif student.photo %}
-      <img src="{{ student.photo.url }}" alt="Фото {{ student.full_name|default:'студента' }}">
+    {% if resume_photo_source != 'hidden' %}
+      {% if resume_photo_url %}
+      <img class="public-resume-photo-v4" src="{{ resume_photo_url }}" alt="Фото {{ student.full_name|default:'студента' }}">
       {% else %}
-      {{ student.full_name|default:"Р"|slice:":1" }}
+      <div class="public-resume-avatar-v4" aria-label="Фото не задано">
+        {{ student.full_name|default:"Р"|slice:":1" }}
+      </div>
       {% endif %}
-    </div>
     {% endif %}
 
     <div class="public-resume-person-v4">

@@ -44,15 +44,25 @@ class ResumeSettingsForm(forms.ModelForm):
         label='Размер шрифта',
     )
 
+    photo_source = forms.ChoiceField(
+        choices=ResumeSettings.PhotoSource.choices,
+        label='Источник фото',
+        help_text='Выберите, откуда брать фото для публичного резюме.',
+    )
+
     class Meta:
         model = ResumeSettings
-        fields = ('title', 'about', 'is_public', 'template', 'font_size', 'selected_sections')
+        fields = ('title', 'about', 'is_public', 'template', 'font_size', 'photo_source', 'photo', 'selected_sections')
         labels = {
             'title': 'Заголовок',
             'about': 'О себе',
             'is_public': 'Публичное резюме',
             'template': 'Шаблон',
             'font_size': 'Размер шрифта',
+            'photo': 'Отдельное фото резюме',
+        }
+        help_texts = {
+            'photo': 'Используется только если выбран источник «Отдельное фото для резюме».',
         }
         widgets = {
             'about': forms.Textarea(attrs={'rows': 6}),

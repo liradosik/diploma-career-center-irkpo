@@ -1,5 +1,6 @@
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
+from django.template.loader import render_to_string
 
 from apps.accounts.decorators import role_required
 from apps.accounts.models import StudentProfile, User
@@ -17,10 +18,31 @@ def _normalize_font_size(font_size):
         return font_size
     return 'standard'
 
+
 def _normalize_template(template_code):
     if template_code in ALLOWED_RESUME_TEMPLATES:
         return template_code
     return 'classic'
+
+
+def _safe_file_url(file_field):
+    if not file_field:
+        return None
+    try:
+        return file_field.url
+    except (ValueError, AttributeError):
+        return None
+
+
+def resolve_resume_photo_url(resume, student, user):
+    source = getattr(resume, 'photo_source', ResumeSettings.PhotoSource.PROFILE)
+    if source == ResumeSettings.PhotoSource.HIDDEN:
+        return None
+    if source == ResumeSettings.PhotoSource.CUSTOM:
+        return _safe_file_url(getattr(resume, 'photo', None))
+    if source == ResumeSettings.PhotoSource.ACCOUNT:
+        return _safe_file_url(getattr(user, 'photo', None))
+    return _safe_file_url(getattr(student, 'photo', None))
 
 
 def _resume_payload(student, resume, profile):
@@ -43,33 +65,13 @@ def _resume_payload(student, resume, profile):
     return entries, grouped, about_text, selected_sections
 
 
-def _resolve_student_photo_url(student, profile):
-    photo_url = None
-    profile_photo = getattr(profile, 'photo', None)
-    if profile_photo:
-        try:
-            photo_url = profile_photo.url
-        except ValueError:
-            photo_url = None
-
-    if not photo_url:
-        user_photo = getattr(student, 'photo', None)
-        if user_photo:
-            try:
-                photo_url = user_photo.url
-            except ValueError:
-                photo_url = None
-    return photo_url
-
-
-
 @role_required(User.Role.STUDENT)
 def builder(request):
     settings_obj, _ = ResumeSettings.objects.get_or_create(student=request.user)
     profile = getattr(request.user, 'student_profile', None)
 
     if request.method == 'POST':
-        form = ResumeSettingsForm(request.POST, instance=settings_obj)
+        form = ResumeSettingsForm(request.POST, request.FILES, instance=settings_obj)
         if form.is_valid():
             settings_obj = form.save(commit=False)
 
@@ -82,6 +84,9 @@ def builder(request):
                 settings_obj.selected_sections = ordered_selected_sections
             else:
                 settings_obj.selected_sections = checked_sections
+
+            if settings_obj.photo_source != ResumeSettings.PhotoSource.CUSTOM:
+                settings_obj.photo = None
 
             settings_obj.save()
     else:
@@ -140,7 +145,6 @@ def builder(request):
 def public_resume(request, token):
     profile = get_object_or_404(StudentProfile, public_resume_token=token)
     student = profile.user
-    student_photo_url = _resolve_student_photo_url(student, profile)
     resume = getattr(profile.user, 'resume_settings', None)
     if not resume:
         return render(
@@ -150,7 +154,8 @@ def public_resume(request, token):
                 'is_unavailable': True,
                 'unavailable_reason': 'not_created',
                 'student': student,
-                'student_photo_url': student_photo_url,
+                'resume_photo_url': None,
+                'resume_photo_source': ResumeSettings.PhotoSource.PROFILE,
             },
             status=404,
         )
@@ -162,42 +167,46 @@ def public_resume(request, token):
                 'is_unavailable': True,
                 'unavailable_reason': 'private',
                 'student': student,
-                'student_photo_url': student_photo_url,
+                'resume_photo_url': None,
+                'resume_photo_source': resume.photo_source,
             },
             status=404,
         )
+
     entries, grouped_entries, about_text, selected_sections = _resume_payload(student, resume, profile)
     resume_template = _normalize_template(getattr(resume, 'template', 'classic'))
     resume_font_size = _normalize_font_size(getattr(resume, 'font_size', 'standard'))
     has_resume_data = any([student.full_name, getattr(resume, 'title', ''), about_text, entries])
     is_owner_view = request.user.is_authenticated and request.user.id == profile.user_id
+    resume_photo_url = resolve_resume_photo_url(resume, profile, student)
+
+    context = {
+        'student': student,
+        'profile': profile,
+        'resume': resume,
+        'entries': entries,
+        'grouped_entries': grouped_entries,
+        'about_text': about_text,
+        'has_resume_data': has_resume_data,
+        'selected_sections': selected_sections,
+        'is_owner_view': is_owner_view,
+        'resume_template': resume_template,
+        'resume_font_size': resume_font_size,
+        'resume_photo_url': resume_photo_url,
+        'resume_photo_source': resume.photo_source,
+    }
+
     if request.GET.get('download') == 'pdf':
-        html = render(request, 'resumes/public.html', {
-            'student': student, 'profile': profile, 'resume': resume, 'entries': entries,
-            'grouped_entries': grouped_entries, 'about_text': about_text, 'has_resume_data': has_resume_data,
-            'selected_sections': selected_sections, 'is_owner_view': is_owner_view, 'is_pdf_mode': True,
-            'resume_template': resume_template,
-            'resume_font_size': resume_font_size,
-            'student_photo_url': student_photo_url,
-        }).content
-        response = HttpResponse(html, content_type='text/html; charset=utf-8')
-        response['Content-Disposition'] = f'attachment; filename=\"resume-{profile.user_id}.html\"'
-        return response
-    return render(
-        request,
-        'resumes/public.html',
-        {
-            'student': student,
-            'profile': profile,
-            'resume': resume,
-            'entries': entries,
-            'grouped_entries': grouped_entries,
-            'about_text': about_text,
-            'has_resume_data': has_resume_data,
-            'selected_sections': selected_sections,
-            'is_owner_view': is_owner_view,
-            'resume_template': resume_template,
-            'resume_font_size': resume_font_size,
-            'student_photo_url': student_photo_url,
-        },
-    )
+        html_string = render_to_string('resumes/public.html', {**context, 'is_pdf_mode': True}, request=request)
+        try:
+            from weasyprint import HTML
+            pdf_bytes = HTML(string=html_string, base_url=request.build_absolute_uri('/')).write_pdf()
+            response = HttpResponse(pdf_bytes, content_type='application/pdf')
+            response['Content-Disposition'] = f'attachment; filename="resume-{profile.user_id}.pdf"'
+            return response
+        except Exception:
+            fallback = HttpResponse(html_string, content_type='text/html; charset=utf-8')
+            fallback['Content-Disposition'] = f'attachment; filename="resume-{profile.user_id}.html"'
+            return fallback
+
+    return render(request, 'resumes/public.html', context)
