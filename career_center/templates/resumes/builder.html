@@ -4,6 +4,7 @@
 {% block title %}Конструктор резюме{% endblock %}
 
 {% block content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
 <div class="student-resume-builder-v2">
 
   <section class="hero student-resume-hero-v2">
@@ -261,8 +262,24 @@
 
   </section>
 </div>
+<div class="resume-photo-crop-modal" id="resumePhotoCropModal" aria-hidden="true">
+  <div class="resume-photo-crop-dialog" role="dialog" aria-modal="true" aria-labelledby="resumePhotoCropTitle">
+    <div class="resume-photo-crop-head">
+      <h3 id="resumePhotoCropTitle">Обрезка фото</h3>
+      <p>Выберите квадратную область для отображения в резюме.</p>
+    </div>
+    <div class="resume-photo-crop-area">
+      <img class="resume-photo-crop-image" id="resumePhotoCropImage" alt="Обрезка выбранного фото">
+    </div>
+    <div class="resume-photo-crop-actions">
+      <button type="button" class="btn" id="resumePhotoCropCancel">Отмена</button>
+      <button type="button" class="btn btn-primary" id="resumePhotoCropApply">Применить фото</button>
+    </div>
+  </div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
 <script>
 (function(){
   const form = document.getElementById('resume-settings-form');
@@ -286,6 +303,12 @@
   const photoUploadBlock = document.getElementById('resumePhotoUploadBlock');
   const photoInput = document.getElementById('{{ form.photo.id_for_label }}');
   const photoFileName = document.getElementById('resumePhotoFileName');
+  const cropModal = document.getElementById('resumePhotoCropModal');
+  const cropImage = document.getElementById('resumePhotoCropImage');
+  const cropCancelBtn = document.getElementById('resumePhotoCropCancel');
+  const cropApplyBtn = document.getElementById('resumePhotoCropApply');
+  let cropper = null;
+  let originalFileName = '';
 
   const templateLabels = {
     classic: 'Классический',
@@ -394,14 +417,57 @@
   }
 
   function updatePhotoFileName() {
-  if (!photoInput || !photoFileName) return;
+    if (!photoInput || !photoFileName) return;
 
-  if (photoInput.files && photoInput.files.length > 0) {
-    photoFileName.textContent = photoInput.files[0].name;
-  } else {
-    photoFileName.textContent = '';
+    if (photoInput.files && photoInput.files.length > 0) {
+      photoFileName.textContent = photoInput.files[0].name;
+    } else {
+      photoFileName.textContent = '';
+    }
   }
-}
+
+  function destroyCropper(){
+    if (cropper) {
+      cropper.destroy();
+      cropper = null;
+    }
+    if (cropImage) {
+      cropImage.removeAttribute('src');
+    }
+  }
+
+  function closeCropModal(){
+    if (!cropModal) return;
+    cropModal.classList.remove('is-open');
+    cropModal.setAttribute('aria-hidden', 'true');
+  }
+
+  function openCropModal(file){
+    if (!cropModal || !cropImage || !window.Cropper) return;
+
+    originalFileName = file.name || 'resume-photo.jpg';
+    const reader = new FileReader();
+
+    reader.onload = function(event){
+      cropImage.src = event.target.result;
+      cropModal.classList.add('is-open');
+      cropModal.setAttribute('aria-hidden', 'false');
+      destroyCropper();
+      cropper = new Cropper(cropImage, {
+        aspectRatio: 1,
+        viewMode: 1,
+        autoCropArea: 0.9,
+        background: false,
+        responsive: true,
+        movable: true,
+        zoomable: true,
+        rotatable: false,
+        scalable: false,
+      });
+    };
+
+    reader.readAsDataURL(file);
+  }
   if (sortableEl && window.Sortable) {
     Sortable.create(sortableEl, {
       animation: 180,
@@ -428,7 +494,49 @@
   }
 
   if (photoInput) {
-    photoInput.addEventListener('change', updatePhotoFileName);
+    photoInput.addEventListener('change', function(){
+      const file = photoInput.files && photoInput.files[0];
+      if (!file) {
+        updatePhotoFileName();
+        return;
+      }
+      openCropModal(file);
+    });
+  }
+
+  if (cropCancelBtn) {
+    cropCancelBtn.addEventListener('click', function(){
+      if (photoInput) {
+        photoInput.value = '';
+      }
+      destroyCropper();
+      closeCropModal();
+      updatePhotoFileName();
+    });
+  }
+
+  if (cropApplyBtn) {
+    cropApplyBtn.addEventListener('click', function(){
+      if (!cropper || !photoInput) return;
+      const canvas = cropper.getCroppedCanvas({
+        width: 600,
+        height: 600,
+        imageSmoothingEnabled: true,
+        imageSmoothingQuality: 'high'
+      });
+      if (!canvas) return;
+      canvas.toBlob(function(blob){
+        if (!blob) return;
+        const extension = originalFileName.split('.').pop() || 'jpg';
+        const croppedFile = new File([blob], `cropped-${originalFileName}`, { type: blob.type || `image/${extension}` });
+        const dt = new DataTransfer();
+        dt.items.add(croppedFile);
+        photoInput.files = dt.files;
+        photoFileName.textContent = 'Фото выбрано и обрезано';
+        destroyCropper();
+        closeCropModal();
+      }, 'image/jpeg', 0.95);
+    });
   }
 
   togglePhotoUploadBlock();

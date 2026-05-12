@@ -1,3 +1,5 @@
+import logging
+
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.template.loader import render_to_string
@@ -8,6 +10,8 @@ from apps.portfolio.models import PortfolioEntry
 
 from .forms import ResumeSettingsForm
 from .models import ResumeSettings
+
+logger = logging.getLogger(__name__)
 
 ALLOWED_RESUME_TEMPLATES = {'classic', 'compact', 'modern', 'academic'}
 ALLOWED_RESUME_FONT_SIZES = {'small', 'standard', 'large'}
@@ -220,8 +224,11 @@ def public_resume(request, token):
             response['Content-Disposition'] = f'attachment; filename="resume-{profile.user_id}.pdf"'
             return response
         except Exception:
-            fallback = HttpResponse(html_string, content_type='text/html; charset=utf-8')
-            fallback['Content-Disposition'] = f'attachment; filename="resume-{profile.user_id}.html"'
-            return fallback
+            logger.exception('Failed to generate resume PDF for student_id=%s', profile.user_id)
+            return HttpResponse(
+                'Не удалось сформировать PDF резюме. Попробуйте позже.',
+                status=500,
+                content_type='text/plain; charset=utf-8',
+            )
 
     return render(request, 'resumes/public.html', context)
