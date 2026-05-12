@@ -13795,3 +13795,151 @@ html {
 .public-resume-column-v4:empty {
   display: none;
 }
+/* === Unified resume templates (builder preview + public) === */
+.resume-template-classic .resume-block-v2,
+.public-resume-page-v4.resume-template-classic .public-resume-block-v4 {
+  border-color: #e3ebf6;
+}
+
+.resume-template-academic {
+  border-radius: 10px;
+  border-color: #bccada;
+  box-shadow: none;
+}
+
+.resume-template-academic .resume-document-header-v2 {
+  border-bottom: 2px solid #c6d2e0;
+}
+
+.resume-template-academic h1,
+.public-resume-page-v4.resume-template-academic .public-resume-person-v4 h1,
+.public-resume-page-v4.resume-template-academic .public-resume-block-v4 h2,
+.public-resume-page-v4.resume-template-academic .public-resume-entry-v4 h3 {
+  font-family: Georgia, 'Times New Roman', serif !important;
+  letter-spacing: -0.02em;
+}
+
+.public-resume-page-v4.resume-template-academic .public-resume-hero-v4,
+.public-resume-page-v4.resume-template-academic .public-resume-sheet-v4 {
+  border-color: #c5d2e1;
+  border-radius: 12px;
+  box-shadow: none;
+  background: #fff;
+}
+
+.public-resume-page-v4.resume-template-academic .public-resume-skills-v4 span {
+  border: 1px solid #c5d2e1;
+  background: #f8fafc;
+  color: #2f435c;
+}
+
+.resume-template-modern {
+  border-color: #b9d6ff;
+  background: linear-gradient(180deg, #eff6ff 0, #ffffff 210px);
+}
+
+.resume-template-modern .resume-document-header-v2 {
+  background: linear-gradient(135deg, #dfeeff, #f4f9ff);
+  border-radius: 20px;
+  padding: 24px;
+}
+
+.public-resume-page-v4.resume-template-modern .public-resume-hero-v4 {
+  background: linear-gradient(130deg, #e9f3ff 0%, #f7fbff 54%, #ffffff 100%);
+  border-color: #c6ddff;
+}
+
+.public-resume-page-v4.resume-template-modern .public-resume-sheet-v4 {
+  border-color: #cfe2ff;
+  box-shadow: 0 18px 42px rgba(30, 102, 208, 0.12);
+}
+
+.public-resume-page-v4.resume-template-modern .public-resume-avatar-v4 {
+  box-shadow: 0 20px 36px rgba(30, 102, 208, 0.28);
+}
+
+.resume-template-compact {
+  padding: 28px;
+  border-radius: 16px;
+}
+
+.resume-template-compact .resume-document-header-v2 {
+  padding-bottom: 16px;
+}
+
+.resume-template-compact .resume-block-v2 {
+  padding-top: 12px;
+  margin-top: 12px;
+}
+
+.resume-template-compact .resume-entry-v2 {
+  padding: 4px 0;
+  gap: 2px;
+}
+
+.public-resume-page-v4.resume-template-compact {
+  gap: 14px;
+}
+
+.public-resume-page-v4.resume-template-compact .public-resume-hero-v4,
+.public-resume-page-v4.resume-template-compact .public-resume-sheet-v4 {
+  padding: 24px;
+  border-radius: 18px;
+}
+
+.public-resume-page-v4.resume-template-compact .public-resume-column-v4 {
+  gap: 16px;
+}
+
+.public-resume-page-v4.resume-template-compact .public-resume-block-v4 {
+  gap: 10px;
+  padding-bottom: 14px;
+}
+
+.public-resume-page-v4.resume-template-compact .public-resume-entry-v4 {
+  gap: 5px;
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+}
+
+/* === Unified font sizes (builder preview + public) === */
+.resume-font-small { font-size: 14px; }
+.resume-font-standard { font-size: 15px; }
+.resume-font-large { font-size: 17px; }
+
+.resume-font-small h1,
+.public-resume-page-v4.resume-font-small .public-resume-person-v4 h1 { font-size: clamp(28px, 3vw, 36px) !important; }
+.resume-font-standard h1,
+.public-resume-page-v4.resume-font-standard .public-resume-person-v4 h1 { font-size: clamp(34px, 4vw, 48px) !important; }
+.resume-font-large h1,
+.public-resume-page-v4.resume-font-large .public-resume-person-v4 h1 { font-size: clamp(38px, 4.2vw, 54px) !important; }
+
+.resume-font-small .resume-subtitle-v2,
+.public-resume-page-v4.resume-font-small .public-resume-position-v4 { font-size: 15px !important; }
+.resume-font-large .resume-subtitle-v2,
+.public-resume-page-v4.resume-font-large .public-resume-position-v4 { font-size: 19px !important; }
+
+.resume-font-small .resume-block-v2 h3,
+.public-resume-page-v4.resume-font-small .public-resume-block-v4 h2 { font-size: 18px !important; }
+.resume-font-standard .resume-block-v2 h3,
+.public-resume-page-v4.resume-font-standard .public-resume-block-v4 h2 { font-size: 22px !important; }
+.resume-font-large .resume-block-v2 h3,
+.public-resume-page-v4.resume-font-large .public-resume-block-v4 h2 { font-size: 26px !important; }
+
+.resume-font-small .resume-block-v2 p,
+.resume-font-small .resume-entry-v2 strong,
+.resume-font-small .resume-contacts-v2,
+.public-resume-page-v4.resume-font-small .public-resume-contacts-v4,
+.public-resume-page-v4.resume-font-small .public-resume-entry-v4 p,
+.public-resume-page-v4.resume-font-small .public-resume-info-v4 span,
+.public-resume-page-v4.resume-font-small .public-resume-muted-v4,
+.public-resume-page-v4.resume-font-small .public-resume-skills-v4 span { font-size: 13px !important; }
+
+.resume-font-large .resume-block-v2 p,
+.resume-font-large .resume-entry-v2 strong,
+.resume-font-large .resume-contacts-v2,
+.public-resume-page-v4.resume-font-large .public-resume-contacts-v4,
+.public-resume-page-v4.resume-font-large .public-resume-entry-v4 p,
+.public-resume-page-v4.resume-font-large .public-resume-info-v4 span,
+.public-resume-page-v4.resume-font-large .public-resume-muted-v4,
+.public-resume-page-v4.resume-font-large .public-resume-skills-v4 span { font-size: 16px !important; }
