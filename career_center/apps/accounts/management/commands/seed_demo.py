@@ -25,9 +25,20 @@ class Command(BaseCommand):
     def demo_all_emails(self):
         return [self.demo_admin_email, *self.demo_curator_emails, *self.demo_student_emails]
 
+
+    def add_arguments(self, parser):
+        parser.add_argument(
+            '--clear-only',
+            action='store_true',
+            help='Удалить только демо-данные, не создавая новые.',
+        )
+
     @transaction.atomic
     def handle(self, *args, **options):
         self._cleanup_demo_data()
+        if options.get('clear_only'):
+            self.stdout.write(self.style.SUCCESS('Демо-данные удалены'))
+            return
         demo_objects = self._create_demo_data()
         self._print_summary(demo_objects)
 
@@ -49,6 +60,8 @@ class Command(BaseCommand):
 
         CourseRegistration.objects.filter(course__title__in=self._course_titles()).delete()
         Course.objects.filter(title__in=self._course_titles()).delete()
+
+        StudyGroup.objects.filter(name__in=['ИСП-22-1', 'ДЗ-22-1', 'ЭБ-22-1']).delete()
 
         Specialty.objects.filter(
             code__in=['09.02.07', '54.02.01', '38.02.01'],
