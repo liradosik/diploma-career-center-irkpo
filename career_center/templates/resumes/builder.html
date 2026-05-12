@@ -24,8 +24,8 @@
 
         {% if profile %}
           <a class="btn" target="_blank" href="{% url 'resumes:public' profile.public_resume_token %}?download=pdf">
-            <i class="bi bi-file-earmark-text"></i>
-            Скачать HTML
+            <i class="bi bi-file-earmark-pdf"></i>
+            Скачать PDF
           </a>
         {% endif %}
       </div>
@@ -62,7 +62,7 @@
         </div>
       </div>
 
-      <form method="post" id="resume-settings-form" class="student-resume-form-v2">
+      <form method="post" enctype="multipart/form-data" id="resume-settings-form" class="student-resume-form-v2">
         {% csrf_token %}
 
         <div class="student-resume-field">
@@ -84,6 +84,21 @@
           <div class="student-resume-field">
             <label for="{{ form.font_size.id_for_label }}">{{ form.font_size.label }}</label>
             {{ form.font_size }}
+          </div>
+        </div>
+
+
+        <div class="student-resume-select-grid">
+          <div class="student-resume-field">
+            <label for="{{ form.photo_source.id_for_label }}">{{ form.photo_source.label }}</label>
+            {{ form.photo_source }}
+            <small>{{ form.photo_source.help_text }}</small>
+          </div>
+
+          <div class="student-resume-field">
+            <label for="{{ form.photo.id_for_label }}">{{ form.photo.label }}</label>
+            {{ form.photo }}
+            <small>{{ form.photo.help_text }}</small>
           </div>
         </div>
 
