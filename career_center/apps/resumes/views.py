@@ -31,7 +31,8 @@ def _resume_payload(student, resume, profile):
     )
     about_text = ((getattr(resume, 'about', '') or '') or getattr(profile, 'about', '') or '').strip()
     section_defaults = ['contacts', 'education', 'skills', 'projects', 'achievements', 'certificates', 'recommendations']
-    selected_sections = (getattr(resume, 'selected_sections', None) or section_defaults)
+    raw_selected_sections = getattr(resume, 'selected_sections', None)
+    selected_sections = section_defaults if raw_selected_sections is None else raw_selected_sections
     grouped = {
         'skills': [e for e in entries if e.type == 'skill'],
         'projects': [e for e in entries if e.type == 'project'],
@@ -120,8 +121,28 @@ def builder(request):
 def public_resume(request, token):
     profile = get_object_or_404(StudentProfile, public_resume_token=token)
     resume = getattr(profile.user, 'resume_settings', None)
-    if not resume or not resume.is_public:
-        return render(request, 'resumes/public.html', {'is_unavailable': True, 'student': profile.user}, status=404)
+    if not resume:
+        return render(
+            request,
+            'resumes/public.html',
+            {
+                'is_unavailable': True,
+                'unavailable_reason': 'not_created',
+                'student': profile.user,
+            },
+            status=404,
+        )
+    if not resume.is_public:
+        return render(
+            request,
+            'resumes/public.html',
+            {
+                'is_unavailable': True,
+                'unavailable_reason': 'private',
+                'student': profile.user,
+            },
+            status=404,
+        )
     entries, grouped_entries, about_text, selected_sections = _resume_payload(profile.user, resume, profile)
     resume_template = _normalize_template(getattr(resume, 'template', 'classic'))
     resume_font_size = _normalize_font_size(getattr(resume, 'font_size', 'standard'))
