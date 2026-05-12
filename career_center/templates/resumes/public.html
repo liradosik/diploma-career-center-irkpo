@@ -13,7 +13,7 @@
 </section>
 
 {% else %}
-<section class="public-resume-page-v4 {% if is_pdf_mode %}is-pdf-mode{% endif %}">
+<section class="public-resume-page-v4 resume-template-{{ resume_template|default:'classic' }} resume-font-{{ resume_font_size|default:'standard' }} {% if is_pdf_mode %}is-pdf-mode{% endif %}">
   <article class="public-resume-hero-v4">
     <div class="public-resume-avatar-v4">
       {{ student.full_name|default:"Р"|slice:":1" }}

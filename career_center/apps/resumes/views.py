@@ -133,6 +133,7 @@ def public_resume(request, token):
             'grouped_entries': grouped_entries, 'about_text': about_text, 'has_resume_data': has_resume_data,
             'selected_sections': selected_sections, 'is_owner_view': is_owner_view, 'is_pdf_mode': True,
             'resume_template': resume_template,
+            'resume_font_size': resume_font_size,
         }).content
         response = HttpResponse(html, content_type='text/html; charset=utf-8')
         response['Content-Disposition'] = f'attachment; filename=\"resume-{profile.user_id}.html\"'
