@@ -122,6 +122,35 @@
           </span>
         </label>
 
+        {% if profile %}
+        <section class="student-resume-public-panel" aria-live="polite">
+          <div class="student-resume-public-panel-head">
+            <h3>Публичное резюме</h3>
+            <span class="student-resume-public-status {% if resume.is_public %}is-on{% else %}is-off{% endif %}">
+              {% if resume.is_public %}Публичное резюме включено{% else %}Публичное резюме выключено{% endif %}
+            </span>
+          </div>
+
+          <div class="student-resume-public-panel-actions">
+            <a class="btn" target="_blank" href="{% url 'resumes:public' profile.public_resume_token %}">
+              <i class="bi bi-box-arrow-up-right"></i>
+              Открыть публичное резюме
+            </a>
+            <button
+              class="btn"
+              type="button"
+              data-copy-public-url
+              data-public-url="{{ request.scheme }}://{{ request.get_host }}{% url 'resumes:public' profile.public_resume_token %}"
+            >
+              <i class="bi bi-link-45deg"></i>
+              Скопировать ссылку
+            </button>
+          </div>
+
+          <p class="student-resume-public-panel-hint" data-copy-public-hint hidden>Ссылка скопирована.</p>
+        </section>
+        {% endif %}
+
         <div class="resume-sections-block">
           <h3 class="resume-sections-title">Разделы резюме</h3>
           <p class="resume-sections-text">
@@ -323,9 +352,45 @@
   const photoCropImage = document.getElementById('resumePhotoCropImage');
   const photoCropApply = document.getElementById('resumePhotoCropApply');
   const photoCropCancelButtons = document.querySelectorAll('[data-photo-crop-cancel]');
+  const copyPublicUrlBtn = document.querySelector('[data-copy-public-url]');
+  const copyPublicHint = document.querySelector('[data-copy-public-hint]');
 
   let resumePhotoCropper = null;
   let resumePhotoOriginalFile = null;
+
+  async function copyPublicResumeUrl(){
+    if (!copyPublicUrlBtn) return;
+    const publicUrl = copyPublicUrlBtn.dataset.publicUrl || '';
+    if (!publicUrl) return;
+
+    let copied = false;
+    if (navigator.clipboard && window.isSecureContext) {
+      try {
+        await navigator.clipboard.writeText(publicUrl);
+        copied = true;
+      } catch (e) {}
+    }
+
+    if (!copied) {
+      const helper = document.createElement('textarea');
+      helper.value = publicUrl;
+      helper.setAttribute('readonly', '');
+      helper.style.position = 'fixed';
+      helper.style.opacity = '0';
+      document.body.appendChild(helper);
+      helper.select();
+      copied = document.execCommand('copy');
+      document.body.removeChild(helper);
+    }
+
+    if (copied && copyPublicHint) {
+      copyPublicHint.hidden = false;
+      window.clearTimeout(copyPublicHint._hideTimerId);
+      copyPublicHint._hideTimerId = window.setTimeout(() => {
+        copyPublicHint.hidden = true;
+      }, 2400);
+    }
+  }
 
   const templateLabels = {
     classic: 'Классический',
@@ -598,6 +663,10 @@
 
   if (photoCropApply) {
     photoCropApply.addEventListener('click', applyCroppedPhoto);
+  }
+
+  if (copyPublicUrlBtn) {
+    copyPublicUrlBtn.addEventListener('click', copyPublicResumeUrl);
   }
 
   photoCropCancelButtons.forEach(function(button){

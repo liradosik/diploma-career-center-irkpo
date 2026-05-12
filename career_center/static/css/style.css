@@ -12068,6 +12068,58 @@ html {
   line-height: 1.35;
 }
 
+.student-resume-public-panel {
+  padding: 16px;
+  border: 1px solid #dbe7f5;
+  border-radius: 18px;
+  background: #f8fbff;
+}
+
+.student-resume-public-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.student-resume-public-panel-head h3 {
+  margin: 0;
+  color: #1d3148;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.student-resume-public-status {
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.student-resume-public-status.is-on {
+  color: #0f7a44;
+  background: #e6f8ee;
+}
+
+.student-resume-public-status.is-off {
+  color: #7a2830;
+  background: #fdeff1;
+}
+
+.student-resume-public-panel-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.student-resume-public-panel-hint {
+  margin: 10px 0 0;
+  color: #1e66d0;
+  font-size: 13px;
+}
+
 /* Sections */
 
 .student-resume-sections-block {
@@ -13669,6 +13721,10 @@ html {
   margin: 0;
   color: #667891;
   font-size: 17px;
+}
+
+.public-resume-owner-actions-v4 {
+  margin-top: 22px;
 }
 
 /* PDF */

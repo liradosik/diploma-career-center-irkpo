@@ -173,7 +173,9 @@ def public_resume(request, token):
             status=404,
         )
 
-    if not resume.is_public:
+    is_owner_view = request.user.is_authenticated and request.user.id == profile.user_id
+
+    if not resume.is_public and not is_owner_view:
         return render(
             request,
             'resumes/public.html',
@@ -191,7 +193,6 @@ def public_resume(request, token):
     resume_template = _normalize_template(getattr(resume, 'template', 'classic'))
     resume_font_size = _normalize_font_size(getattr(resume, 'font_size', 'standard'))
     has_resume_data = any([student.full_name, getattr(resume, 'title', ''), about_text, entries])
-    is_owner_view = request.user.is_authenticated and request.user.id == profile.user_id
     resume_photo_url = resolve_resume_photo_url(resume, profile, student)
 
     # Для старых записей profile в публичном резюме считаем как account.
