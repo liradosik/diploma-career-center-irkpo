@@ -34,15 +34,18 @@ def _safe_file_url(file_field):
         return None
 
 
-def resolve_resume_photo_url(resume, student, user):
-    source = getattr(resume, 'photo_source', ResumeSettings.PhotoSource.PROFILE)
+def resolve_resume_photo_url(resume, profile, user):
+    source = getattr(resume, 'photo_source', ResumeSettings.PhotoSource.ACCOUNT)
+
     if source == ResumeSettings.PhotoSource.HIDDEN:
         return None
+
     if source == ResumeSettings.PhotoSource.CUSTOM:
         return _safe_file_url(getattr(resume, 'photo', None))
-    if source == ResumeSettings.PhotoSource.ACCOUNT:
-        return _safe_file_url(getattr(user, 'photo', None))
-    return _safe_file_url(getattr(student, 'photo', None))
+
+    # Старое значение profile больше не показывается в интерфейсе.
+    # Если оно осталось в базе, трактуем его как фото из аккаунта.
+    return _safe_file_url(getattr(user, 'photo', None))
 
 
 def _resume_payload(student, resume, profile):
@@ -69,6 +72,11 @@ def _resume_payload(student, resume, profile):
 def builder(request):
     settings_obj, _ = ResumeSettings.objects.get_or_create(student=request.user)
     profile = getattr(request.user, 'student_profile', None)
+
+    # Для старых резюме: если в базе стоит profile, сразу переводим на account.
+    if settings_obj.photo_source == ResumeSettings.PhotoSource.PROFILE:
+        settings_obj.photo_source = ResumeSettings.PhotoSource.ACCOUNT
+        settings_obj.save(update_fields=['photo_source'])
 
     if request.method == 'POST':
         form = ResumeSettingsForm(request.POST, request.FILES, instance=settings_obj)
@@ -146,6 +154,7 @@ def public_resume(request, token):
     profile = get_object_or_404(StudentProfile, public_resume_token=token)
     student = profile.user
     resume = getattr(profile.user, 'resume_settings', None)
+
     if not resume:
         return render(
             request,
@@ -155,10 +164,11 @@ def public_resume(request, token):
                 'unavailable_reason': 'not_created',
                 'student': student,
                 'resume_photo_url': None,
-                'resume_photo_source': ResumeSettings.PhotoSource.PROFILE,
+                'resume_photo_source': ResumeSettings.PhotoSource.ACCOUNT,
             },
             status=404,
         )
+
     if not resume.is_public:
         return render(
             request,
@@ -180,6 +190,11 @@ def public_resume(request, token):
     is_owner_view = request.user.is_authenticated and request.user.id == profile.user_id
     resume_photo_url = resolve_resume_photo_url(resume, profile, student)
 
+    # Для старых записей profile в публичном резюме считаем как account.
+    resume_photo_source = resume.photo_source
+    if resume_photo_source == ResumeSettings.PhotoSource.PROFILE:
+        resume_photo_source = ResumeSettings.PhotoSource.ACCOUNT
+
     context = {
         'student': student,
         'profile': profile,
@@ -193,7 +208,7 @@ def public_resume(request, token):
         'resume_template': resume_template,
         'resume_font_size': resume_font_size,
         'resume_photo_url': resume_photo_url,
-        'resume_photo_source': resume.photo_source,
+        'resume_photo_source': resume_photo_source,
     }
 
     if request.GET.get('download') == 'pdf':

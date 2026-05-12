@@ -18,7 +18,7 @@
 
 {% else %}
 <section class="public-resume-page-v4 resume-template-{{ resume_template|default:'classic' }} resume-font-{{ resume_font_size|default:'standard' }} {% if is_pdf_mode %}is-pdf-mode{% endif %}">
-  <article class="public-resume-hero-v4">
+  <article class="public-resume-hero-v4 {% if resume_photo_source == 'hidden' %}public-resume-hero-no-photo{% else %}public-resume-hero-has-photo{% endif %}">
     {% if resume_photo_source != 'hidden' %}
       {% if resume_photo_url %}
       <img class="public-resume-photo-v4" src="{{ resume_photo_url }}" alt="Фото {{ student.full_name|default:'студента' }}">

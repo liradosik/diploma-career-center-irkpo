@@ -10,8 +10,11 @@ class ResumeSettings(models.Model):
         ACADEMIC = 'academic', 'Академический'
 
     class PhotoSource(models.TextChoices):
+        # Оставлено только для обратной совместимости со старыми записями в БД.
+        # В форме этот вариант больше не показывается.
         PROFILE = 'profile', 'Из профиля студента'
-        ACCOUNT = 'account', 'Из аккаунта пользователя'
+
+        ACCOUNT = 'account', 'Фото из аккаунта'
         CUSTOM = 'custom', 'Отдельное фото для резюме'
         HIDDEN = 'hidden', 'Не показывать фото'
 
@@ -27,7 +30,7 @@ class ResumeSettings(models.Model):
     template = models.CharField(max_length=64, choices=Template.choices, default=Template.CLASSIC)
     font_size = models.CharField(max_length=32, choices=FontSize.choices, default=FontSize.STANDARD)
     is_public = models.BooleanField(default=True)
-    photo_source = models.CharField(max_length=32, choices=PhotoSource.choices, default=PhotoSource.PROFILE)
+    photo_source = models.CharField(max_length=32, choices=PhotoSource.choices, default=PhotoSource.ACCOUNT)
     photo = models.ImageField(upload_to='resume_photos/', blank=True, null=True)
 
     def __str__(self):

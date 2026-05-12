@@ -27,6 +27,12 @@ class ResumeSettingsForm(forms.ModelForm):
         ('recommendations', 'Отзывы и рекомендации'),
     ]
 
+    PHOTO_SOURCE_CHOICES = [
+        (ResumeSettings.PhotoSource.ACCOUNT, 'Фото из аккаунта'),
+        (ResumeSettings.PhotoSource.CUSTOM, 'Отдельное фото для резюме'),
+        (ResumeSettings.PhotoSource.HIDDEN, 'Не показывать фото'),
+    ]
+
     selected_sections = forms.MultipleChoiceField(
         choices=SECTION_CHOICES,
         required=False,
@@ -45,14 +51,23 @@ class ResumeSettingsForm(forms.ModelForm):
     )
 
     photo_source = forms.ChoiceField(
-        choices=ResumeSettings.PhotoSource.choices,
+        choices=PHOTO_SOURCE_CHOICES,
         label='Источник фото',
-        help_text='Выберите, откуда брать фото для публичного резюме.',
+        help_text='Выберите, какое фото показывать в публичном резюме.',
     )
 
     class Meta:
         model = ResumeSettings
-        fields = ('title', 'about', 'is_public', 'template', 'font_size', 'photo_source', 'photo', 'selected_sections')
+        fields = (
+            'title',
+            'about',
+            'is_public',
+            'template',
+            'font_size',
+            'photo_source',
+            'photo',
+            'selected_sections',
+        )
         labels = {
             'title': 'Заголовок',
             'about': 'О себе',
@@ -66,6 +81,10 @@ class ResumeSettingsForm(forms.ModelForm):
         }
         widgets = {
             'about': forms.Textarea(attrs={'rows': 6}),
+            'photo': forms.FileInput(attrs={
+                'accept': 'image/*',
+                'class': 'student-resume-photo-native',
+            }),
         }
 
     def __init__(self, *args, **kwargs):
@@ -73,6 +92,9 @@ class ResumeSettingsForm(forms.ModelForm):
 
         if self.instance and self.instance.selected_sections:
             self.initial['selected_sections'] = self.instance.selected_sections
+
+        if self.instance and self.instance.photo_source == ResumeSettings.PhotoSource.PROFILE:
+            self.initial['photo_source'] = ResumeSettings.PhotoSource.ACCOUNT
 
         self.fields['title'].widget.attrs.update({
             'data-preview': 'title',
@@ -84,6 +106,8 @@ class ResumeSettingsForm(forms.ModelForm):
         })
         self.fields['template'].widget.attrs.update({'data-preview': 'template'})
         self.fields['font_size'].widget.attrs.update({'data-preview': 'font-size'})
+        self.fields['photo_source'].widget.attrs.update({'class': 'student-resume-photo-select'})
+        self.fields['photo'].widget.attrs.update({'class': 'student-resume-photo-input'})
 
     def save(self, commit=True):
         instance = super().save(commit=False)

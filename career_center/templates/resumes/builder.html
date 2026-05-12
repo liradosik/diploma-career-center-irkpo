@@ -32,20 +32,20 @@
     </div>
 
     <div class="resume-builder-hero-decor" aria-hidden="true">
-    <span class="resume-builder-orbit resume-builder-orbit-lg"></span>
-    <span class="resume-builder-orbit resume-builder-orbit-md"></span>
-    <span class="resume-builder-orbit resume-builder-orbit-sm"></span>
+      <span class="resume-builder-orbit resume-builder-orbit-lg"></span>
+      <span class="resume-builder-orbit resume-builder-orbit-md"></span>
+      <span class="resume-builder-orbit resume-builder-orbit-sm"></span>
 
-    <span class="resume-builder-diamond resume-builder-diamond-one"></span>
-    <span class="resume-builder-diamond resume-builder-diamond-two"></span>
+      <span class="resume-builder-diamond resume-builder-diamond-one"></span>
+      <span class="resume-builder-diamond resume-builder-diamond-two"></span>
 
-    <span class="resume-builder-dot resume-builder-dot-one"></span>
-    <span class="resume-builder-dot resume-builder-dot-two"></span>
-    <span class="resume-builder-dot resume-builder-dot-three"></span>
+      <span class="resume-builder-dot resume-builder-dot-one"></span>
+      <span class="resume-builder-dot resume-builder-dot-two"></span>
+      <span class="resume-builder-dot resume-builder-dot-three"></span>
 
-    <span class="resume-builder-line resume-builder-line-one"></span>
-    <span class="resume-builder-line resume-builder-line-two"></span>
-</div>
+      <span class="resume-builder-line resume-builder-line-one"></span>
+      <span class="resume-builder-line resume-builder-line-two"></span>
+    </div>
   </section>
 
   <section class="student-resume-layout-v2">
@@ -87,20 +87,31 @@
           </div>
         </div>
 
+        <div class="student-resume-photo-grid">
+  <div class="student-resume-field student-resume-photo-source-card">
+    <label for="{{ form.photo_source.id_for_label }}">{{ form.photo_source.label }}</label>
+    {{ form.photo_source }}
+    <small>{{ form.photo_source.help_text }}</small>
+  </div>
 
-        <div class="student-resume-select-grid">
-          <div class="student-resume-field">
-            <label for="{{ form.photo_source.id_for_label }}">{{ form.photo_source.label }}</label>
-            {{ form.photo_source }}
-            <small>{{ form.photo_source.help_text }}</small>
-          </div>
+  <div
+    class="student-resume-field student-resume-file-field"
+    id="resumePhotoUploadBlock"
+  >
+    <label for="{{ form.photo.id_for_label }}">{{ form.photo.label }}</label>
 
-          <div class="student-resume-field">
-            <label for="{{ form.photo.id_for_label }}">{{ form.photo.label }}</label>
-            {{ form.photo }}
-            <small>{{ form.photo.help_text }}</small>
-          </div>
-        </div>
+    <div class="student-resume-photo-actions">
+  {{ form.photo }}
+
+  <label for="{{ form.photo.id_for_label }}" class="student-resume-photo-action-btn">
+    <i class="bi bi-upload"></i>
+    Выбрать фото
+  </label>
+</div>
+
+<span class="student-resume-upload-name" id="resumePhotoFileName"></span>
+  </div>
+</div>
 
         <label class="student-resume-public-toggle">
           {{ form.is_public }}
@@ -113,36 +124,36 @@
         </label>
 
         <div class="resume-sections-block">
-    <h3 class="resume-sections-title">Разделы резюме</h3>
-    <p class="resume-sections-text">
-        Отметьте блоки, которые должны попасть в итоговое резюме, и перетащите их в нужном порядке.
-    </p>
+          <h3 class="resume-sections-title">Разделы резюме</h3>
+          <p class="resume-sections-text">
+            Отметьте блоки, которые должны попасть в итоговое резюме, и перетащите их в нужном порядке.
+          </p>
 
-    <div class="resume-sections-sortable" id="resumeSectionsSortable">
-        {% for value, label in ordered_section_choices %}
-            <div class="resume-section-item" data-key="{{ value }}">
+          <div class="resume-sections-sortable" id="resumeSectionsSortable">
+            {% for value, label in ordered_section_choices %}
+              <div class="resume-section-item" data-key="{{ value }}">
                 <div class="resume-section-item-left">
-                    <span class="resume-section-drag" title="Перетащить">⋮⋮</span>
+                  <span class="resume-section-drag" title="Перетащить">⋮⋮</span>
 
-                    <input
-                        type="checkbox"
-                        name="selected_sections"
-                        value="{{ value }}"
-                        id="section_{{ value }}"
-                        class="resume-section-checkbox"
-                        {% if value in selected_sections %}checked{% endif %}
-                    >
+                  <input
+                    type="checkbox"
+                    name="selected_sections"
+                    value="{{ value }}"
+                    id="section_{{ value }}"
+                    class="resume-section-checkbox"
+                    {% if value in selected_sections %}checked{% endif %}
+                  >
 
-                    <label for="section_{{ value }}" class="resume-section-label">
-                        {{ label }}
-                    </label>
+                  <label for="section_{{ value }}" class="resume-section-label">
+                    {{ label }}
+                  </label>
                 </div>
-            </div>
-        {% endfor %}
-    </div>
+              </div>
+            {% endfor %}
+          </div>
 
-    <input type="hidden" name="section_order" id="sectionOrderInput">
-</div>
+          <input type="hidden" name="section_order" id="sectionOrderInput">
+        </div>
 
         {% if form.errors %}
           <div class="student-resume-errors">
@@ -271,6 +282,11 @@
   const sortableEl = document.getElementById('resumeSectionsSortable');
   const sectionOrderInput = document.getElementById('sectionOrderInput');
 
+  const photoSourceInput = document.getElementById('{{ form.photo_source.id_for_label }}');
+  const photoUploadBlock = document.getElementById('resumePhotoUploadBlock');
+  const photoInput = document.getElementById('{{ form.photo.id_for_label }}');
+  const photoFileName = document.getElementById('resumePhotoFileName');
+
   const templateLabels = {
     classic: 'Классический',
     compact: 'Компактный',
@@ -369,7 +385,23 @@
 
     doc.classList.add('resume-font-' + size);
   }
+  function togglePhotoUploadBlock() {
+    if (!photoSourceInput || !photoUploadBlock) return;
 
+    const isCustom = photoSourceInput.value === 'custom';
+    photoUploadBlock.hidden = !isCustom;
+    photoUploadBlock.classList.toggle('is-hidden', !isCustom);
+  }
+
+  function updatePhotoFileName() {
+  if (!photoInput || !photoFileName) return;
+
+  if (photoInput.files && photoInput.files.length > 0) {
+    photoFileName.textContent = photoInput.files[0].name;
+  } else {
+    photoFileName.textContent = '';
+  }
+}
   if (sortableEl && window.Sortable) {
     Sortable.create(sortableEl, {
       animation: 180,
@@ -391,7 +423,16 @@
   });
 
   form.addEventListener('submit', updateSectionOrderInput);
+  if (photoSourceInput) {
+    photoSourceInput.addEventListener('change', togglePhotoUploadBlock);
+  }
 
+  if (photoInput) {
+    photoInput.addEventListener('change', updatePhotoFileName);
+  }
+
+  togglePhotoUploadBlock();
+  updatePhotoFileName();
   updateText();
   updateSections();
   updateTemplate();

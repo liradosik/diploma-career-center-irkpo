@@ -14701,3 +14701,380 @@ html {
     width: min(100% - 24px, 1120px) !important;
   }
 }
+/* === Resume photo source cleanup === */
+
+.student-resume-photo-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 18px 20px;
+  align-items: start;
+  margin-top: 2px;
+}
+
+.student-resume-photo-source-card,
+.student-resume-file-field {
+  min-width: 0;
+}
+
+.student-resume-photo-source-card select,
+.student-resume-file-field input[type="file"] {
+  min-height: 54px;
+  border-radius: 18px;
+  border-color: #cfe0f5;
+  background: #fbfdff;
+}
+
+.student-resume-file-box {
+  min-width: 0;
+  padding: 14px 16px;
+  border: 1px solid #cfe0f5;
+  border-radius: 18px;
+  background: #fbfdff;
+  color: #1f3654;
+  line-height: 1.45;
+  overflow: hidden;
+}
+
+.student-resume-file-box a {
+  color: var(--primary);
+  font-weight: 650;
+  overflow-wrap: anywhere;
+}
+
+.student-resume-file-box input[type="file"] {
+  width: 100%;
+  margin-top: 8px;
+  padding: 10px;
+  border: 1px dashed #bfd7f7;
+  border-radius: 14px;
+  background: #f7fbff;
+}
+
+.student-resume-file-box input[type="checkbox"] {
+  width: auto;
+  min-width: 0;
+  margin: 0 6px 0 0;
+  accent-color: var(--primary);
+}
+
+.student-resume-file-field small,
+.student-resume-photo-source-card small {
+  display: block;
+  margin-top: 8px;
+  color: #6f829a;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+/* === Public resume hero/photo fix === */
+
+.public-resume-hero-v4 {
+  align-items: center !important;
+}
+
+.public-resume-hero-v4.public-resume-hero-has-photo {
+  grid-template-columns: 150px minmax(0, 1fr) minmax(260px, 0.85fr) !important;
+}
+
+.public-resume-hero-v4.public-resume-hero-no-photo {
+  grid-template-columns: minmax(0, 1.15fr) minmax(260px, 0.85fr) !important;
+}
+
+.public-resume-photo-v4,
+.public-resume-avatar-v4 {
+  width: 150px !important;
+  height: 150px !important;
+  min-width: 150px !important;
+  max-width: 150px !important;
+  aspect-ratio: 1 / 1 !important;
+  border-radius: 50% !important;
+  overflow: hidden !important;
+  flex: 0 0 150px !important;
+}
+
+.public-resume-photo-v4 {
+  display: block !important;
+  object-fit: cover !important;
+  object-position: center !important;
+}
+
+.public-resume-avatar-v4 {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: linear-gradient(135deg, #dfeeff, #f5f9ff) !important;
+  color: var(--primary) !important;
+  font-size: 54px !important;
+  font-weight: 760 !important;
+  box-shadow: inset 0 0 0 1px rgba(30, 102, 208, 0.14);
+}
+
+.public-resume-person-v4 {
+  min-width: 0 !important;
+}
+
+.public-resume-person-v4 h1 {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.public-resume-contacts-v4 {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 8px 12px !important;
+  align-items: center !important;
+}
+
+.public-resume-contacts-v4 span {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.public-resume-hero-no-photo .public-resume-person-v4 {
+  grid-column: 1;
+}
+
+.public-resume-hero-no-photo .public-resume-about-v4 {
+  grid-column: 2;
+}
+
+.public-resume-page-v4.is-pdf-mode .public-resume-photo-v4,
+.public-resume-page-v4.is-pdf-mode .public-resume-avatar-v4 {
+  width: 112px !important;
+  height: 112px !important;
+  min-width: 112px !important;
+  max-width: 112px !important;
+  flex-basis: 112px !important;
+}
+
+.public-resume-page-v4.is-pdf-mode .public-resume-hero-v4.public-resume-hero-has-photo {
+  grid-template-columns: 112px minmax(0, 1fr) minmax(220px, 0.8fr) !important;
+}
+
+@media (max-width: 1100px) {
+  .student-resume-photo-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .public-resume-hero-v4.public-resume-hero-has-photo {
+    grid-template-columns: 96px minmax(0, 1fr) !important;
+  }
+
+  .public-resume-hero-v4.public-resume-hero-no-photo {
+    grid-template-columns: 1fr !important;
+  }
+
+  .public-resume-about-v4,
+  .public-resume-hero-no-photo .public-resume-about-v4 {
+    grid-column: 1 / -1 !important;
+  }
+
+  .public-resume-photo-v4,
+  .public-resume-avatar-v4 {
+    width: 96px !important;
+    height: 96px !important;
+    min-width: 96px !important;
+    max-width: 96px !important;
+    flex-basis: 96px !important;
+  }
+
+  .public-resume-avatar-v4 {
+    font-size: 34px !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .public-resume-hero-v4.public-resume-hero-has-photo,
+  .public-resume-hero-v4.public-resume-hero-no-photo {
+    grid-template-columns: 1fr !important;
+  }
+
+  .public-resume-photo-v4,
+  .public-resume-avatar-v4 {
+    width: 86px !important;
+    height: 86px !important;
+    min-width: 86px !important;
+    max-width: 86px !important;
+    flex-basis: 86px !important;
+  }
+
+  .public-resume-person-v4 h1 {
+    font-size: clamp(34px, 9vw, 46px) !important;
+    line-height: 1.05 !important;
+  }
+
+  .public-resume-about-v4,
+  .public-resume-hero-no-photo .public-resume-about-v4 {
+    grid-column: auto !important;
+  }
+}
+.student-resume-photo-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 18px 20px;
+  align-items: start;
+}
+
+.student-resume-file-field[hidden] {
+  display: none !important;
+}
+
+.student-resume-current-photo {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 12px;
+  padding: 12px 14px;
+  border: 1px solid #dbe7f7;
+  border-radius: 16px;
+  background: #f8fbff;
+}
+
+.student-resume-current-photo-label {
+  color: #6f829a;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.student-resume-current-photo a {
+  color: var(--primary);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.student-resume-clear-photo {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  cursor: pointer;
+  font-weight: 500;
+  color: #31445f;
+}
+
+.student-resume-clear-photo input[type="checkbox"] {
+  width: auto;
+  margin: 0;
+}
+
+.student-resume-upload-control {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  min-width: 0;
+  padding: 14px;
+  border: 1px dashed #bfd7f7;
+  border-radius: 18px;
+  background: #f8fbff;
+}
+
+.student-resume-photo-input,
+.student-resume-photo-native,
+.student-resume-upload-control input[type="file"] {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+.student-resume-upload-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: 14px;
+  border: 1px solid #cfe1fb;
+  background: linear-gradient(135deg, #ffffff 0%, #f2f8ff 100%);
+  color: var(--primary);
+  font-weight: 700;
+  cursor: pointer;
+  transition: .18s ease;
+  margin: 0;
+}
+
+.student-resume-upload-btn:hover {
+  border-color: #b7d1f5;
+  box-shadow: 0 8px 18px rgba(30, 102, 208, 0.10);
+  transform: translateY(-1px);
+}
+
+.student-resume-upload-name {
+  min-width: 0;
+  color: #5f728a;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 900px) {
+  .student-resume-photo-grid {
+    grid-template-columns: 1fr;
+  }
+}
+/* === Resume photo buttons cleanup === */
+
+.student-resume-file-field[hidden] {
+  display: none !important;
+}
+
+.student-resume-photo-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  min-width: 0;
+}
+
+.student-resume-photo-input,
+.student-resume-photo-native,
+.student-resume-photo-actions input[type="file"] {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+.student-resume-photo-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: fit-content;
+  min-height: 46px;
+  padding: 0 18px;
+  border: 1px solid #cfe1fb;
+  border-radius: 16px;
+  background: #f8fbff;
+  color: #1e66d0;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color .18s ease, background-color .18s ease, box-shadow .18s ease, transform .18s ease;
+  margin: 0;
+}
+
+.student-resume-photo-action-btn:hover {
+  border-color: #b7d1f5;
+  background: #ffffff;
+  box-shadow: 0 10px 22px rgba(30, 102, 208, 0.10);
+  transform: translateY(-1px);
+}   
+
+.student-resume-upload-name {
+  display: block;
+  margin-top: 8px;
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.student-resume-current-photo,
+.student-resume-clear-photo,
+.student-resume-upload-control {
+  display: none !important;
+}
