@@ -8,7 +8,11 @@
 <section class="public-resume-unavailable-v4">
   <div class="public-resume-unavailable-card-v4">
     <h1>Резюме недоступно</h1>
+    {% if unavailable_reason == 'not_created' %}
+    <p>Студент ещё не создал резюме для публичного просмотра.</p>
+    {% else %}
     <p>Публичный доступ к этому резюме отключён.</p>
+    {% endif %}
   </div>
 </section>
 
@@ -16,7 +20,13 @@
 <section class="public-resume-page-v4 resume-template-{{ resume_template|default:'classic' }} resume-font-{{ resume_font_size|default:'standard' }} {% if is_pdf_mode %}is-pdf-mode{% endif %}">
   <article class="public-resume-hero-v4">
     <div class="public-resume-avatar-v4">
+      {% if profile.photo %}
+      <img src="{{ profile.photo.url }}" alt="Фото {{ student.full_name|default:'студента' }}">
+      {% elif student.photo %}
+      <img src="{{ student.photo.url }}" alt="Фото {{ student.full_name|default:'студента' }}">
+      {% else %}
       {{ student.full_name|default:"Р"|slice:":1" }}
+      {% endif %}
     </div>
 
     <div class="public-resume-person-v4">
@@ -38,6 +48,36 @@
   <main class="public-resume-sheet-v4">
     <div class="public-resume-column-v4">
 
+      {% if 'contacts' in selected_sections %}
+      {% if student.email or profile.phone or profile.city %}
+      <section class="public-resume-block-v4">
+        <h2>Контактная информация</h2>
+        <div class="public-resume-info-v4">
+          {% if student.email %}
+          <p>
+            <strong>Email:</strong>
+            <span>{{ student.email }}</span>
+          </p>
+          {% endif %}
+          {% if profile.phone %}
+          <p>
+            <strong>Телефон:</strong>
+            <span>{{ profile.phone }}</span>
+          </p>
+          {% endif %}
+          {% if profile.city %}
+          <p>
+            <strong>Город:</strong>
+            <span>{{ profile.city }}</span>
+          </p>
+          {% endif %}
+        </div>
+      </section>
+      {% endif %}
+      {% endif %}
+
+      {% if 'education' in selected_sections %}
+      {% if student.specialty or student.group %}
       <section class="public-resume-block-v4">
         <h2>Основная информация</h2>
 
@@ -62,6 +102,8 @@
           {% endif %}
         </div>
       </section>
+      {% endif %}
+      {% endif %}
 
       {% if 'skills' in selected_sections %}
       <section class="public-resume-block-v4">
@@ -184,30 +226,6 @@
   {% endif %}
 
 </section>
-
-{% if not is_pdf_mode %}
-<script>
-(function () {
-  const button = document.querySelector('[data-copy-public-resume]');
-  if (!button) return;
-
-  button.addEventListener('click', async function () {
-    const oldText = button.textContent.trim();
-
-    try {
-      await navigator.clipboard.writeText(window.location.href);
-      button.textContent = 'Ссылка скопирована';
-    } catch (error) {
-      button.textContent = 'Скопируйте из адресной строки';
-    }
-
-    setTimeout(function () {
-      button.textContent = oldText;
-    }, 1800);
-  });
-})();
-</script>
-{% endif %}
 
 {% endif %}
 {% endblock %}
