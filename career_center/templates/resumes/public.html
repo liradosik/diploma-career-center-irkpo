@@ -26,13 +26,17 @@
 {% else %}
 <section class="public-resume-page-v4 resume-template-{{ resume_template|default:'classic' }} resume-font-{{ resume_font_size|default:'standard' }} {% if is_pdf_mode %}is-pdf-mode{% endif %}">
   {% if is_owner_view and not is_pdf_mode %}
-  <div class="public-resume-mini-actions-v4">
-    <a class="btn" href="{% url 'resumes:builder' %}">
-      <i class="bi bi-arrow-left"></i>
-      Вернуться в конструктор резюме
-    </a>
+<div class="public-resume-owner-bar-v4">
+  <div class="public-resume-owner-note-v4">
+    <span class="public-resume-owner-label-v4">Предпросмотр</span>
+    <p>Так страницу увидит работодатель по публичной ссылке.</p>
   </div>
-  {% endif %}
+
+  <a class="public-resume-owner-back-v4" href="{% url 'resumes:builder' %}">
+    Вернуться в конструктор
+  </a>
+</div>
+{% endif %}
   <article class="public-resume-hero-v4 {% if resume_photo_source == 'hidden' %}public-resume-hero-no-photo{% else %}public-resume-hero-has-photo{% endif %}">
     {% if resume_photo_source != 'hidden' %}
       {% if resume_photo_url %}

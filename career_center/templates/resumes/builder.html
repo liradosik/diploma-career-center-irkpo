@@ -29,24 +29,25 @@
             <i class="bi bi-file-earmark-pdf"></i>
             Скачать PDF
           </a>
+
+          <a class="btn" target="_blank" href="{% url 'resumes:public' profile.public_resume_token %}">
+            <i class="bi bi-box-arrow-up-right"></i>
+            Открыть публичное резюме
+          </a>
         {% endif %}
       </div>
     </div>
 
     <div class="resume-builder-hero-decor" aria-hidden="true">
       <span class="resume-builder-orbit resume-builder-orbit-lg"></span>
-      <span class="resume-builder-orbit resume-builder-orbit-md"></span>
       <span class="resume-builder-orbit resume-builder-orbit-sm"></span>
 
-      <span class="resume-builder-diamond resume-builder-diamond-one"></span>
       <span class="resume-builder-diamond resume-builder-diamond-two"></span>
 
       <span class="resume-builder-dot resume-builder-dot-one"></span>
       <span class="resume-builder-dot resume-builder-dot-two"></span>
       <span class="resume-builder-dot resume-builder-dot-three"></span>
 
-      <span class="resume-builder-line resume-builder-line-one"></span>
-      <span class="resume-builder-line resume-builder-line-two"></span>
     </div>
   </section>
 
@@ -121,35 +122,6 @@
             <small>Если включено, резюме доступно по персональной ссылке.</small>
           </span>
         </label>
-
-        {% if profile %}
-        <section class="student-resume-public-panel" aria-live="polite">
-          <div class="student-resume-public-panel-head">
-            <h3>Публичное резюме</h3>
-            <span class="student-resume-public-status {% if resume.is_public %}is-on{% else %}is-off{% endif %}">
-              {% if resume.is_public %}Публичное резюме включено{% else %}Публичное резюме выключено{% endif %}
-            </span>
-          </div>
-
-          <div class="student-resume-public-panel-actions">
-            <a class="btn" target="_blank" href="{% url 'resumes:public' profile.public_resume_token %}">
-              <i class="bi bi-box-arrow-up-right"></i>
-              Открыть публичное резюме
-            </a>
-            <button
-              class="btn"
-              type="button"
-              data-copy-public-url
-              data-public-url="{{ request.scheme }}://{{ request.get_host }}{% url 'resumes:public' profile.public_resume_token %}"
-            >
-              <i class="bi bi-link-45deg"></i>
-              Скопировать ссылку
-            </button>
-          </div>
-
-          <p class="student-resume-public-panel-hint" data-copy-public-hint hidden>Ссылка скопирована.</p>
-        </section>
-        {% endif %}
 
         <div class="resume-sections-block">
           <h3 class="resume-sections-title">Разделы резюме</h3>

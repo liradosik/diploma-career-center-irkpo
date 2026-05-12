@@ -15662,3 +15662,136 @@ html {
 .public-resume-page-v4.is-pdf-mode.resume-template-compact .public-resume-hero-v4 {
   background: #ffffff !important;
 }
+.student-resume-hero-actions {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.student-resume-hero-copy-hint {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 4px;
+  color: #2563eb;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.student-resume-hero-copy-hint[hidden] {
+  display: none;
+}
+.public-resume-owner-bar-v4 {
+  width: min(1408px, calc(100% - 48px));
+  margin: 28px auto 20px;
+  padding: 14px 18px;
+  border: 1px solid rgba(191, 219, 254, 0.85);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 14px 34px rgba(37, 99, 235, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.public-resume-owner-note-v4 {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  color: #5f7390;
+}
+
+.public-resume-owner-label-v4 {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: #eff6ff;
+  color: #2563eb;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.public-resume-owner-note-v4 p {
+  margin: 0;
+  color: #6b7f9d;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.public-resume-owner-back-v4 {
+  min-height: 42px;
+  padding: 0 18px;
+  border: 1px solid rgba(191, 219, 254, 0.95);
+  border-radius: 999px;
+  background: #ffffff;
+  color: #1e3a5f;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.07);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+}
+
+.public-resume-owner-back-v4:hover {
+  transform: translateY(-1px);
+  border-color: rgba(96, 165, 250, 0.9);
+  color: #2563eb;
+  box-shadow: 0 14px 30px rgba(37, 99, 235, 0.12);
+}
+
+.public-resume-owner-icon-v4 {
+  display: none;
+}
+
+@media (max-width: 760px) {
+  .public-resume-owner-bar-v4 {
+    width: min(100% - 24px, 1408px);
+    margin-top: 18px;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .public-resume-owner-note-v4 {
+    align-items: flex-start;
+  }
+
+  .public-resume-owner-back-v4 {
+    width: 100%;
+  }
+}
+.public-resume-owner-back-v4 {
+  min-height: 42px;
+  padding: 0 18px;
+  border: 1px solid rgba(191, 219, 254, 0.95);
+  border-radius: 999px;
+  background: #ffffff;
+  color: #1e3a5f;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.07);
+  transition: none;
+}
+
+.public-resume-owner-back-v4:hover {
+  transform: none;
+  border-color: rgba(191, 219, 254, 0.95);
+  color: #1e3a5f;
+  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.07);
+  background: #ffffff;
+}
