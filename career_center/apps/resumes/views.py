@@ -9,7 +9,13 @@ from .forms import ResumeSettingsForm
 from .models import ResumeSettings
 
 ALLOWED_RESUME_TEMPLATES = {'classic', 'compact', 'modern', 'academic'}
+ALLOWED_RESUME_FONT_SIZES = {'small', 'standard', 'large'}
 
+
+def _normalize_font_size(font_size):
+    if font_size in ALLOWED_RESUME_FONT_SIZES:
+        return font_size
+    return 'standard'
 
 def _normalize_template(template_code):
     if template_code in ALLOWED_RESUME_TEMPLATES:
@@ -36,18 +42,52 @@ def _resume_payload(student, resume, profile):
     return entries, grouped, about_text, selected_sections
 
 
+
 @role_required(User.Role.STUDENT)
 def builder(request):
     settings_obj, _ = ResumeSettings.objects.get_or_create(student=request.user)
     profile = getattr(request.user, 'student_profile', None)
+
     if request.method == 'POST':
         form = ResumeSettingsForm(request.POST, instance=settings_obj)
         if form.is_valid():
-            form.save()
+            settings_obj = form.save(commit=False)
+
+            checked_sections = request.POST.getlist('selected_sections')
+            raw_order = request.POST.get('section_order', '')
+            section_order = [item for item in raw_order.split(',') if item]
+
+            if section_order:
+                ordered_selected_sections = [key for key in section_order if key in checked_sections]
+                settings_obj.selected_sections = ordered_selected_sections
+            else:
+                settings_obj.selected_sections = checked_sections
+
+            settings_obj.save()
     else:
         form = ResumeSettingsForm(instance=settings_obj)
+
     entries, grouped_entries, about_text, selected_sections = _resume_payload(request.user, settings_obj, profile)
+
     resume_template = _normalize_template(getattr(settings_obj, 'template', 'classic'))
+    resume_font_size = _normalize_font_size(getattr(settings_obj, 'font_size', 'standard'))
+
+    section_choices = ResumeSettingsForm.SECTION_CHOICES
+    saved_order = list(getattr(settings_obj, 'selected_sections', None) or [])
+
+    ordered_section_choices = []
+    used_keys = set()
+
+    for key in saved_order:
+        for choice_key, choice_label in section_choices:
+            if choice_key == key and choice_key not in used_keys:
+                ordered_section_choices.append((choice_key, choice_label))
+                used_keys.add(choice_key)
+
+    for choice_key, choice_label in section_choices:
+        if choice_key not in used_keys:
+            ordered_section_choices.append((choice_key, choice_label))
+
     has_base_data = any(
         [
             request.user.full_name,
@@ -57,6 +97,7 @@ def builder(request):
             request.user.group,
         ]
     )
+
     return render(
         request,
         'resumes/builder.html',
@@ -67,9 +108,11 @@ def builder(request):
             'profile': profile,
             'grouped_entries': grouped_entries,
             'selected_sections': selected_sections,
+            'ordered_section_choices': ordered_section_choices,
             'has_resume_data': has_base_data or bool(entries),
             'about_text': about_text,
             'resume_template': resume_template,
+            'resume_font_size': resume_font_size,
         },
     )
 
@@ -81,6 +124,7 @@ def public_resume(request, token):
         return render(request, 'resumes/public.html', {'is_unavailable': True, 'student': profile.user}, status=404)
     entries, grouped_entries, about_text, selected_sections = _resume_payload(profile.user, resume, profile)
     resume_template = _normalize_template(getattr(resume, 'template', 'classic'))
+    resume_font_size = _normalize_font_size(getattr(resume, 'font_size', 'standard'))
     has_resume_data = any([profile.user.full_name, getattr(resume, 'title', ''), about_text, entries])
     is_owner_view = request.user.is_authenticated and request.user.id == profile.user_id
     if request.GET.get('download') == 'pdf':
@@ -107,5 +151,6 @@ def public_resume(request, token):
             'selected_sections': selected_sections,
             'is_owner_view': is_owner_view,
             'resume_template': resume_template,
+            'resume_font_size': resume_font_size,
         },
     )
