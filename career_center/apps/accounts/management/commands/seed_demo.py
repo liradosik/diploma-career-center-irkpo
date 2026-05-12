@@ -64,6 +64,7 @@ class Command(BaseCommand):
 
         admin = User.objects.create_user(
             email=self.demo_admin_email,
+            username='admin_demo',
             full_name='Демо Администратор',
             role=User.Role.ADMIN,
             is_staff=True,
@@ -72,8 +73,8 @@ class Command(BaseCommand):
         )
 
         curators = [
-            User.objects.create_user(email='curator.1@irkpo.ru', full_name='Куратор Ирина Петрова', role=User.Role.CURATOR, password=DEMO_PASSWORD),
-            User.objects.create_user(email='curator.2@irkpo.ru', full_name='Куратор Павел Смирнов', role=User.Role.CURATOR, password=DEMO_PASSWORD),
+            User.objects.create_user(username='curator_1', email='curator.1@irkpo.ru', full_name='Куратор Ирина Петрова', role=User.Role.CURATOR, password=DEMO_PASSWORD),
+            User.objects.create_user(username='curator_2', email='curator.2@irkpo.ru', full_name='Куратор Павел Смирнов', role=User.Role.CURATOR, password=DEMO_PASSWORD),
         ]
 
         groups = {
@@ -108,7 +109,7 @@ class Command(BaseCommand):
 
         students = []
         for i, (email, full_name, group_name, academic_status) in enumerate(student_specs, start=1):
-            student = User.objects.create_user(email=email, full_name=full_name, role=User.Role.STUDENT, academic_status=academic_status, password=DEMO_PASSWORD)
+            student = User.objects.create_user(username=f'student_{i}', email=email, full_name=full_name, role=User.Role.STUDENT, academic_status=academic_status, password=DEMO_PASSWORD)
             sync_student_with_group(student, groups[group_name])
             student.contact_phone = f'+7 (900) 000-00-{i:02d}'
             student.contact_email = email
