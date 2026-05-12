@@ -15078,3 +15078,93 @@ html {
 .student-resume-upload-control {
   display: none !important;
 }
+
+.resume-photo-crop-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(15, 23, 42, 0.52);
+}
+
+.resume-photo-crop-modal.is-open {
+  display: flex;
+}
+
+.resume-photo-crop-dialog {
+  width: min(680px, 100%);
+  max-height: calc(100vh - 48px);
+  overflow: auto;
+  background: #fff;
+  border: 1px solid #cde0f8;
+  border-radius: 20px;
+  box-shadow: 0 20px 56px rgba(15, 23, 42, 0.24);
+  padding: 18px;
+}
+
+.resume-photo-crop-head h3 {
+  margin: 0;
+  font-size: 22px;
+  color: #122338;
+}
+
+.resume-photo-crop-head p {
+  margin: 8px 0 0;
+  color: #61758f;
+  font-size: 14px;
+}
+
+.resume-photo-crop-area {
+  margin-top: 14px;
+  border: 1px solid #dbe7f7;
+  border-radius: 16px;
+  min-height: 260px;
+  max-height: 56vh;
+  overflow: hidden;
+  background: #f8fbff;
+}
+
+.resume-photo-crop-image {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+}
+
+.resume-photo-crop-actions {
+  margin-top: 14px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.student-resume-photo-actions {
+  align-items: center;
+}
+
+.student-resume-photo-action-btn {
+  max-width: 100%;
+}
+
+.student-resume-upload-name {
+  word-break: break-word;
+}
+
+@media (max-width: 640px) {
+  .resume-photo-crop-modal {
+    padding: 12px;
+  }
+
+  .resume-photo-crop-dialog {
+    border-radius: 16px;
+    padding: 14px;
+    max-height: calc(100vh - 24px);
+  }
+
+  .resume-photo-crop-actions .btn {
+    width: 100%;
+  }
+}
