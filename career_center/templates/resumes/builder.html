@@ -24,8 +24,8 @@
 
         {% if profile %}
           <a class="btn" target="_blank" href="{% url 'resumes:public' profile.public_resume_token %}?download=pdf">
-            <i class="bi bi-file-earmark-pdf"></i>
-            Скачать PDF
+            <i class="bi bi-file-earmark-text"></i>
+            Скачать HTML
           </a>
         {% endif %}
       </div>

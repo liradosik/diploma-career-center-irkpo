@@ -43,6 +43,25 @@ def _resume_payload(student, resume, profile):
     return entries, grouped, about_text, selected_sections
 
 
+def _resolve_student_photo_url(student, profile):
+    photo_url = None
+    profile_photo = getattr(profile, 'photo', None)
+    if profile_photo:
+        try:
+            photo_url = profile_photo.url
+        except ValueError:
+            photo_url = None
+
+    if not photo_url:
+        user_photo = getattr(student, 'photo', None)
+        if user_photo:
+            try:
+                photo_url = user_photo.url
+            except ValueError:
+                photo_url = None
+    return photo_url
+
+
 
 @role_required(User.Role.STUDENT)
 def builder(request):
@@ -120,6 +139,8 @@ def builder(request):
 
 def public_resume(request, token):
     profile = get_object_or_404(StudentProfile, public_resume_token=token)
+    student = profile.user
+    student_photo_url = _resolve_student_photo_url(student, profile)
     resume = getattr(profile.user, 'resume_settings', None)
     if not resume:
         return render(
@@ -128,7 +149,8 @@ def public_resume(request, token):
             {
                 'is_unavailable': True,
                 'unavailable_reason': 'not_created',
-                'student': profile.user,
+                'student': student,
+                'student_photo_url': student_photo_url,
             },
             status=404,
         )
@@ -139,22 +161,24 @@ def public_resume(request, token):
             {
                 'is_unavailable': True,
                 'unavailable_reason': 'private',
-                'student': profile.user,
+                'student': student,
+                'student_photo_url': student_photo_url,
             },
             status=404,
         )
-    entries, grouped_entries, about_text, selected_sections = _resume_payload(profile.user, resume, profile)
+    entries, grouped_entries, about_text, selected_sections = _resume_payload(student, resume, profile)
     resume_template = _normalize_template(getattr(resume, 'template', 'classic'))
     resume_font_size = _normalize_font_size(getattr(resume, 'font_size', 'standard'))
-    has_resume_data = any([profile.user.full_name, getattr(resume, 'title', ''), about_text, entries])
+    has_resume_data = any([student.full_name, getattr(resume, 'title', ''), about_text, entries])
     is_owner_view = request.user.is_authenticated and request.user.id == profile.user_id
     if request.GET.get('download') == 'pdf':
         html = render(request, 'resumes/public.html', {
-            'student': profile.user, 'profile': profile, 'resume': resume, 'entries': entries,
+            'student': student, 'profile': profile, 'resume': resume, 'entries': entries,
             'grouped_entries': grouped_entries, 'about_text': about_text, 'has_resume_data': has_resume_data,
             'selected_sections': selected_sections, 'is_owner_view': is_owner_view, 'is_pdf_mode': True,
             'resume_template': resume_template,
             'resume_font_size': resume_font_size,
+            'student_photo_url': student_photo_url,
         }).content
         response = HttpResponse(html, content_type='text/html; charset=utf-8')
         response['Content-Disposition'] = f'attachment; filename=\"resume-{profile.user_id}.html\"'
@@ -163,7 +187,7 @@ def public_resume(request, token):
         request,
         'resumes/public.html',
         {
-            'student': profile.user,
+            'student': student,
             'profile': profile,
             'resume': resume,
             'entries': entries,
@@ -174,5 +198,6 @@ def public_resume(request, token):
             'is_owner_view': is_owner_view,
             'resume_template': resume_template,
             'resume_font_size': resume_font_size,
+            'student_photo_url': student_photo_url,
         },
     )
