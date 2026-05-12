@@ -13,11 +13,26 @@
     {% else %}
     <p>Публичный доступ к этому резюме отключён.</p>
     {% endif %}
+    {% if is_owner_view %}
+    <div class="public-resume-owner-actions-v4">
+      <a class="btn btn-primary" href="{% url 'resumes:builder' %}">
+        Вернуться в конструктор резюме
+      </a>
+    </div>
+    {% endif %}
   </div>
 </section>
 
 {% else %}
 <section class="public-resume-page-v4 resume-template-{{ resume_template|default:'classic' }} resume-font-{{ resume_font_size|default:'standard' }} {% if is_pdf_mode %}is-pdf-mode{% endif %}">
+  {% if is_owner_view and not is_pdf_mode %}
+  <div class="public-resume-mini-actions-v4">
+    <a class="btn" href="{% url 'resumes:builder' %}">
+      <i class="bi bi-arrow-left"></i>
+      Вернуться в конструктор резюме
+    </a>
+  </div>
+  {% endif %}
   <article class="public-resume-hero-v4 {% if resume_photo_source == 'hidden' %}public-resume-hero-no-photo{% else %}public-resume-hero-has-photo{% endif %}">
     {% if resume_photo_source != 'hidden' %}
       {% if resume_photo_url %}
