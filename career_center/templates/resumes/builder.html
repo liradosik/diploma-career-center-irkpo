@@ -5,6 +5,7 @@
 
 {% block content %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
+
 <div class="student-resume-builder-v2">
 
   <section class="hero student-resume-hero-v2">
@@ -89,30 +90,27 @@
         </div>
 
         <div class="student-resume-photo-grid">
-  <div class="student-resume-field student-resume-photo-source-card">
-    <label for="{{ form.photo_source.id_for_label }}">{{ form.photo_source.label }}</label>
-    {{ form.photo_source }}
-    <small>{{ form.photo_source.help_text }}</small>
-  </div>
+          <div class="student-resume-field student-resume-photo-source-card">
+            <label for="{{ form.photo_source.id_for_label }}">{{ form.photo_source.label }}</label>
+            {{ form.photo_source }}
+            <small>{{ form.photo_source.help_text }}</small>
+          </div>
 
-  <div
-    class="student-resume-field student-resume-file-field"
-    id="resumePhotoUploadBlock"
-  >
-    <label for="{{ form.photo.id_for_label }}">{{ form.photo.label }}</label>
+          <div class="student-resume-field student-resume-file-field" id="resumePhotoUploadBlock">
+            <label for="{{ form.photo.id_for_label }}">{{ form.photo.label }}</label>
 
-    <div class="student-resume-photo-actions">
-  {{ form.photo }}
+            <div class="student-resume-photo-actions">
+              {{ form.photo }}
 
-  <label for="{{ form.photo.id_for_label }}" class="student-resume-photo-action-btn">
-    <i class="bi bi-upload"></i>
-    Выбрать фото
-  </label>
-</div>
+              <label for="{{ form.photo.id_for_label }}" class="student-resume-photo-action-btn">
+                <i class="bi bi-upload"></i>
+                Выбрать фото
+              </label>
+            </div>
 
-<span class="student-resume-upload-name" id="resumePhotoFileName"></span>
-  </div>
-</div>
+            <span class="student-resume-upload-name" id="resumePhotoFileName"></span>
+          </div>
+        </div>
 
         <label class="student-resume-public-toggle">
           {{ form.is_public }}
@@ -262,24 +260,41 @@
 
   </section>
 </div>
-<div class="resume-photo-crop-modal" id="resumePhotoCropModal" aria-hidden="true">
+
+<div class="resume-photo-crop-modal" id="resumePhotoCropModal" hidden aria-hidden="true">
+  <div class="resume-photo-crop-backdrop" data-photo-crop-cancel></div>
+
   <div class="resume-photo-crop-dialog" role="dialog" aria-modal="true" aria-labelledby="resumePhotoCropTitle">
     <div class="resume-photo-crop-head">
-      <h3 id="resumePhotoCropTitle">Обрезка фото</h3>
-      <p>Выберите квадратную область для отображения в резюме.</p>
+      <div>
+        <h3 id="resumePhotoCropTitle">Обрезка фото</h3>
+        <p>Выберите квадратную область для отображения в резюме.</p>
+      </div>
+
+      <button class="resume-photo-crop-close" type="button" data-photo-crop-cancel aria-label="Закрыть">
+        ×
+      </button>
     </div>
+
     <div class="resume-photo-crop-area">
-      <img class="resume-photo-crop-image" id="resumePhotoCropImage" alt="Обрезка выбранного фото">
+      <img id="resumePhotoCropImage" class="resume-photo-crop-image" src="" alt="">
     </div>
+
     <div class="resume-photo-crop-actions">
-      <button type="button" class="btn" id="resumePhotoCropCancel">Отмена</button>
-      <button type="button" class="btn btn-primary" id="resumePhotoCropApply">Применить фото</button>
+      <button class="btn" type="button" data-photo-crop-cancel>
+        Отмена
+      </button>
+
+      <button class="btn btn-primary" type="button" id="resumePhotoCropApply">
+        Применить фото
+      </button>
     </div>
   </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
+
 <script>
 (function(){
   const form = document.getElementById('resume-settings-form');
@@ -303,12 +318,14 @@
   const photoUploadBlock = document.getElementById('resumePhotoUploadBlock');
   const photoInput = document.getElementById('{{ form.photo.id_for_label }}');
   const photoFileName = document.getElementById('resumePhotoFileName');
-  const cropModal = document.getElementById('resumePhotoCropModal');
-  const cropImage = document.getElementById('resumePhotoCropImage');
-  const cropCancelBtn = document.getElementById('resumePhotoCropCancel');
-  const cropApplyBtn = document.getElementById('resumePhotoCropApply');
-  let cropper = null;
-  let originalFileName = '';
+
+  const photoCropModal = document.getElementById('resumePhotoCropModal');
+  const photoCropImage = document.getElementById('resumePhotoCropImage');
+  const photoCropApply = document.getElementById('resumePhotoCropApply');
+  const photoCropCancelButtons = document.querySelectorAll('[data-photo-crop-cancel]');
+
+  let resumePhotoCropper = null;
+  let resumePhotoOriginalFile = null;
 
   const templateLabels = {
     classic: 'Классический',
@@ -408,66 +425,147 @@
 
     doc.classList.add('resume-font-' + size);
   }
-  function togglePhotoUploadBlock() {
+
+  function togglePhotoUploadBlock(){
     if (!photoSourceInput || !photoUploadBlock) return;
 
     const isCustom = photoSourceInput.value === 'custom';
     photoUploadBlock.hidden = !isCustom;
-    photoUploadBlock.classList.toggle('is-hidden', !isCustom);
   }
 
-  function updatePhotoFileName() {
-    if (!photoInput || !photoFileName) return;
-
-    if (photoInput.files && photoInput.files.length > 0) {
-      photoFileName.textContent = photoInput.files[0].name;
-    } else {
-      photoFileName.textContent = '';
+  function destroyPhotoCropper(){
+    if (resumePhotoCropper) {
+      resumePhotoCropper.destroy();
+      resumePhotoCropper = null;
     }
   }
 
-  function destroyCropper(){
-    if (cropper) {
-      cropper.destroy();
-      cropper = null;
+  function closePhotoCropModal(options){
+    const shouldResetInput = options && options.resetInput;
+
+    destroyPhotoCropper();
+
+    if (photoCropImage) {
+      photoCropImage.onload = null;
+      photoCropImage.src = '';
     }
-    if (cropImage) {
-      cropImage.removeAttribute('src');
+
+    if (photoCropModal) {
+      photoCropModal.classList.remove('is-open');
+      photoCropModal.setAttribute('aria-hidden', 'true');
+      photoCropModal.hidden = true;
+    }
+
+    if (shouldResetInput && photoInput) {
+      photoInput.value = '';
+      resumePhotoOriginalFile = null;
+
+      if (photoFileName) {
+        photoFileName.textContent = '';
+      }
     }
   }
 
-  function closeCropModal(){
-    if (!cropModal) return;
-    cropModal.classList.remove('is-open');
-    cropModal.setAttribute('aria-hidden', 'true');
-  }
+  function openPhotoCropModal(file){
+    if (!photoCropModal || !photoCropImage) return;
 
-  function openCropModal(file){
-    if (!cropModal || !cropImage || !window.Cropper) return;
+    if (!window.Cropper) {
+      if (photoFileName) {
+        photoFileName.textContent = 'Фото выбрано, но обрезка недоступна';
+      }
+      return;
+    }
 
-    originalFileName = file.name || 'resume-photo.jpg';
+    resumePhotoOriginalFile = file;
+    destroyPhotoCropper();
+
     const reader = new FileReader();
 
     reader.onload = function(event){
-      cropImage.src = event.target.result;
-      cropModal.classList.add('is-open');
-      cropModal.setAttribute('aria-hidden', 'false');
-      destroyCropper();
-      cropper = new Cropper(cropImage, {
-        aspectRatio: 1,
-        viewMode: 1,
-        autoCropArea: 0.9,
-        background: false,
-        responsive: true,
-        movable: true,
-        zoomable: true,
-        rotatable: false,
-        scalable: false,
-      });
+      photoCropImage.onload = function(){
+        destroyPhotoCropper();
+
+        resumePhotoCropper = new Cropper(photoCropImage, {
+          aspectRatio: 1,
+          viewMode: 1,
+          autoCropArea: 0.9,
+          background: false,
+          responsive: true,
+          movable: true,
+          zoomable: true,
+          rotatable: false,
+          scalable: false
+        });
+      };
+
+      photoCropImage.src = event.target.result;
+
+      photoCropModal.hidden = false;
+      photoCropModal.classList.add('is-open');
+      photoCropModal.setAttribute('aria-hidden', 'false');
     };
 
     reader.readAsDataURL(file);
   }
+
+  function handlePhotoInputChange(){
+    if (!photoInput || !photoInput.files || !photoInput.files.length) return;
+
+    const file = photoInput.files[0];
+
+    if (!file.type || !file.type.startsWith('image/')) {
+      photoInput.value = '';
+
+      if (photoFileName) {
+        photoFileName.textContent = 'Выберите файл изображения';
+      }
+
+      return;
+    }
+
+    openPhotoCropModal(file);
+  }
+
+  function applyCroppedPhoto(){
+    if (!resumePhotoCropper || !photoInput || !resumePhotoOriginalFile) return;
+
+    const canvas = resumePhotoCropper.getCroppedCanvas({
+      width: 600,
+      height: 600,
+      imageSmoothingEnabled: true,
+      imageSmoothingQuality: 'high'
+    });
+
+    if (!canvas) return;
+
+    canvas.toBlob(function(blob){
+      if (!blob) return;
+
+      const cleanName = resumePhotoOriginalFile.name
+        ? resumePhotoOriginalFile.name.replace(/\.[^.]+$/, '')
+        : 'resume-photo';
+
+      const croppedFile = new File(
+        [blob],
+        cleanName + '-cropped.jpg',
+        {
+          type: 'image/jpeg',
+          lastModified: Date.now()
+        }
+      );
+
+      const dataTransfer = new DataTransfer();
+      dataTransfer.items.add(croppedFile);
+      photoInput.files = dataTransfer.files;
+
+      if (photoFileName) {
+        photoFileName.textContent = 'Фото выбрано и обрезано';
+      }
+
+      closePhotoCropModal({ resetInput: false });
+    }, 'image/jpeg', 0.92);
+  }
+
   if (sortableEl && window.Sortable) {
     Sortable.create(sortableEl, {
       animation: 180,
@@ -489,58 +587,32 @@
   });
 
   form.addEventListener('submit', updateSectionOrderInput);
+
   if (photoSourceInput) {
     photoSourceInput.addEventListener('change', togglePhotoUploadBlock);
   }
 
   if (photoInput) {
-    photoInput.addEventListener('change', function(){
-      const file = photoInput.files && photoInput.files[0];
-      if (!file) {
-        updatePhotoFileName();
-        return;
-      }
-      openCropModal(file);
-    });
+    photoInput.addEventListener('change', handlePhotoInputChange);
   }
 
-  if (cropCancelBtn) {
-    cropCancelBtn.addEventListener('click', function(){
-      if (photoInput) {
-        photoInput.value = '';
-      }
-      destroyCropper();
-      closeCropModal();
-      updatePhotoFileName();
-    });
+  if (photoCropApply) {
+    photoCropApply.addEventListener('click', applyCroppedPhoto);
   }
 
-  if (cropApplyBtn) {
-    cropApplyBtn.addEventListener('click', function(){
-      if (!cropper || !photoInput) return;
-      const canvas = cropper.getCroppedCanvas({
-        width: 600,
-        height: 600,
-        imageSmoothingEnabled: true,
-        imageSmoothingQuality: 'high'
-      });
-      if (!canvas) return;
-      canvas.toBlob(function(blob){
-        if (!blob) return;
-        const extension = originalFileName.split('.').pop() || 'jpg';
-        const croppedFile = new File([blob], `cropped-${originalFileName}`, { type: blob.type || `image/${extension}` });
-        const dt = new DataTransfer();
-        dt.items.add(croppedFile);
-        photoInput.files = dt.files;
-        photoFileName.textContent = 'Фото выбрано и обрезано';
-        destroyCropper();
-        closeCropModal();
-      }, 'image/jpeg', 0.95);
+  photoCropCancelButtons.forEach(function(button){
+    button.addEventListener('click', function(){
+      closePhotoCropModal({ resetInput: true });
     });
-  }
+  });
+
+  document.addEventListener('keydown', function(event){
+    if (event.key === 'Escape' && photoCropModal && !photoCropModal.hidden) {
+      closePhotoCropModal({ resetInput: true });
+    }
+  });
 
   togglePhotoUploadBlock();
-  updatePhotoFileName();
   updateText();
   updateSections();
   updateTemplate();

@@ -216,7 +216,7 @@ def public_resume(request, token):
     }
 
     if request.GET.get('download') == 'pdf':
-        html_string = render_to_string('resumes/public.html', {**context, 'is_pdf_mode': True}, request=request)
+        html_string = render_to_string('resumes/public_pdf.html', {**context, 'is_pdf_mode': True}, request=request)
         try:
             from weasyprint import HTML
             pdf_bytes = HTML(string=html_string, base_url=request.build_absolute_uri('/')).write_pdf()
