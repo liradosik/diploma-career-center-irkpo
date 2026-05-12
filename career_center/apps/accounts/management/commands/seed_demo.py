@@ -62,20 +62,25 @@ class Command(BaseCommand):
             'eco': Specialty.objects.create(code='38.02.01', name='Экономика и бухгалтерский учёт', letter_code='ЭБ'),
         }
 
-        admin = User.objects.create_user(
+        admin = User(
             email=self.demo_admin_email,
-            username='admin_demo',
             full_name='Демо Администратор',
             role=User.Role.ADMIN,
             is_staff=True,
             is_superuser=True,
-            password=DEMO_PASSWORD,
         )
+        admin.set_password(DEMO_PASSWORD)
+        admin.save()
 
-        curators = [
-            User.objects.create_user(username='curator_1', email='curator.1@irkpo.ru', full_name='Куратор Ирина Петрова', role=User.Role.CURATOR, password=DEMO_PASSWORD),
-            User.objects.create_user(username='curator_2', email='curator.2@irkpo.ru', full_name='Куратор Павел Смирнов', role=User.Role.CURATOR, password=DEMO_PASSWORD),
-        ]
+        curators = []
+        for email, full_name in [
+            ('curator.1@irkpo.ru', 'Куратор Ирина Петрова'),
+            ('curator.2@irkpo.ru', 'Куратор Павел Смирнов'),
+        ]:
+            curator = User(email=email, full_name=full_name, role=User.Role.CURATOR)
+            curator.set_password(DEMO_PASSWORD)
+            curator.save()
+            curators.append(curator)
 
         groups = {
             'ИСП-22-1': StudyGroup.objects.create(
@@ -109,7 +114,8 @@ class Command(BaseCommand):
 
         students = []
         for i, (email, full_name, group_name, academic_status) in enumerate(student_specs, start=1):
-            student = User.objects.create_user(username=f'student_{i}', email=email, full_name=full_name, role=User.Role.STUDENT, academic_status=academic_status, password=DEMO_PASSWORD)
+            student = User(email=email, full_name=full_name, role=User.Role.STUDENT, academic_status=academic_status)
+            student.set_password(DEMO_PASSWORD)
             sync_student_with_group(student, groups[group_name])
             student.contact_phone = f'+7 (900) 000-00-{i:02d}'
             student.contact_email = email
