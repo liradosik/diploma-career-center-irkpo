@@ -23,7 +23,13 @@
     <img class="public-resume-photo-v4" src="{{ student_photo_url }}" alt="Фото {{ student.full_name|default:'студента' }}">
     {% else %}
     <div class="public-resume-avatar-v4">
+      {% if profile.photo %}
+      <img src="{{ profile.photo.url }}" alt="Фото {{ student.full_name|default:'студента' }}">
+      {% elif student.photo %}
+      <img src="{{ student.photo.url }}" alt="Фото {{ student.full_name|default:'студента' }}">
+      {% else %}
       {{ student.full_name|default:"Р"|slice:":1" }}
+      {% endif %}
     </div>
     {% endif %}
 
