@@ -21153,3 +21153,749 @@ html {
     font-size: 30px !important;
   }
 }
+/* === Support knowledge base v4 === */
+
+.support-knowledge-page-v4 {
+  display: grid;
+  gap: 22px;
+}
+
+/* hero */
+
+.knowledge-hero-v4 {
+  position: relative;
+  min-height: 250px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 230px;
+  gap: 24px;
+  align-items: center;
+  overflow: hidden;
+  padding: 42px 46px;
+  border: 1px solid #d9e7f8;
+  border-radius: 30px;
+  background:
+    radial-gradient(circle at 84% 18%, rgba(61, 139, 255, 0.16), transparent 28%),
+    linear-gradient(135deg, #f8fbff 0%, #eef6ff 58%, #ffffff 100%);
+  box-shadow: 0 14px 34px rgba(25, 66, 120, 0.07);
+}
+
+.knowledge-hero-content-v4 {
+  position: relative;
+  z-index: 2;
+  min-width: 0;
+}
+
+.knowledge-hero-v4 h1 {
+  margin: 0 0 12px;
+  color: #172536;
+  font-size: clamp(42px, 4.7vw, 66px);
+  line-height: 0.98;
+  font-weight: 720;
+  letter-spacing: -0.055em;
+}
+
+.knowledge-hero-v4 p {
+  max-width: 720px;
+  margin: 0;
+  color: #64748b;
+  font-size: 17px;
+  line-height: 1.55;
+}
+
+.knowledge-hero-actions-v4 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.knowledge-hero-actions-v4 .btn {
+  min-height: 42px;
+  border-radius: 14px;
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.knowledge-hero-panel-v4 {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding: 24px 20px;
+  border: 1px solid rgba(207, 224, 245, 0.82);
+  border-radius: 26px;
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: 0 18px 42px rgba(30, 102, 208, 0.10);
+  backdrop-filter: blur(8px);
+  text-align: center;
+}
+
+.knowledge-hero-panel-icon-v4 {
+  width: 74px;
+  height: 74px;
+  display: inline-grid;
+  place-items: center;
+  margin-bottom: 4px;
+  border-radius: 24px;
+  background: #e8f1ff;
+  color: #1e66d0;
+  font-size: 32px;
+}
+
+.knowledge-hero-panel-v4 strong {
+  color: #172536;
+  font-size: 28px;
+  line-height: 1;
+  font-weight: 720;
+}
+
+.knowledge-hero-panel-v4 span {
+  max-width: 160px;
+  color: #667891;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+/* decor */
+
+.knowledge-hero-decor-v4 {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.knowledge-decor-circle,
+.knowledge-decor-star,
+.knowledge-decor-dot {
+  position: absolute;
+  display: block;
+}
+
+.knowledge-decor-circle {
+  border-radius: 50%;
+  border: 18px solid rgba(30, 102, 208, 0.08);
+}
+
+.knowledge-decor-circle-one {
+  width: 180px;
+  height: 180px;
+  right: 72px;
+  top: -42px;
+}
+
+.knowledge-decor-circle-two {
+  width: 84px;
+  height: 84px;
+  right: 292px;
+  bottom: 42px;
+  border-width: 13px;
+  opacity: 0.8;
+}
+
+.knowledge-decor-circle-three {
+  width: 44px;
+  height: 44px;
+  right: 400px;
+  top: 54px;
+  border-width: 9px;
+  opacity: 0.55;
+}
+
+.knowledge-decor-star {
+  color: rgba(30, 102, 208, 0.44);
+  line-height: 1;
+}
+
+.knowledge-decor-star-one {
+  right: 326px;
+  top: 58px;
+  font-size: 24px;
+}
+
+.knowledge-decor-star-two {
+  right: 64px;
+  bottom: 60px;
+  font-size: 28px;
+}
+
+.knowledge-decor-star-three {
+  right: 230px;
+  top: 146px;
+  font-size: 16px;
+}
+
+.knowledge-decor-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: rgba(30, 102, 208, 0.32);
+}
+
+.knowledge-decor-dot-one {
+  right: 470px;
+  bottom: 88px;
+}
+
+.knowledge-decor-dot-two {
+  right: 176px;
+  top: 50px;
+}
+
+/* categories */
+
+.knowledge-category-strip-v4 {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.knowledge-category-chip-v4 {
+  min-height: 86px;
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  gap: 2px 10px;
+  align-items: center;
+  padding: 15px;
+  border: 1px solid #d9e7f8;
+  border-radius: 20px;
+  background: #ffffff;
+  box-shadow: 0 8px 22px rgba(25, 66, 120, 0.045);
+  transition: border-color .16s ease, background-color .16s ease, transform .16s ease;
+}
+
+.knowledge-category-chip-v4:hover {
+  border-color: #bcd7fb;
+  background: #fbfdff;
+  transform: translateY(-1px);
+}
+
+.knowledge-category-chip-v4 > span {
+  grid-row: 1 / 3;
+  width: 38px;
+  height: 38px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 13px;
+  background: #eaf3ff;
+  color: #1e66d0;
+  font-size: 18px;
+}
+
+.knowledge-category-chip-v4 strong {
+  min-width: 0;
+  color: #172536;
+  font-size: 14px;
+  line-height: 1.2;
+  font-weight: 680;
+}
+
+.knowledge-category-chip-v4 small {
+  color: #7a8ca5;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* layout */
+
+.knowledge-layout-v4 {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.knowledge-side-card-v4 {
+  position: sticky;
+  top: 28px;
+  display: grid;
+  gap: 14px;
+  padding: 22px;
+  border: 1px solid #d9e7f8;
+  border-radius: 24px;
+  background: #ffffff;
+  box-shadow: 0 10px 26px rgba(25, 66, 120, 0.055);
+}
+
+.knowledge-side-icon-v4 {
+  width: 52px;
+  height: 52px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 18px;
+  background: #eaf3ff;
+  color: #1e66d0;
+  font-size: 24px;
+}
+
+.knowledge-side-card-v4 h2 {
+  margin: 0;
+  color: #172536;
+  font-size: 22px;
+  line-height: 1.15;
+  font-weight: 700;
+}
+
+.knowledge-side-card-v4 p {
+  margin: 0;
+  color: #667891;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.knowledge-side-list-v4 {
+  display: grid;
+  gap: 10px;
+  padding-top: 6px;
+}
+
+.knowledge-side-list-v4 span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #52667f;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.knowledge-side-list-v4 i {
+  color: #1b9c62;
+}
+
+/* FAQ sections */
+
+.knowledge-faq-sections-v4 {
+  display: grid;
+  gap: 18px;
+  min-width: 0;
+}
+
+.knowledge-category-section-v4 {
+  padding: 22px;
+  border: 1px solid #d9e7f8;
+  border-radius: 24px;
+  background: #ffffff;
+  box-shadow: 0 10px 26px rgba(25, 66, 120, 0.055);
+}
+
+.knowledge-category-head-v4 {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  margin-bottom: 16px;
+}
+
+.knowledge-category-head-icon-v4 {
+  width: 44px;
+  height: 44px;
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: 15px;
+  background: #eaf3ff;
+  color: #1e66d0;
+  font-size: 20px;
+}
+
+.knowledge-category-head-v4 h2 {
+  margin: 0;
+  color: #172536;
+  font-size: 22px;
+  line-height: 1.16;
+  font-weight: 700;
+}
+
+.knowledge-category-head-v4 p {
+  margin: 4px 0 0;
+  color: #7a8ca5;
+  font-size: 13px;
+}
+
+.knowledge-faq-grid-v4 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.knowledge-faq-card-v4 {
+  min-height: 170px;
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  padding: 17px;
+  border: 1px solid #e1ebf7;
+  border-radius: 20px;
+  background: #fbfdff;
+  transition: border-color .16s ease, background-color .16s ease;
+}
+
+.knowledge-faq-card-v4:hover {
+  border-color: #bcd7fb;
+  background: #ffffff;
+}
+
+.knowledge-faq-card-top-v4 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.knowledge-faq-icon-v4 {
+  width: 38px;
+  height: 38px;
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: 13px;
+  background: #eaf3ff;
+  color: #1e66d0;
+  font-size: 18px;
+}
+
+.knowledge-faq-pill-v4 {
+  min-height: 24px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 9px;
+  border: 1px solid #cfe2fa;
+  border-radius: 999px;
+  background: #f4f8ff;
+  color: #1f67d2;
+  font-size: 11px;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.knowledge-faq-card-v4 h3 {
+  margin: 0;
+  color: #172536;
+  font-size: 17px;
+  line-height: 1.25;
+  font-weight: 700;
+}
+
+.knowledge-faq-card-v4 p {
+  margin: 0;
+  color: #5f728c;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.knowledge-empty-category-v4 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px;
+  border: 1px dashed #c8ddf7;
+  border-radius: 18px;
+  background: #f8fbff;
+  color: #667891;
+  font-size: 14px;
+}
+
+.knowledge-empty-category-v4 i {
+  color: #1e66d0;
+  font-size: 18px;
+}
+
+/* CTA */
+
+.knowledge-cta-v4 {
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 18px;
+  padding: 24px;
+  overflow: hidden;
+  border: 1px solid #d9e7f8;
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 92% 16%, rgba(255, 255, 255, 0.18), transparent 24%),
+    linear-gradient(135deg, #1e66d0 0%, #3d8bff 100%);
+  box-shadow: 0 16px 34px rgba(30, 102, 208, 0.16);
+}
+
+.knowledge-cta-icon-v4 {
+  width: 56px;
+  height: 56px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+  font-size: 25px;
+}
+
+.knowledge-cta-v4 h2 {
+  margin: 0 0 4px;
+  color: #ffffff;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.knowledge-cta-v4 p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 14px;
+}
+
+.knowledge-cta-v4 .btn-primary {
+  border: 0 !important;
+  background: #ffffff !important;
+  color: #1e66d0 !important;
+  box-shadow: 0 12px 24px rgba(18, 61, 130, 0.16) !important;
+}
+
+/* responsive */
+
+@media (max-width: 1320px) {
+  .knowledge-category-strip-v4 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .knowledge-layout-v4 {
+    grid-template-columns: 1fr;
+  }
+
+  .knowledge-side-card-v4 {
+    position: static;
+  }
+
+  .knowledge-side-list-v4 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .knowledge-hero-v4 {
+    grid-template-columns: 1fr;
+    padding: 34px 28px;
+  }
+
+  .knowledge-hero-panel-v4 {
+    justify-items: start;
+    text-align: left;
+  }
+
+  .knowledge-category-strip-v4,
+  .knowledge-faq-grid-v4 {
+    grid-template-columns: 1fr;
+  }
+
+  .knowledge-side-list-v4 {
+    grid-template-columns: 1fr;
+  }
+
+  .knowledge-cta-v4 {
+    grid-template-columns: 1fr;
+  }
+
+  .knowledge-cta-v4 .btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 760px) {
+  .knowledge-hero-v4,
+  .knowledge-category-section-v4,
+  .knowledge-side-card-v4,
+  .knowledge-cta-v4 {
+    padding: 20px;
+  }
+
+  .knowledge-hero-v4 h1 {
+    font-size: 42px;
+  }
+
+  .knowledge-hero-decor-v4 {
+    opacity: 0.5;
+  }
+
+  .knowledge-decor-circle-two,
+  .knowledge-decor-circle-three,
+  .knowledge-decor-dot-one {
+    display: none;
+  }
+}
+/* === Knowledge base v5: full-width FAQ after removing side card === */
+
+.support-knowledge-page-v4 {
+  gap: 24px;
+}
+
+/* Убираем двухколоночную сетку: FAQ теперь на всю ширину */
+.knowledge-layout-v4 {
+  display: block !important;
+}
+
+.knowledge-side-card-v4 {
+  display: none !important;
+}
+
+.knowledge-faq-sections-v4 {
+  width: 100%;
+  display: grid;
+  gap: 22px;
+}
+
+/* Секция категории */
+.knowledge-category-section-v4 {
+  width: 100%;
+  padding: 28px 30px;
+  border: 1px solid #d9e7f8;
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at 96% 8%, rgba(30, 102, 208, 0.035), transparent 24%),
+    #ffffff;
+  box-shadow: 0 12px 30px rgba(25, 66, 120, 0.06);
+}
+
+/* Заголовок категории */
+.knowledge-category-head-v4 {
+  margin-bottom: 20px;
+}
+
+.knowledge-category-head-icon-v4 {
+  width: 50px;
+  height: 50px;
+  border-radius: 17px;
+  background: #eaf3ff;
+  color: #1e66d0;
+  font-size: 22px;
+}
+
+.knowledge-category-head-v4 h2 {
+  color: #172536;
+  font-size: 25px;
+  font-weight: 680;
+  letter-spacing: -0.025em;
+}
+
+.knowledge-category-head-v4 p {
+  margin-top: 5px;
+  color: #71829a;
+  font-size: 14px;
+}
+
+/* Карточки FAQ шире и ровнее */
+.knowledge-faq-grid-v4 {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.knowledge-faq-card-v4 {
+  min-height: 190px;
+  padding: 20px;
+  border: 1px solid #dce8f7;
+  border-radius: 22px;
+  background: linear-gradient(180deg, #fbfdff 0%, #ffffff 100%);
+  box-shadow: 0 8px 20px rgba(25, 66, 120, 0.045);
+}
+
+.knowledge-faq-card-v4:hover {
+  border-color: #bdd8fb;
+  background: #ffffff;
+  box-shadow: 0 12px 26px rgba(25, 66, 120, 0.07);
+}
+
+/* Верх карточки */
+.knowledge-faq-card-top-v4 {
+  margin-bottom: 8px;
+}
+
+.knowledge-faq-icon-v4 {
+  width: 42px;
+  height: 42px;
+  border-radius: 15px;
+  background: #eaf3ff;
+  color: #1e66d0;
+  font-size: 19px;
+}
+
+/* Метку категории сделать спокойнее */
+.knowledge-faq-pill-v4 {
+  min-height: 26px;
+  padding: 0 10px;
+  border-color: #d5e6fb;
+  background: #f5f9ff;
+  color: #2f6fc9;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* Текст */
+.knowledge-faq-card-v4 h3 {
+  margin-top: 4px;
+  color: #172536;
+  font-size: 18px;
+  line-height: 1.28;
+  font-weight: 660;
+  letter-spacing: -0.015em;
+}
+
+.knowledge-faq-card-v4 p {
+  color: #5f728c;
+  font-size: 14.5px;
+  line-height: 1.5;
+}
+
+/* Пустые категории — красиво, не огромной дырой */
+.knowledge-empty-category-v4 {
+  min-height: 82px;
+  padding: 18px 20px;
+  border: 1px dashed #c8ddf7;
+  border-radius: 20px;
+  background: #f8fbff;
+  color: #667891;
+}
+
+/* Категории сверху — чуть аккуратнее */
+.knowledge-category-strip-v4 {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.knowledge-category-chip-v4 {
+  min-height: 82px;
+  border-radius: 20px;
+  background: #ffffff;
+}
+
+.knowledge-category-chip-v4 strong {
+  font-weight: 640;
+}
+
+/* CTA снизу */
+.knowledge-cta-v4 {
+  margin-top: 2px;
+}
+
+/* Адаптив */
+@media (max-width: 1500px) {
+  .knowledge-faq-grid-v4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .knowledge-category-strip-v4 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .knowledge-category-section-v4 {
+    padding: 22px;
+  }
+
+  .knowledge-faq-grid-v4,
+  .knowledge-category-strip-v4 {
+    grid-template-columns: 1fr;
+  }
+
+  .knowledge-faq-card-v4 {
+    min-height: auto;
+  }
+}
