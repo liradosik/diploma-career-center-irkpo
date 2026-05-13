@@ -30,8 +30,19 @@ class EmailAuthenticationForm(AuthenticationForm):
 class StudentProfileForm(forms.ModelForm):
     class Meta:
         model = StudentProfile
-        fields = ('phone', 'city', 'about')
-        labels = {'phone': 'Телефон', 'city': 'Город', 'about': 'О себе'}
+        fields = ('phone', 'city', 'contact_link', 'about')
+        labels = {
+            'phone': 'Телефон',
+            'city': 'Город',
+            'contact_link': 'Дополнительный контакт',
+            'about': 'О себе',
+        }
+        widgets = {
+            'phone': forms.TextInput(attrs={'placeholder': '+7 (900) 123-45-67'}),
+            'city': forms.TextInput(attrs={'placeholder': 'Например, Иркутск'}),
+            'contact_link': forms.TextInput(attrs={'placeholder': 'VK, Telegram, ссылка или другой контакт'}),
+            'about': forms.Textarea(attrs={'rows': 4, 'placeholder': 'Кратко расскажите о себе, интересах и профессиональных целях'}),
+        }
 
 
 class UserStudentForm(forms.ModelForm):

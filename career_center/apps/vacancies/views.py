@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.core.paginator import Paginator
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 
@@ -50,8 +51,22 @@ def vacancy_list(request):
         StudentFavoriteVacancy.objects.filter(student=request.user).values_list('vacancy_id', flat=True)
     )
 
+    vacancies = vacancies.order_by('-created_at')
+
+    paginator = Paginator(vacancies, 12)
+    page_obj = paginator.get_page(request.GET.get('page'))
+
+    query_params = request.GET.copy()
+    query_params.pop('page', None)
+    querystring = query_params.urlencode()
+
     return render(request, 'vacancies/list.html', {
-        'vacancies': vacancies.order_by('-created_at'),
+        'vacancies': page_obj.object_list,
+        'page_obj': page_obj,
+        'querystring': querystring,
+        'page_start': page_obj.start_index() if page_obj.paginator.count else 0,
+        'page_end': page_obj.end_index() if page_obj.paginator.count else 0,
+
         'q': q,
         'format_filter': format_filter,
         'employment_filter': employment_filter,
@@ -59,6 +74,7 @@ def vacancy_list(request):
         'format_options': active_vacancies.values_list('format_type', flat=True).distinct().order_by('format_type'),
         'employment_options': active_vacancies.values_list('employment_type', flat=True).distinct().order_by('employment_type'),
         'direction_options': active_vacancies.values_list('direction', flat=True).distinct().order_by('direction'),
+
         'responded_vacancy_ids': responded_vacancy_ids,
         'favorite_vacancy_ids': favorite_vacancy_ids,
     })
@@ -85,11 +101,18 @@ def vacancy_detail(request, pk):
 def respond(request, pk):
     if request.method != 'POST':
         return redirect('vacancies:detail', pk=pk)
+
     vacancy = get_object_or_404(Vacancy, pk=pk, status=Vacancy.Status.ACTIVE)
     profile = getattr(request.user, 'student_profile', None)
     resume = getattr(request.user, 'resume_settings', None)
     resume_link = request.build_absolute_uri(f"/resumes/public/{profile.public_resume_token}/") if profile and resume and resume.is_public else ''
-    response, created = VacancyResponse.objects.get_or_create(student=request.user, vacancy=vacancy, defaults={'resume_link_snapshot': resume_link})
+
+    response, created = VacancyResponse.objects.get_or_create(
+        student=request.user,
+        vacancy=vacancy,
+        defaults={'resume_link_snapshot': resume_link},
+    )
+
     if created:
         ActivityLog.objects.create(
             student=request.user,
@@ -99,10 +122,18 @@ def respond(request, pk):
             related_model='vacancies.Vacancy',
             related_object_id=vacancy.id,
         )
+        messages.success(request, 'Отклик сохранён.')
+
+    else:
+        messages.info(request, 'Вы уже откликнулись на эту вакансию.')
+
+    next_url = request.POST.get('next')
+    if next_url:
+        return redirect(next_url)
+
     if created:
-        messages.success(request, 'Отклик сохранён. Свяжитесь с работодателем по контактам ниже.')
         return redirect(f"{redirect('vacancies:detail', pk=pk).url}?responded=1")
-    messages.info(request, 'Вы уже откликнулись на эту вакансию.')
+
     return redirect('vacancies:detail', pk=pk)
 
 

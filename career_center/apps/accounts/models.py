@@ -96,6 +96,7 @@ class StudentProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='student_profile')
     phone = models.CharField(max_length=32, blank=True)
     city = models.CharField(max_length=128, blank=True)
+    contact_link = models.CharField(max_length=255, blank=True)
     about = models.TextField(blank=True)
     public_resume_token = models.CharField(max_length=64, unique=True, blank=True)
     photo = models.ImageField(upload_to='students/photos/', blank=True, null=True)

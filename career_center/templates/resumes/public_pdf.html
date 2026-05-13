@@ -210,10 +210,461 @@
     .pdf-muted {
       color: #64748b;
     }
+    /* === PDF resume templates === */
+
+/* classic — базовый стиль, оставляем спокойным */
+.pdf-template-classic .pdf-hero {
+  border-color: #cfe0f5;
+  background: #f8fbff;
+}
+
+.pdf-template-classic .pdf-block h2 {
+  color: #1e66d0;
+}
+
+/* modern — более современный голубой стиль */
+.pdf-template-modern {
+  color: #172536;
+}
+
+.pdf-template-modern .pdf-hero {
+  border: 0;
+  border-radius: 18px;
+  background: #edf5ff;
+}
+
+.pdf-template-modern .pdf-name {
+  color: #172536;
+  font-size: 28px;
+  font-weight: 800;
+}
+
+.pdf-template-modern .pdf-position {
+  color: #1e66d0;
+}
+
+.pdf-template-modern .pdf-about,
+.pdf-template-modern .pdf-block {
+  border-color: #d6e6f8;
+  border-radius: 16px;
+  background: #ffffff;
+}
+
+.pdf-template-modern .pdf-block h2 {
+  border-bottom-color: #d8e7f8;
+  color: #1e66d0;
+  font-size: 15px;
+}
+
+.pdf-template-modern .pdf-skill {
+  background: #eef6ff;
+  color: #1e66d0;
+}
+
+/* academic — строже, меньше “сайтовости”, больше документа */
+.pdf-template-academic {
+  color: #111827;
+}
+
+.pdf-template-academic .pdf-hero {
+  padding: 0 0 12px;
+  border: 0;
+  border-bottom: 2px solid #172536;
+  border-radius: 0;
+  background: #ffffff;
+}
+
+.pdf-template-academic .pdf-photo-cell {
+  width: 86px;
+  padding-right: 14px;
+}
+
+.pdf-template-academic .pdf-photo,
+.pdf-template-academic .pdf-avatar {
+  width: 70px;
+  height: 70px;
+  border-radius: 8px;
+}
+
+.pdf-template-academic .pdf-avatar {
+  line-height: 70px;
+  background: #f1f5f9;
+  color: #172536;
+}
+
+.pdf-template-academic .pdf-name {
+  color: #111827;
+  font-size: 25px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.pdf-template-academic .pdf-position {
+  color: #334155;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.pdf-template-academic .pdf-contacts {
+  color: #475569;
+}
+
+.pdf-template-academic .pdf-about {
+  border: 0;
+  border-left: 3px solid #172536;
+  border-radius: 0;
+  background: #f8fafc;
+}
+
+.pdf-template-academic .pdf-block {
+  border: 0;
+  border-radius: 0;
+  border-top: 1px solid #cbd5e1;
+  background: #ffffff;
+  padding: 10px 0 8px;
+}
+
+.pdf-template-academic .pdf-block h2 {
+  border-bottom: 0;
+  color: #111827;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.pdf-template-academic .pdf-skill {
+  border-color: #cbd5e1;
+  background: #f8fafc;
+  color: #111827;
+}
+
+/* compact — более плотная версия */
+.pdf-template-compact {
+  font-size: 10px;
+  line-height: 1.35;
+}
+
+.pdf-template-compact .pdf-hero {
+  padding: 12px 14px;
+  border-radius: 10px;
+}
+
+.pdf-template-compact .pdf-photo-cell {
+  width: 72px;
+  padding-right: 12px;
+}
+
+.pdf-template-compact .pdf-photo,
+.pdf-template-compact .pdf-avatar {
+  width: 60px;
+  height: 60px;
+}
+
+.pdf-template-compact .pdf-avatar {
+  line-height: 60px;
+  font-size: 22px;
+}
+
+.pdf-template-compact .pdf-name {
+  font-size: 21px;
+  margin-bottom: 3px;
+}
+
+.pdf-template-compact .pdf-position {
+  font-size: 11px;
+  margin-bottom: 4px;
+}
+
+.pdf-template-compact .pdf-about {
+  margin-top: 7px;
+  padding: 7px 9px;
+}
+
+.pdf-template-compact .pdf-grid {
+  margin-top: 8px;
+  border-spacing: 7px 0;
+}
+
+.pdf-template-compact .pdf-block {
+  margin-bottom: 7px;
+  padding: 8px 10px;
+  border-radius: 9px;
+}
+
+.pdf-template-compact .pdf-block h2 {
+  margin-bottom: 5px;
+  font-size: 12px;
+}
+
+.pdf-template-compact .pdf-entry {
+  margin-bottom: 5px;
+  padding-bottom: 5px;
+}
+
+.pdf-template-compact .pdf-entry h3 {
+  font-size: 10.5px;
+}
+
+.pdf-template-compact .pdf-row strong,
+.pdf-template-compact .pdf-row span,
+.pdf-template-compact .pdf-entry span,
+.pdf-template-compact .pdf-entry p,
+.pdf-template-compact .pdf-muted {
+  font-size: 9.5px;
+}
+
+/* font size settings */
+.pdf-font-small {
+  font-size: 10px;
+}
+
+.pdf-font-standard {
+  font-size: 11px;
+}
+
+.pdf-font-large {
+  font-size: 12px;
+}
+
+.pdf-font-large .pdf-name {
+  font-size: 30px;
+}
+
+.pdf-font-large .pdf-block h2 {
+  font-size: 16px;
+}
+
+.pdf-font-large .pdf-row strong,
+.pdf-font-large .pdf-row span,
+.pdf-font-large .pdf-entry span,
+.pdf-font-large .pdf-entry p,
+.pdf-font-large .pdf-muted {
+  font-size: 11.5px;
+}
+/* === PDF resume templates: stronger overrides === */
+
+/* CLASSIC — классический документ: белый фон, рамки, спокойный синий */
+.pdf-template-classic .pdf-hero {
+  padding: 16px 18px;
+  border: 1px solid #b8c7da;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.pdf-template-classic .pdf-photo,
+.pdf-template-classic .pdf-avatar {
+  border-radius: 8px;
+}
+
+.pdf-template-classic .pdf-name {
+  color: #172536;
+  font-size: 25px;
+  font-weight: 700;
+}
+
+.pdf-template-classic .pdf-position {
+  color: #334e70;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.pdf-template-classic .pdf-about {
+  border: 1px solid #cfd8e6;
+  border-radius: 6px;
+  background: #ffffff;
+}
+
+.pdf-template-classic .pdf-block {
+  border: 1px solid #cfd8e6;
+  border-radius: 6px;
+  background: #ffffff;
+}
+
+.pdf-template-classic .pdf-block h2 {
+  border-bottom: 1px solid #cfd8e6;
+  color: #172536;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.pdf-template-classic .pdf-skill {
+  border-color: #cfd8e6;
+  background: #ffffff;
+  color: #172536;
+}
+
+/* MODERN — оставляем явно голубым и мягким */
+.pdf-template-modern .pdf-hero {
+  border: 0;
+  border-radius: 18px;
+  background: #edf5ff;
+}
+
+.pdf-template-modern .pdf-photo,
+.pdf-template-modern .pdf-avatar {
+  border-radius: 50%;
+}
+
+.pdf-template-modern .pdf-name {
+  color: #172536;
+  font-size: 28px;
+  font-weight: 800;
+}
+
+.pdf-template-modern .pdf-position {
+  color: #1e66d0;
+}
+
+.pdf-template-modern .pdf-about,
+.pdf-template-modern .pdf-block {
+  border: 1px solid #d6e6f8;
+  border-radius: 16px;
+  background: #ffffff;
+}
+
+.pdf-template-modern .pdf-block h2 {
+  border-bottom-color: #d8e7f8;
+  color: #1e66d0;
+}
+
+/* COMPACT — максимально плотный: меньше отступы, меньше фото, меньше блоки */
+.pdf-template-compact {
+  font-size: 9.5px;
+  line-height: 1.28;
+}
+
+.pdf-template-compact .pdf-hero {
+  padding: 10px 12px;
+  border: 1px solid #cfd8e6;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.pdf-template-compact .pdf-photo-cell {
+  width: 58px;
+  padding-right: 10px;
+}
+
+.pdf-template-compact .pdf-photo,
+.pdf-template-compact .pdf-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+}
+
+.pdf-template-compact .pdf-avatar {
+  line-height: 48px;
+  font-size: 18px;
+}
+
+.pdf-template-compact .pdf-name {
+  margin-bottom: 2px;
+  color: #172536;
+  font-size: 18px;
+  line-height: 1.05;
+  font-weight: 700;
+}
+
+.pdf-template-compact .pdf-position {
+  margin-bottom: 3px;
+  color: #334e70;
+  font-size: 10px;
+  line-height: 1.15;
+  font-weight: 700;
+}
+
+.pdf-template-compact .pdf-contacts {
+  font-size: 8.8px;
+}
+
+.pdf-template-compact .pdf-about {
+  margin-top: 6px;
+  padding: 6px 8px;
+  border: 1px solid #d7dee9;
+  border-radius: 6px;
+  background: #ffffff;
+  font-size: 9px;
+}
+
+.pdf-template-compact .pdf-grid {
+  margin-top: 7px;
+  border-spacing: 6px 0;
+}
+
+.pdf-template-compact .pdf-block {
+  margin-bottom: 6px;
+  padding: 7px 8px;
+  border: 1px solid #d7dee9;
+  border-radius: 6px;
+  background: #ffffff;
+}
+
+.pdf-template-compact .pdf-block h2 {
+  margin-bottom: 4px;
+  padding-bottom: 3px;
+  border-bottom: 1px solid #d7dee9;
+  color: #172536;
+  font-size: 10.5px;
+  font-weight: 700;
+}
+
+.pdf-template-compact .pdf-row {
+  margin-bottom: 3px;
+}
+
+.pdf-template-compact .pdf-row strong,
+.pdf-template-compact .pdf-row span,
+.pdf-template-compact .pdf-entry span,
+.pdf-template-compact .pdf-entry p,
+.pdf-template-compact .pdf-muted {
+  font-size: 8.8px;
+}
+
+.pdf-template-compact .pdf-entry {
+  margin-bottom: 4px;
+  padding-bottom: 4px;
+}
+
+.pdf-template-compact .pdf-entry h3 {
+  margin-bottom: 2px;
+  font-size: 9.4px;
+}
+
+.pdf-template-compact .pdf-skill {
+  margin: 0 3px 3px 0;
+  padding: 2px 5px;
+  border-color: #d7dee9;
+  background: #ffffff;
+  color: #172536;
+  font-size: 8.5px;
+}
+
+/* ACADEMIC — оставляем строгим, но закрепим поверх остальных */
+.pdf-template-academic .pdf-hero {
+  padding: 0 0 12px;
+  border: 0;
+  border-bottom: 2px solid #172536;
+  border-radius: 0;
+  background: #ffffff;
+}
+
+.pdf-template-academic .pdf-block {
+  border: 0;
+  border-top: 1px solid #cbd5e1;
+  border-radius: 0;
+  background: #ffffff;
+}
+
+.pdf-template-academic .pdf-block h2 {
+  border-bottom: 0;
+  color: #111827;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
   </style>
 </head>
 
-<body>
+<body class="pdf-template-{{ resume_template|default:'classic' }} pdf-font-{{ resume_font_size|default:'standard' }}">
   <div class="pdf-page">
 
     <section class="pdf-hero">
@@ -237,6 +688,7 @@
           {% if student.email %}{{ student.email }}{% endif %}
           {% if profile.phone %} · {{ profile.phone }}{% endif %}
           {% if profile.city %} · {{ profile.city }}{% endif %}
+          {% if profile.contact_link %} · {{ profile.contact_link }}{% endif %}
         </p>
       </div>
     </section>
@@ -251,7 +703,7 @@
       <div class="pdf-column">
 
         {% if 'contacts' in selected_sections %}
-          {% if student.email or profile.phone or profile.city %}
+          {% if student.email or profile.phone or profile.city or profile.contact_link %}
             <section class="pdf-block">
               <h2>Контактная информация</h2>
 
@@ -273,6 +725,12 @@
                 <p class="pdf-row">
                   <strong>Город:</strong>
                   <span>{{ profile.city }}</span>
+                </p>
+              {% endif %}
+              {% if profile.contact_link %}
+                <p class="pdf-row">
+                  <strong>Дополнительный контакт:</strong>
+                  <span>{{ profile.contact_link }}</span>
                 </p>
               {% endif %}
             </section>

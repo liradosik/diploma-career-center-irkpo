@@ -1,15 +1,241 @@
 {% extends 'base_dashboard.html' %}
+{% load ui_extras %}
+
 {% block title %}Избранное{% endblock %}
+
 {% block content %}
-<div class="student-favorites-page">
-  <section class="hero"><h1>Избранное</h1><p>Сохранённые вакансии и курсы.</p></section>
-  {% if not favorite_vacancies and not favorite_courses %}
-    <section class="card favorite-card"><p>Вы пока ничего не добавили в избранное.</p><a class="btn" href="{% url 'vacancies:list' %}">Перейти к вакансиям</a> <a class="btn" href="{% url 'courses:list' %}">Перейти к курсам</a></section>
-  {% else %}
-  <div class="favorites-grid">
-    <section class="card favorite-card"><h2>Избранные вакансии</h2>{% for f in favorite_vacancies %}<div class="favorite-item"><strong>{{ f.vacancy.title }}</strong> — {{ f.vacancy.company }} · {{ f.vacancy.format_type }} · {{ f.vacancy.employment_type }}<div><a class="btn" href="{% url 'vacancies:detail' f.vacancy_id %}">Открыть</a><form method="post" action="{% url 'vacancies:toggle_favorite' f.vacancy_id %}" style="display:inline">{% csrf_token %}<button class="btn favorite-toggle" type="submit">Убрать из избранного</button></form></div></div>{% empty %}<p>Нет избранных вакансий.</p>{% endfor %}</section>
-    <section class="card favorite-card"><h2>Избранные курсы</h2>{% for f in favorite_courses %}<div class="favorite-item"><strong>{{ f.course.title }}</strong> — {{ f.course.get_format_type_display }} · {{ f.course.get_kind_display }} · {{ f.course.date|date:"d.m.Y" }}<div><a class="btn" href="{% url 'courses:detail' f.course_id %}">Открыть</a><form method="post" action="{% url 'courses:toggle_favorite' f.course_id %}" style="display:inline">{% csrf_token %}<button class="btn favorite-toggle" type="submit">Убрать из избранного</button></form></div></div>{% empty %}<p>Нет избранных курсов.</p>{% endfor %}</section>
+<div class="student-favorites-page-v2">
+
+  <section class="hero student-favorites-hero-v2">
+  <div class="student-favorites-hero-content-v2">
+    <div class="hero-kicker">Личный список</div>
+    <h1>Избранное</h1>
+    <p>Сохранённые вакансии, стажировки, курсы и семинары.</p>
   </div>
+
+  <div class="student-vacancies-hero-art student-favorites-hero-art-v2" aria-hidden="true">
+    <span class="vacancies-decor-circle vacancies-decor-circle-one"></span>
+    <span class="vacancies-decor-circle vacancies-decor-circle-two"></span>
+    <span class="vacancies-decor-circle vacancies-decor-circle-three"></span>
+
+    <span class="vacancies-decor-star vacancies-decor-star-one">✦</span>
+    <span class="vacancies-decor-star vacancies-decor-star-two">✧</span>
+    <span class="vacancies-decor-star vacancies-decor-star-three">✦</span>
+    <span class="vacancies-decor-star vacancies-decor-star-four">✧</span>
+
+    <span class="vacancies-decor-dot vacancies-decor-dot-one"></span>
+    <span class="vacancies-decor-dot vacancies-decor-dot-two"></span>
+  </div>
+</section>
+
+  {% if not favorite_vacancies and not favorite_courses %}
+    <section class="student-favorites-empty-v2">
+      <div class="student-favorites-empty-icon-v2">
+        <i class="bi bi-bookmark"></i>
+      </div>
+
+      <h2>В избранном пока пусто</h2>
+      <p>Добавляйте вакансии и курсы в избранное, чтобы быстро вернуться к ним позже.</p>
+
+      <div class="student-favorites-empty-actions-v2">
+        <a class="btn btn-primary" href="{% url 'vacancies:list' %}">
+          Перейти к вакансиям
+        </a>
+
+        <a class="btn" href="{% url 'courses:list' %}">
+          Перейти к курсам
+        </a>
+      </div>
+    </section>
+  {% else %}
+
+    <section class="student-favorites-section-v2">
+      <div class="student-favorites-section-head-v2">
+        <div class="student-favorites-section-title-v2">
+          <span class="student-favorites-section-icon-v2">
+            <i class="bi bi-briefcase"></i>
+          </span>
+
+          <div>
+            <h2>Избранные вакансии</h2>
+            <p>Сохранённые предложения для отклика.</p>
+          </div>
+
+          <strong>{{ favorite_vacancies|length }}</strong>
+        </div>
+
+        <a class="student-favorites-link-v2" href="{% url 'vacancies:list' %}">
+          Смотреть все вакансии
+          <i class="bi bi-arrow-right"></i>
+        </a>
+      </div>
+
+      <div class="student-favorites-list-v2">
+        {% for f in favorite_vacancies %}
+          <article class="student-favorite-row-v2">
+            <div class="student-favorite-icon-v2 {% cycle 'is-blue' 'is-green' 'is-orange' 'is-purple' %}">
+              {% if 'дизайн' in f.vacancy.direction|lower or 'design' in f.vacancy.direction|lower %}
+                <i class="bi bi-palette"></i>
+              {% elif 'it' in f.vacancy.direction|lower or 'разработ' in f.vacancy.title|lower or 'програм' in f.vacancy.direction|lower %}
+                <i class="bi bi-code-slash"></i>
+              {% elif 'аналит' in f.vacancy.title|lower %}
+                <i class="bi bi-bar-chart"></i>
+              {% else %}
+                <i class="bi bi-briefcase"></i>
+              {% endif %}
+            </div>
+
+            <div class="student-favorite-main-v2">
+              <div class="student-favorite-title-line-v2">
+                <h3>{{ f.vacancy.title }}</h3>
+
+                {% if f.vacancy.id in responded_vacancy_ids %}
+                  <span class="student-favorite-status-v2 is-success">
+                    <i class="bi bi-check2"></i>
+                    Откликнулись
+                  </span>
+                {% else %}
+                  <span class="student-favorite-status-v2">
+                    Сохранено
+                  </span>
+                {% endif %}
+              </div>
+
+              <p>{{ f.vacancy.company }}</p>
+
+              <div class="student-favorite-tags-v2">
+                <span>{{ f.vacancy.format_type }}</span>
+                <span>{{ f.vacancy.employment_type }}</span>
+                <span>{{ f.vacancy.direction }}</span>
+              </div>
+            </div>
+
+            <div class="student-favorite-meta-v2">
+              <span>
+                <i class="bi bi-calendar3"></i>
+                {{ f.vacancy.created_at|date:"d.m.Y" }}
+              </span>
+            </div>
+
+            <div class="student-favorite-actions-v2">
+              <a class="btn student-favorite-open-btn-v2" href="{% url 'vacancies:detail' f.vacancy_id %}">
+                Открыть
+              </a>
+
+              <form method="post" action="{% url 'vacancies:toggle_favorite' f.vacancy_id %}">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                <button class="student-favorite-remove-btn-v2" type="submit" title="Убрать из избранного">
+                  <i class="bi bi-bookmark-check-fill"></i>
+                </button>
+              </form>
+            </div>
+          </article>
+        {% empty %}
+          <div class="student-favorites-mini-empty-v2">
+            <p>Нет избранных вакансий.</p>
+            <a href="{% url 'vacancies:list' %}">Перейти к вакансиям</a>
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+
+    <section class="student-favorites-section-v2">
+      <div class="student-favorites-section-head-v2">
+        <div class="student-favorites-section-title-v2">
+          <span class="student-favorites-section-icon-v2 is-purple">
+            <i class="bi bi-mortarboard"></i>
+          </span>
+
+          <div>
+            <h2>Избранные курсы</h2>
+            <p>Сохранённые мероприятия и обучение.</p>
+          </div>
+
+          <strong>{{ favorite_courses|length }}</strong>
+        </div>
+
+        <a class="student-favorites-link-v2" href="{% url 'courses:list' %}">
+          Смотреть все курсы
+          <i class="bi bi-arrow-right"></i>
+        </a>
+      </div>
+
+      <div class="student-favorites-list-v2">
+        {% for f in favorite_courses %}
+          {% with reg=registration_map|dict_get:f.course_id %}
+            <article class="student-favorite-row-v2">
+              <div class="student-favorite-icon-v2 {% cycle 'is-blue' 'is-purple' 'is-green' 'is-orange' %}">
+                {% if f.course.kind == 'course' %}
+                  <i class="bi bi-journal-bookmark"></i>
+                {% elif f.course.kind == 'seminar' %}
+                  <i class="bi bi-easel"></i>
+                {% else %}
+                  <i class="bi bi-briefcase"></i>
+                {% endif %}
+              </div>
+
+              <div class="student-favorite-main-v2">
+                <div class="student-favorite-title-line-v2">
+                  <h3>{{ f.course.title }}</h3>
+
+                  {% if reg and reg.status == 'registered' %}
+                    <span class="student-favorite-status-v2 is-success">
+                      <i class="bi bi-check2"></i>
+                      Вы записаны
+                    </span>
+                  {% elif reg and reg.status == 'cancelled' %}
+                    <span class="student-favorite-status-v2 is-muted">
+                      Запись отменена
+                    </span>
+                  {% else %}
+                    <span class="student-favorite-status-v2">
+                      Сохранено
+                    </span>
+                  {% endif %}
+                </div>
+
+                <p>{{ f.course.organization }}</p>
+
+                <div class="student-favorite-tags-v2">
+                  <span>{{ f.course.get_kind_display }}</span>
+                  <span>{{ f.course.get_format_type_display }}</span>
+                  <span>{{ f.course.date|date:"d.m.Y" }}</span>
+                </div>
+              </div>
+
+              <div class="student-favorite-meta-v2">
+                <span>
+                  <i class="bi bi-calendar3"></i>
+                  {{ f.course.date|date:"d.m.Y" }}
+                </span>
+              </div>
+
+              <div class="student-favorite-actions-v2">
+                <a class="btn student-favorite-open-btn-v2" href="{% url 'courses:detail' f.course_id %}">
+                  Открыть
+                </a>
+
+                <form method="post" action="{% url 'courses:toggle_favorite' f.course_id %}">
+                  {% csrf_token %}
+                  <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                  <button class="student-favorite-remove-btn-v2" type="submit" title="Убрать из избранного">
+                    <i class="bi bi-bookmark-check-fill"></i>
+                  </button>
+                </form>
+              </div>
+            </article>
+          {% endwith %}
+        {% empty %}
+          <div class="student-favorites-mini-empty-v2">
+            <p>Нет избранных курсов.</p>
+            <a href="{% url 'courses:list' %}">Перейти к курсам</a>
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+
   {% endif %}
+
 </div>
 {% endblock %}

@@ -56,6 +56,7 @@
         {% if student.email %}<span>{{ student.email }}</span>{% endif %}
         {% if profile.phone %}<span>{{ profile.phone }}</span>{% endif %}
         {% if profile.city %}<span>{{ profile.city }}</span>{% endif %}
+        {% if profile.contact_link %}<span>{{ profile.contact_link }}</span>{% endif %}
       </p>
     </div>
 
@@ -68,7 +69,7 @@
     <div class="public-resume-column-v4">
 
       {% if 'contacts' in selected_sections %}
-      {% if student.email or profile.phone or profile.city %}
+      {% if student.email or profile.phone or profile.city or profile.contact_link %}
       <section class="public-resume-block-v4">
         <h2>Контактная информация</h2>
         <div class="public-resume-info-v4">
@@ -88,6 +89,12 @@
           <p>
             <strong>Город:</strong>
             <span>{{ profile.city }}</span>
+          </p>
+          {% endif %}
+          {% if profile.contact_link %}
+          <p>
+            <strong>Дополнительный контакт:</strong>
+            <span>{{ profile.contact_link }}</span>
           </p>
           {% endif %}
         </div>

@@ -272,9 +272,25 @@ def student_favorites(request):
         .select_related('course')
         .order_by('-created_at')
     )
+
+    course_ids = favorite_courses.values_list('course_id', flat=True)
+    course_registrations = CourseRegistration.objects.filter(
+        student=request.user,
+        course_id__in=course_ids,
+    )
+    registration_map = {registration.course_id: registration for registration in course_registrations}
+
+    responded_vacancy_ids = set(
+        VacancyResponse.objects
+        .filter(student=request.user)
+        .values_list('vacancy_id', flat=True)
+    )
+
     return render(request, 'accounts/student_favorites.html', {
         'favorite_vacancies': favorite_vacancies,
         'favorite_courses': favorite_courses,
+        'registration_map': registration_map,
+        'responded_vacancy_ids': responded_vacancy_ids,
     })
 
 

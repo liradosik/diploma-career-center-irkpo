@@ -21,7 +21,7 @@
   --radius-sm: 14px;
   --shadow-sm: 0 10px 30px rgba(20, 45, 90, 0.07);
   --shadow-md: 0 18px 50px rgba(30, 102, 208, 0.10);
-  --admin-sidebar-width: 286px;
+  --admin-sidebar-width: 252px;
 }
 
 *,
@@ -18795,3 +18795,2361 @@ html {
   }
 }
 .student-favorites-page .favorites-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.student-favorites-page .favorite-card{padding:20px}.student-favorites-page .favorite-item{padding:12px;border:1px solid #e4ecf8;border-radius:12px;margin:8px 0}.favorite-toggle{border-color:#b9d2f3;color:#2f5c9d}
+/* === Student vacancies: final card layout like mockup === */
+
+:root {
+  --admin-sidebar-width: 252px;
+}
+
+.student-vacancies-page-v2 {
+  display: grid;
+  gap: 22px;
+}
+
+/* Фильтр снова в аккуратной карточке */
+.student-vacancies-filter-card-v2 {
+  padding: 28px;
+  border: 1px solid #d9e7f8;
+  border-radius: 28px;
+  background: #ffffff;
+  box-shadow: 0 14px 34px rgba(25, 66, 120, 0.07);
+}
+
+.student-vacancies-filter-grid-v2 {
+  display: grid !important;
+  grid-template-columns: minmax(320px, 1.35fr) minmax(220px, 1fr);
+  gap: 20px 28px;
+  align-items: end;
+}
+
+.student-vacancies-field-v2 {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+}
+
+.student-vacancies-field-v2 > span:first-child {
+  color: #172536;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.student-vacancies-field-v2 input,
+.student-vacancies-field-v2 select {
+  width: 100%;
+  min-height: 58px;
+  padding: 0 20px;
+  border: 1px solid #cfe0f4;
+  border-radius: 18px;
+  background: #fbfdff;
+  color: #172536;
+  font-size: 16px;
+  outline: none;
+}
+
+.student-vacancies-search-wrap-v2 {
+  position: relative;
+  display: block;
+}
+
+.student-vacancies-search-wrap-v2 input {
+  padding-right: 54px;
+}
+
+.student-vacancies-search-wrap-v2 i {
+  position: absolute;
+  right: 18px;
+  top: 50%;
+  color: #6f8198;
+  font-size: 22px;
+  transform: translateY(-50%);
+}
+
+.student-vacancies-filter-actions-v2 {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.student-vacancies-filter-actions-v2 .btn {
+  min-height: 56px;
+  padding: 0 26px;
+  border-radius: 18px;
+  font-size: 17px;
+  font-weight: 800;
+}
+
+/* Список карточек */
+.student-vacancies-list-v2 {
+  display: grid;
+  gap: 20px;
+}
+
+/* Карточка вакансии */
+.student-vacancy-card-v2 {
+  display: grid !important;
+  grid-template-columns: 76px minmax(0, 1fr) minmax(170px, 220px);
+  gap: 22px;
+  align-items: center;
+  padding: 26px 28px;
+  border: 1px solid #d9e7f8;
+  border-radius: 26px;
+  background: #ffffff;
+  box-shadow: 0 12px 28px rgba(25, 66, 120, 0.06);
+}
+
+.student-vacancy-card-v2:hover {
+  border-color: #bcd7fb;
+  box-shadow: 0 16px 34px rgba(25, 66, 120, 0.09);
+}
+
+/* Иконка слева */
+.student-vacancy-icon-v2 {
+  width: 62px;
+  height: 62px;
+  display: grid;
+  place-items: center;
+  border-radius: 20px;
+  font-size: 27px;
+}
+
+.student-vacancy-icon-v2.is-blue {
+  background: #eaf3ff;
+  color: #1f67d2;
+}
+
+.student-vacancy-icon-v2.is-green {
+  background: #e9f8f0;
+  color: #20875a;
+}
+
+.student-vacancy-icon-v2.is-orange {
+  background: #fff3e2;
+  color: #be760d;
+}
+
+.student-vacancy-icon-v2.is-purple {
+  background: #f2edff;
+  color: #7657d8;
+}
+
+/* Основная часть */
+.student-vacancy-main-v2 {
+  min-width: 0;
+}
+
+.student-vacancy-title-row-v2 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+.student-vacancy-title-row-v2 h2 {
+  margin: 0;
+  color: #172536;
+  font-size: 23px;
+  line-height: 1.15;
+  font-weight: 850;
+  letter-spacing: -0.02em;
+}
+
+.student-vacancy-title-row-v2 span {
+  min-height: 26px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 11px;
+  border-radius: 999px;
+  background: #eaf3ff;
+  color: #1f67d2;
+  font-size: 13px;
+  font-weight: 850;
+}
+
+.student-vacancy-company-v2 {
+  margin: 0 0 12px;
+  color: #52667f;
+  font-size: 16px;
+  line-height: 1.3;
+}
+
+.student-vacancy-tags-v2 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.student-vacancy-tags-v2 span {
+  min-height: 30px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 13px;
+  border: 1px solid #cfe2fa;
+  border-radius: 999px;
+  background: #f4f8ff;
+  color: #1f67d2;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+/* Описание в списке скрываем */
+.student-vacancy-description-v2 {
+  display: none !important;
+}
+
+/* Кнопки */
+.student-vacancy-actions-v2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: nowrap;
+}
+
+.student-vacancy-actions-v2 form {
+  margin: 0;
+  flex: 0 0 auto;
+}
+
+.student-vacancy-actions-v2 .btn,
+.student-vacancy-detail-btn,
+.student-vacancy-action-btn {
+  min-height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 22px;
+  border-radius: 17px;
+  font-size: 17px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.student-vacancy-detail-btn {
+  min-width: 138px;
+}
+
+.student-vacancy-action-btn {
+  min-width: 150px;
+}
+
+.student-vacancy-responded-badge {
+  min-width: 156px;
+  min-height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 18px;
+  border: 1px solid rgba(27, 156, 98, 0.22);
+  border-radius: 17px;
+  background: rgba(27, 156, 98, 0.10);
+  color: #24724c;
+  font-size: 16px;
+  font-weight: 850;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.student-vacancy-save-inline {
+  position: static !important;
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  min-height: 48px;
+  display: inline-grid;
+  place-items: center;
+  margin: 0;
+  border: 1px solid #cfe0f4;
+  border-radius: 17px;
+  background: #ffffff;
+  color: #1f67d2;
+  font-size: 19px;
+  cursor: pointer;
+}
+
+.student-vacancy-save-inline.is-active {
+  border-color: #9fc7ff;
+  background: #f4f9ff;
+  color: #174d9c;
+}
+
+/* Правая мета-часть */
+.student-vacancy-side-v2 {
+  display: grid;
+  justify-items: end;
+  align-self: stretch;
+  min-height: auto;
+}
+
+.student-vacancy-side-meta {
+  display: grid;
+  gap: 18px;
+  justify-items: end;
+  align-content: center;
+  color: #52667f;
+}
+
+.student-vacancy-side-meta p {
+  margin: 0;
+  display: grid;
+  gap: 6px;
+  justify-items: end;
+}
+
+.student-vacancy-side-meta i {
+  color: #1f67d2;
+  font-size: 21px;
+}
+
+.student-vacancy-side-meta span {
+  font-size: 16px;
+}
+
+.student-vacancy-side-meta small {
+  color: #667891;
+  font-size: 14px;
+}
+
+.student-vacancy-side-meta strong {
+  color: #172536;
+  font-size: 16px;
+  font-weight: 850;
+}
+
+/* Пагинация */
+.student-vacancies-pagination-wrap {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  margin: 10px 0 4px;
+}
+
+.student-vacancies-pagination-wrap p {
+  margin: 0;
+  color: #667891;
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.student-vacancies-pagination {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px;
+  border: 1px solid #d7e6f8;
+  border-radius: 999px;
+  background: #ffffff;
+  box-shadow: 0 12px 28px rgba(25, 66, 120, 0.07);
+}
+
+.student-vacancies-pagination a,
+.student-vacancies-pagination span {
+  min-width: 38px;
+  height: 38px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 999px;
+  color: #52667f;
+  font-size: 15px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.student-vacancies-pagination a:hover {
+  background: #eef5ff;
+  color: #1e66d0;
+}
+
+.student-vacancies-pagination .is-current {
+  color: #ffffff;
+  background: linear-gradient(135deg, #1e66d0, #3d8bff);
+}
+
+.student-vacancies-pagination .is-disabled {
+  color: #b7c4d6;
+}
+
+.student-vacancies-pagination .is-gap {
+  color: #8a9bb3;
+}
+
+/* Empty */
+.student-vacancies-empty-v2 {
+  padding: 42px 24px;
+  border: 1px solid #d9e7f8;
+  border-radius: 26px;
+  background: #ffffff;
+  text-align: center;
+}
+
+.student-vacancies-empty-icon-v2 {
+  width: 62px;
+  height: 62px;
+  display: inline-grid;
+  place-items: center;
+  margin-bottom: 16px;
+  border-radius: 20px;
+  background: #eaf3ff;
+  color: #1f67d2;
+  font-size: 25px;
+}
+
+/* Адаптив */
+@media (max-width: 1180px) {
+  .student-vacancy-card-v2 {
+    grid-template-columns: 76px minmax(0, 1fr);
+  }
+
+  .student-vacancy-side-v2 {
+    grid-column: 2;
+    justify-items: start;
+  }
+
+  .student-vacancy-side-meta,
+  .student-vacancy-side-meta p {
+    justify-items: start;
+  }
+
+  .student-vacancy-actions-v2 {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 900px) {
+  .student-vacancies-filter-grid-v2 {
+    grid-template-columns: 1fr;
+  }
+
+  .student-vacancies-filter-actions-v2 {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .student-vacancies-filter-actions-v2 .btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 760px) {
+  .student-vacancy-card-v2 {
+    grid-template-columns: 1fr;
+  }
+
+  .student-vacancy-side-v2 {
+    grid-column: auto;
+  }
+
+  .student-vacancy-actions-v2 {
+    align-items: stretch;
+  }
+
+  .student-vacancy-actions-v2 .btn,
+  .student-vacancy-responded-badge {
+    width: 100%;
+  }
+
+  .student-vacancy-save-inline {
+    width: 100%;
+  }
+}
+/* === Student vacancies: compact card layout closer to mockup === */
+
+/* меньше жирности по всей странице вакансий */
+.student-vacancies-page-v2 h1,
+.student-vacancies-page-v2 h2,
+.student-vacancies-page-v2 h3,
+.student-vacancies-page-v2 strong,
+.student-vacancies-page-v2 .btn,
+.student-vacancies-page-v2 button {
+  font-weight: 650;
+}
+
+/* фильтр компактнее, как в макете */
+.student-vacancies-filter-card-v2 {
+  padding: 20px 22px !important;
+  border-radius: 22px !important;
+}
+
+.student-vacancies-filter-grid-v2 {
+  display: grid !important;
+  grid-template-columns:
+    minmax(280px, 1.55fr)
+    minmax(160px, 0.75fr)
+    minmax(150px, 0.7fr)
+    minmax(150px, 0.7fr)
+    auto !important;
+  gap: 12px !important;
+  align-items: end !important;
+}
+
+.student-vacancies-field-v2 {
+  gap: 7px !important;
+}
+
+.student-vacancies-field-v2 > span:first-child {
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.04em;
+  text-transform: none;
+}
+
+.student-vacancies-field-v2 input,
+.student-vacancies-field-v2 select {
+  min-height: 42px !important;
+  padding: 0 14px !important;
+  border-radius: 13px !important;
+  font-size: 13px !important;
+}
+
+.student-vacancies-search-wrap-v2 i {
+  right: 14px !important;
+  font-size: 17px !important;
+}
+
+.student-vacancies-filter-actions-v2 {
+  grid-column: auto !important;
+  display: flex !important;
+  gap: 8px !important;
+}
+
+.student-vacancies-filter-actions-v2 .btn {
+  min-height: 42px !important;
+  padding: 0 15px !important;
+  border-radius: 13px !important;
+  font-size: 13px !important;
+  font-weight: 650 !important;
+}
+
+/* карточки — компактные горизонтальные, как в макете */
+.student-vacancies-list-v2 {
+  gap: 10px !important;
+}
+
+.student-vacancy-card-v2 {
+  display: grid !important;
+  grid-template-columns: 52px minmax(260px, 1fr) minmax(145px, 0.45fr) auto !important;
+  grid-template-rows: auto auto auto !important;
+  column-gap: 18px !important;
+  row-gap: 4px !important;
+  align-items: center !important;
+
+  padding: 16px 18px !important;
+  min-height: 96px !important;
+  border-radius: 18px !important;
+  box-shadow: 0 8px 22px rgba(25, 66, 120, 0.045) !important;
+}
+
+/* чтобы элементы main могли лечь по сетке карточки */
+.student-vacancy-main-v2 {
+  display: contents !important;
+}
+
+.student-vacancy-icon-v2 {
+  grid-column: 1 !important;
+  grid-row: 1 / 4 !important;
+
+  width: 46px !important;
+  height: 46px !important;
+  border-radius: 14px !important;
+  font-size: 20px !important;
+}
+
+.student-vacancy-title-row-v2 {
+  grid-column: 2 !important;
+  grid-row: 1 !important;
+
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  margin: 0 !important;
+}
+
+.student-vacancy-title-row-v2 h2 {
+  margin: 0 !important;
+  font-size: 16px !important;
+  line-height: 1.15 !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.01em !important;
+}
+
+.student-vacancy-title-row-v2 span {
+  min-height: 22px !important;
+  padding: 0 8px !important;
+  border-radius: 999px !important;
+  font-size: 11px !important;
+  font-weight: 650 !important;
+}
+
+.student-vacancy-company-v2 {
+  grid-column: 2 !important;
+  grid-row: 2 !important;
+
+  margin: 2px 0 0 !important;
+  font-size: 13px !important;
+  line-height: 1.25 !important;
+  color: #52667f !important;
+}
+
+.student-vacancy-tags-v2 {
+  grid-column: 2 !important;
+  grid-row: 3 !important;
+
+  display: flex !important;
+  gap: 6px !important;
+  margin: 6px 0 0 !important;
+}
+
+.student-vacancy-tags-v2 span {
+  min-height: 23px !important;
+  padding: 0 8px !important;
+  font-size: 11px !important;
+  font-weight: 650 !important;
+  border-radius: 999px !important;
+}
+
+/* правая мета-информация */
+.student-vacancy-side-v2 {
+  grid-column: 3 !important;
+  grid-row: 1 / 4 !important;
+
+  display: grid !important;
+  justify-items: start !important;
+  align-items: center !important;
+  align-self: center !important;
+}
+
+.student-vacancy-side-meta {
+  display: grid !important;
+  gap: 8px !important;
+  justify-items: start !important;
+  align-content: center !important;
+}
+
+.student-vacancy-side-meta p {
+  margin: 0 !important;
+  display: grid !important;
+  gap: 3px !important;
+  justify-items: start !important;
+}
+
+.student-vacancy-side-meta i {
+  font-size: 15px !important;
+}
+
+.student-vacancy-side-meta span {
+  font-size: 13px !important;
+  color: #52667f !important;
+}
+
+.student-vacancy-side-meta small {
+  font-size: 11px !important;
+  color: #7a8ca5 !important;
+}
+
+.student-vacancy-side-meta strong {
+  font-size: 13px !important;
+  font-weight: 700 !important;
+}
+
+/* кнопки справа, в одну строку */
+.student-vacancy-actions-v2 {
+  grid-column: 4 !important;
+  grid-row: 1 / 4 !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 8px !important;
+  flex-wrap: nowrap !important;
+  margin: 0 !important;
+}
+
+.student-vacancy-actions-v2 form {
+  margin: 0 !important;
+}
+
+.student-vacancy-actions-v2 .btn,
+.student-vacancy-detail-btn,
+.student-vacancy-action-btn,
+.student-vacancy-responded-badge {
+  min-height: 38px !important;
+  height: 38px !important;
+  padding: 0 14px !important;
+  border-radius: 12px !important;
+  font-size: 12px !important;
+  font-weight: 650 !important;
+  white-space: nowrap !important;
+}
+
+.student-vacancy-detail-btn {
+  min-width: 96px !important;
+}
+
+.student-vacancy-action-btn {
+  min-width: 112px !important;
+}
+
+.student-vacancy-responded-badge {
+  min-width: 126px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  line-height: 1 !important;
+}
+
+.student-vacancy-save-inline {
+  width: 38px !important;
+  height: 38px !important;
+  min-width: 38px !important;
+  min-height: 38px !important;
+  border-radius: 12px !important;
+  font-size: 15px !important;
+}
+
+/* пагинация как мягкая нижняя штучка */
+.student-vacancies-pagination-wrap {
+  margin-top: 12px !important;
+}
+
+.student-vacancies-pagination-wrap p {
+  font-size: 12px !important;
+}
+
+.student-vacancies-pagination {
+  padding: 6px !important;
+  gap: 4px !important;
+}
+
+.student-vacancies-pagination a,
+.student-vacancies-pagination span {
+  min-width: 32px !important;
+  height: 32px !important;
+  font-size: 13px !important;
+  font-weight: 650 !important;
+}
+
+/* адаптив */
+@media (max-width: 1400px) {
+  .student-vacancies-filter-grid-v2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .student-vacancies-filter-actions-v2 {
+    grid-column: 1 / -1 !important;
+  }
+
+  .student-vacancy-card-v2 {
+    grid-template-columns: 52px minmax(0, 1fr) minmax(130px, 0.45fr) !important;
+  }
+
+  .student-vacancy-actions-v2 {
+    grid-column: 2 / 4 !important;
+    grid-row: 4 !important;
+    justify-content: flex-start !important;
+    margin-top: 8px !important;
+  }
+}
+
+@media (max-width: 800px) {
+  .student-vacancies-filter-grid-v2 {
+    grid-template-columns: 1fr !important;
+  }
+
+  .student-vacancy-card-v2 {
+    grid-template-columns: 1fr !important;
+  }
+
+  .student-vacancy-icon-v2,
+  .student-vacancy-title-row-v2,
+  .student-vacancy-company-v2,
+  .student-vacancy-tags-v2,
+  .student-vacancy-side-v2,
+  .student-vacancy-actions-v2 {
+    grid-column: 1 !important;
+    grid-row: auto !important;
+  }
+
+  .student-vacancy-actions-v2 {
+    flex-wrap: wrap !important;
+  }
+}
+/* === Student courses: compact card layout like vacancies === */
+
+.student-courses-page-v2 h1,
+.student-courses-page-v2 h2,
+.student-courses-page-v2 h3,
+.student-courses-page-v2 strong,
+.student-courses-page-v2 .btn,
+.student-courses-page-v2 button {
+  font-weight: 650;
+}
+
+.student-courses-page-v2 {
+  display: grid;
+  gap: 22px;
+}
+
+/* фильтр */
+.student-courses-filter-card-v2 {
+  padding: 20px 22px !important;
+  border: 1px solid #d9e7f8 !important;
+  border-radius: 22px !important;
+  background: #ffffff !important;
+  box-shadow: 0 14px 34px rgba(25, 66, 120, 0.07) !important;
+}
+
+.student-courses-filters-v2 {
+  display: grid !important;
+  grid-template-columns:
+    minmax(280px, 1.55fr)
+    minmax(150px, 0.7fr)
+    minmax(150px, 0.7fr)
+    minmax(180px, 0.85fr)
+    auto !important;
+  gap: 12px !important;
+  align-items: end !important;
+}
+
+.student-courses-filter-field {
+  display: grid !important;
+  gap: 7px !important;
+  margin: 0 !important;
+}
+
+.student-courses-filter-field label {
+  color: #172536 !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.04em !important;
+}
+
+.student-courses-filter-field input,
+.student-courses-filter-field select {
+  width: 100% !important;
+  min-height: 42px !important;
+  padding: 0 14px !important;
+  border: 1px solid #cfe0f4 !important;
+  border-radius: 13px !important;
+  background: #fbfdff !important;
+  color: #172536 !important;
+  font-size: 13px !important;
+  outline: none !important;
+}
+
+.student-courses-search-box {
+  position: relative !important;
+  display: block !important;
+}
+
+.student-courses-search-box input {
+  padding-left: 38px !important;
+}
+
+.student-courses-search-box i {
+  position: absolute !important;
+  left: 14px !important;
+  top: 50% !important;
+  color: #6f8198 !important;
+  font-size: 16px !important;
+  transform: translateY(-50%) !important;
+}
+
+.student-courses-filter-actions {
+  display: flex !important;
+  gap: 8px !important;
+  align-items: end !important;
+}
+
+.student-courses-filter-actions .btn {
+  min-height: 42px !important;
+  padding: 0 15px !important;
+  border-radius: 13px !important;
+  font-size: 13px !important;
+  font-weight: 650 !important;
+  white-space: nowrap !important;
+}
+
+/* список */
+.student-courses-list-v2 {
+  display: grid !important;
+  gap: 10px !important;
+}
+
+.student-course-card-v2 {
+  display: grid !important;
+  grid-template-columns: 52px minmax(260px, 1fr) minmax(145px, 0.45fr) auto !important;
+  grid-template-rows: auto auto auto !important;
+  column-gap: 18px !important;
+  row-gap: 4px !important;
+  align-items: center !important;
+
+  padding: 16px 18px !important;
+  min-height: 96px !important;
+  border: 1px solid #d9e7f8 !important;
+  border-radius: 18px !important;
+  background: #ffffff !important;
+  box-shadow: 0 8px 22px rgba(25, 66, 120, 0.045) !important;
+}
+
+.student-course-card-v2:hover {
+  border-color: #bcd7fb !important;
+  box-shadow: 0 12px 26px rgba(25, 66, 120, 0.07) !important;
+  transform: none !important;
+}
+
+.student-course-main-v2 {
+  display: contents !important;
+}
+
+.student-course-icon {
+  grid-column: 1 !important;
+  grid-row: 1 / 4 !important;
+
+  width: 46px !important;
+  height: 46px !important;
+  min-width: 46px !important;
+  border-radius: 14px !important;
+  font-size: 20px !important;
+}
+
+.student-course-icon i,
+.student-course-icon .bi,
+.student-course-icon .bi::before {
+  width: auto !important;
+  height: auto !important;
+  font-size: 20px !important;
+  line-height: 1 !important;
+}
+
+.student-course-title-row-v2 {
+  grid-column: 2 !important;
+  grid-row: 1 !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 8px !important;
+  margin: 0 !important;
+  width: auto !important;
+}
+
+.student-course-title-row-v2 > div {
+  min-width: 0 !important;
+}
+
+.student-course-title-row-v2 h2 {
+  margin: 0 !important;
+  color: #172536 !important;
+  font-size: 16px !important;
+  line-height: 1.15 !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.01em !important;
+}
+
+.student-course-organization {
+  grid-column: 2 !important;
+  grid-row: 2 !important;
+
+  margin: 2px 0 0 !important;
+  color: #52667f !important;
+  font-size: 13px !important;
+  line-height: 1.25 !important;
+}
+
+.student-course-status-badge {
+  min-height: 22px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  margin: 0 !important;
+  padding: 0 8px !important;
+  border-radius: 999px !important;
+  font-size: 11px !important;
+  font-weight: 650 !important;
+  white-space: nowrap !important;
+}
+
+.student-course-tags-v2 {
+  grid-column: 2 !important;
+  grid-row: 3 !important;
+
+  display: flex !important;
+  gap: 6px !important;
+  margin: 6px 0 0 !important;
+}
+
+.student-course-tags-v2 span {
+  min-height: 23px !important;
+  padding: 0 8px !important;
+  border-radius: 999px !important;
+  font-size: 11px !important;
+  font-weight: 650 !important;
+}
+
+.student-course-description-v2 {
+  display: none !important;
+}
+
+.student-course-places-line-v2 {
+  grid-column: 3 !important;
+  grid-row: 1 / 4 !important;
+
+  display: grid !important;
+  gap: 4px !important;
+  width: auto !important;
+  max-width: 150px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: #52667f !important;
+  font-size: 12px !important;
+  font-weight: 550 !important;
+}
+
+.student-course-places-line-v2 i {
+  display: none !important;
+}
+
+.student-course-side-v2 {
+  grid-column: 3 !important;
+  grid-row: 1 / 4 !important;
+
+  display: grid !important;
+  justify-items: start !important;
+  align-items: center !important;
+  align-self: center !important;
+}
+
+.student-course-date-card-v2,
+.student-course-format-card-v2 {
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.student-course-date-card-v2 i {
+  color: #1f67d2 !important;
+  font-size: 15px !important;
+}
+
+.student-course-date-card-v2 span,
+.student-course-format-card-v2 span {
+  color: #52667f !important;
+  font-size: 12px !important;
+  font-weight: 550 !important;
+}
+
+.student-course-date-card-v2 strong {
+  color: #172536 !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+}
+
+.student-course-actions-v2 {
+  grid-column: 4 !important;
+  grid-row: 1 / 4 !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 8px !important;
+  flex-wrap: nowrap !important;
+  margin: 0 !important;
+}
+
+.student-course-actions-v2 form {
+  margin: 0 !important;
+}
+
+.student-course-actions-v2 .btn,
+.student-course-detail-btn,
+.student-course-action-btn,
+.student-course-cancel-btn,
+.student-course-disabled-btn {
+  min-height: 38px !important;
+  height: 38px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 14px !important;
+  border-radius: 12px !important;
+  font-size: 12px !important;
+  font-weight: 650 !important;
+  white-space: nowrap !important;
+}
+
+.student-course-detail-btn {
+  min-width: 96px !important;
+}
+
+.student-course-action-btn,
+.student-course-cancel-btn,
+.student-course-disabled-btn {
+  min-width: 112px !important;
+}
+
+.student-course-cancel-btn {
+  border: 1px solid #f0c8c8 !important;
+  background: #fff5f5 !important;
+  color: #b54b4b !important;
+}
+
+.student-course-disabled-btn {
+  border: 1px solid #d8e1ed !important;
+  background: #f5f8fc !important;
+  color: #7a8ca5 !important;
+  cursor: not-allowed !important;
+}
+
+.student-course-favorite-btn {
+  width: 38px !important;
+  height: 38px !important;
+  min-width: 38px !important;
+  min-height: 38px !important;
+  display: inline-grid !important;
+  place-items: center !important;
+  border: 1px solid #cfe0f4 !important;
+  border-radius: 12px !important;
+  background: #ffffff !important;
+  color: #1f67d2 !important;
+  font-size: 15px !important;
+  cursor: pointer !important;
+}
+
+.student-course-favorite-btn.is-active {
+  border-color: #9fc7ff !important;
+  background: #f4f9ff !important;
+  color: #174d9c !important;
+}
+
+/* пагинация */
+.student-courses-pagination-wrap {
+  display: grid !important;
+  justify-items: center !important;
+  gap: 12px !important;
+  margin: 12px 0 4px !important;
+}
+
+.student-courses-pagination-wrap p {
+  margin: 0 !important;
+  color: #667891 !important;
+  font-size: 12px !important;
+  font-weight: 650 !important;
+}
+
+.student-courses-pagination {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  padding: 6px !important;
+  border: 1px solid #d7e6f8 !important;
+  border-radius: 999px !important;
+  background: #ffffff !important;
+  box-shadow: 0 12px 28px rgba(25, 66, 120, 0.07) !important;
+}
+
+.student-courses-pagination a,
+.student-courses-pagination span {
+  min-width: 32px !important;
+  height: 32px !important;
+  display: inline-grid !important;
+  place-items: center !important;
+  border-radius: 999px !important;
+  color: #52667f !important;
+  font-size: 13px !important;
+  font-weight: 650 !important;
+  text-decoration: none !important;
+}
+
+.student-courses-pagination a:hover {
+  background: #eef5ff !important;
+  color: #1e66d0 !important;
+}
+
+.student-courses-pagination .is-current {
+  color: #ffffff !important;
+  background: linear-gradient(135deg, #1e66d0, #3d8bff) !important;
+}
+
+.student-courses-pagination .is-disabled {
+  color: #b7c4d6 !important;
+}
+
+.student-courses-pagination .is-gap {
+  color: #8a9bb3 !important;
+}
+
+/* адаптив */
+@media (max-width: 1400px) {
+  .student-courses-filters-v2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .student-courses-filter-actions {
+    grid-column: 1 / -1 !important;
+  }
+
+  .student-course-card-v2 {
+    grid-template-columns: 52px minmax(0, 1fr) minmax(130px, 0.45fr) !important;
+  }
+
+  .student-course-actions-v2 {
+    grid-column: 2 / 4 !important;
+    grid-row: 4 !important;
+    justify-content: flex-start !important;
+    margin-top: 8px !important;
+  }
+}
+
+@media (max-width: 800px) {
+  .student-courses-filters-v2 {
+    grid-template-columns: 1fr !important;
+  }
+
+  .student-course-card-v2 {
+    grid-template-columns: 1fr !important;
+  }
+
+  .student-course-icon,
+  .student-course-title-row-v2,
+  .student-course-organization,
+  .student-course-tags-v2,
+  .student-course-places-line-v2,
+  .student-course-side-v2,
+  .student-course-actions-v2 {
+    grid-column: 1 !important;
+    grid-row: auto !important;
+  }
+
+  .student-course-actions-v2 {
+    flex-wrap: wrap !important;
+  }
+}
+/* === Student courses: layout fix after compact redesign === */
+
+.student-course-card-v2 {
+  grid-template-columns: 52px minmax(360px, 1fr) minmax(150px, 0.42fr) minmax(330px, auto) !important;
+  grid-template-rows: auto auto auto auto !important;
+  align-items: center !important;
+  padding: 18px 22px !important;
+}
+
+/* левая иконка */
+.student-course-icon {
+  grid-column: 1 !important;
+  grid-row: 1 / 5 !important;
+}
+
+/* название + статус */
+.student-course-title-row-v2 {
+  grid-column: 2 !important;
+  grid-row: 1 !important;
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: flex-start !important;
+  gap: 10px !important;
+  margin: 0 !important;
+}
+
+.student-course-title-row-v2 h2 {
+  font-size: 17px !important;
+  font-weight: 700 !important;
+}
+
+.student-course-organization {
+  margin-top: 3px !important;
+  font-size: 13px !important;
+  color: #52667f !important;
+}
+
+.student-course-status-badge {
+  flex: 0 0 auto !important;
+  margin-top: 1px !important;
+}
+
+/* теги */
+.student-course-tags-v2 {
+  grid-column: 2 !important;
+  grid-row: 3 !important;
+  margin-top: 8px !important;
+}
+
+/* описание точно скрыто */
+.student-course-description-v2 {
+  display: none !important;
+}
+
+/* места — под тегами, а не в колонке даты */
+.student-course-places-line-v2 {
+  grid-column: 2 !important;
+  grid-row: 4 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  max-width: none !important;
+  margin-top: 8px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: #52667f !important;
+  font-size: 12px !important;
+  line-height: 1.3 !important;
+}
+
+.student-course-places-line-v2 i {
+  display: inline-flex !important;
+  color: #1f67d2 !important;
+  font-size: 14px !important;
+}
+
+/* дата и формат — отдельная правая колонка */
+.student-course-side-v2 {
+  grid-column: 3 !important;
+  grid-row: 1 / 5 !important;
+  display: grid !important;
+  justify-items: start !important;
+  align-items: center !important;
+  gap: 9px !important;
+}
+
+.student-course-date-card-v2,
+.student-course-format-card-v2 {
+  display: grid !important;
+  gap: 4px !important;
+  justify-items: start !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.student-course-date-card-v2 i {
+  color: #1f67d2 !important;
+  font-size: 15px !important;
+}
+
+.student-course-date-card-v2 span {
+  color: #667891 !important;
+  font-size: 12px !important;
+}
+
+.student-course-date-card-v2 strong {
+  color: #172536 !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  white-space: nowrap !important;
+}
+
+.student-course-format-card-v2 span {
+  color: #52667f !important;
+  font-size: 13px !important;
+  font-weight: 550 !important;
+}
+
+/* кнопки — крайняя правая колонка */
+.student-course-actions-v2 {
+  grid-column: 4 !important;
+  grid-row: 1 / 5 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 8px !important;
+  flex-wrap: nowrap !important;
+  margin: 0 !important;
+}
+
+.student-course-actions-v2 .btn,
+.student-course-detail-btn,
+.student-course-action-btn,
+.student-course-cancel-btn,
+.student-course-disabled-btn {
+  min-height: 38px !important;
+  height: 38px !important;
+  padding: 0 14px !important;
+  border-radius: 12px !important;
+  font-size: 12px !important;
+  font-weight: 650 !important;
+  white-space: nowrap !important;
+}
+
+/* кнопка отмены чуть мягче */
+.student-course-cancel-btn {
+  border-color: #f2caca !important;
+  background: #fff7f7 !important;
+  color: #b84e4e !important;
+}
+
+/* избранное — квадратная кнопка */
+.student-course-favorite-btn {
+  width: 38px !important;
+  height: 38px !important;
+  min-width: 38px !important;
+  min-height: 38px !important;
+  border-radius: 12px !important;
+}
+
+/* адаптив */
+@media (max-width: 1450px) {
+  .student-course-card-v2 {
+    grid-template-columns: 52px minmax(0, 1fr) minmax(130px, 0.4fr) !important;
+  }
+
+  .student-course-actions-v2 {
+    grid-column: 2 / 4 !important;
+    grid-row: 5 !important;
+    justify-content: flex-start !important;
+    margin-top: 10px !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .student-course-card-v2 {
+    grid-template-columns: 1fr !important;
+  }
+
+  .student-course-icon,
+  .student-course-title-row-v2,
+  .student-course-tags-v2,
+  .student-course-places-line-v2,
+  .student-course-side-v2,
+  .student-course-actions-v2 {
+    grid-column: 1 !important;
+    grid-row: auto !important;
+  }
+
+  .student-course-actions-v2 {
+    flex-wrap: wrap !important;
+  }
+}
+/* === Курсы/семинары студента: фильтры как у вакансий === */
+
+.student-courses-filters-v2 {
+  display: grid;
+  grid-template-columns:
+    minmax(280px, 1.15fr)
+    minmax(180px, 0.55fr)
+    minmax(180px, 0.55fr)
+    minmax(180px, 0.55fr)
+    auto
+    auto !important;
+  gap: 16px;
+  align-items: end;
+}
+
+/* поиск уже */
+.student-courses-filter-search {
+  max-width: 490px;
+}
+
+/* убираем лупу внутри поиска */
+.student-courses-search-box i,
+.student-courses-search-box svg {
+  display: none !important;
+}
+
+/* обычный отступ без иконки */
+.student-courses-search-box input {
+  padding-left: 18px !important;
+  padding-right: 18px !important;
+}
+
+/* кнопки в одну строку */
+.student-courses-filter-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  grid-column: auto !important;
+  white-space: nowrap;
+}
+
+.student-courses-filter-actions .btn,
+.student-courses-filter-actions button,
+.student-courses-filter-actions .button {
+  min-width: 0;
+}
+
+/* чтобы селекты и поиск не были слишком длинными */
+.student-courses-filters-v2 .form-group,
+.student-courses-filters-v2 .filter-group,
+.student-courses-filters-v2 .student-courses-filter-field {
+  min-width: 0;
+}
+
+/* планшет */
+@media (max-width: 1280px) {
+  .student-courses-filters-v2 {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+
+  .student-courses-filter-actions {
+    grid-column: 1 / -1 !important;
+  }
+
+  .student-courses-filter-search {
+    max-width: none;
+  }
+}
+
+/* телефон */
+@media (max-width: 760px) {
+  .student-courses-filters-v2 {
+    grid-template-columns: 1fr !important;
+  }
+
+  .student-courses-filter-actions {
+    flex-wrap: wrap;
+  }
+}
+/* === Student vacancies: remove search icon === */
+
+.student-vacancies-search-wrap-v2 i,
+.student-vacancies-search-wrap-v2 svg {
+  display: none !important;
+}
+
+.student-vacancies-search-wrap-v2 input {
+  padding-left: 18px !important;
+  padding-right: 18px !important;
+}
+/* === Student courses: places above status === */
+
+.student-course-side-v2 {
+  grid-column: 3 !important;
+  grid-row: 1 / 5 !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  justify-content: center !important;
+  gap: 8px !important;
+}
+
+.student-course-places-line-v2 {
+  display: none !important;
+}
+
+.student-course-places-side {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 7px !important;
+
+  min-height: 28px !important;
+  padding: 0 11px !important;
+
+  border: 1px solid #d7e6f8 !important;
+  border-radius: 999px !important;
+  background: #f7fbff !important;
+
+  color: #52667f !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  white-space: nowrap !important;
+}
+
+.student-course-places-side i {
+  color: #1f67d2 !important;
+  font-size: 14px !important;
+}
+
+.student-course-status-side {
+  min-height: 30px !important;
+  padding: 0 12px !important;
+  font-size: 12px !important;
+  font-weight: 650 !important;
+}
+
+/* чтобы справа кнопки не сжимались */
+.student-course-actions-v2 {
+  grid-column: 4 !important;
+  grid-row: 1 / 5 !important;
+}
+
+@media (max-width: 1450px) {
+  .student-course-side-v2 {
+    grid-column: 2 / 4 !important;
+    grid-row: 4 !important;
+    align-items: flex-start !important;
+    margin-top: 8px !important;
+  }
+
+  .student-course-actions-v2 {
+    grid-column: 2 / 4 !important;
+    grid-row: 5 !important;
+  }
+}
+/* === Student favorites v2 === */
+
+.student-favorites-page-v2 {
+  display: grid;
+  gap: 20px;
+}
+
+.student-favorites-hero-v2 {
+  position: relative;
+  overflow: hidden;
+}
+
+.student-favorites-hero-v2 > div:first-child {
+  position: relative;
+  z-index: 2;
+}
+
+.student-favorites-section-v2 {
+  padding: 22px;
+  border: 1px solid #d9e7f8;
+  border-radius: 24px;
+  background: #ffffff;
+  box-shadow: 0 12px 28px rgba(25, 66, 120, 0.055);
+}
+
+.student-favorites-section-head-v2 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 14px;
+}
+
+.student-favorites-section-title-v2 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.student-favorites-section-title-v2 h2 {
+  margin: 0;
+  color: #172536;
+  font-size: 22px;
+  line-height: 1.15;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.student-favorites-section-title-v2 p {
+  margin: 4px 0 0;
+  color: #667891;
+  font-size: 13px;
+}
+
+.student-favorites-section-title-v2 strong {
+  min-width: 32px;
+  min-height: 26px;
+  display: inline-grid;
+  place-items: center;
+  padding: 0 9px;
+  border-radius: 999px;
+  background: #eaf3ff;
+  color: #1f67d2;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.student-favorites-section-icon-v2 {
+  width: 42px;
+  height: 42px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 14px;
+  background: #eaf3ff;
+  color: #1f67d2;
+  font-size: 19px;
+  flex: 0 0 auto;
+}
+
+.student-favorites-section-icon-v2.is-purple {
+  background: #f2edff;
+  color: #7657d8;
+}
+
+.student-favorites-link-v2 {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #1f67d2;
+  font-size: 13px;
+  font-weight: 650;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.student-favorites-link-v2:hover {
+  text-decoration: underline;
+}
+
+.student-favorites-list-v2 {
+  overflow: hidden;
+  border: 1px solid #e1ebf7;
+  border-radius: 18px;
+  background: #ffffff;
+}
+
+.student-favorite-row-v2 {
+  display: grid;
+  grid-template-columns: 50px minmax(0, 1fr) minmax(120px, 0.28fr) auto;
+  gap: 14px;
+  align-items: center;
+  padding: 14px 16px;
+  border-bottom: 1px solid #edf2f8;
+}
+
+.student-favorite-row-v2:last-child {
+  border-bottom: 0;
+}
+
+.student-favorite-row-v2:hover {
+  background: #fbfdff;
+}
+
+.student-favorite-icon-v2 {
+  width: 46px;
+  height: 46px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 15px;
+  font-size: 20px;
+}
+
+.student-favorite-icon-v2.is-blue {
+  background: #eaf3ff;
+  color: #1f67d2;
+}
+
+.student-favorite-icon-v2.is-green {
+  background: #e9f8f0;
+  color: #20875a;
+}
+
+.student-favorite-icon-v2.is-orange {
+  background: #fff3e2;
+  color: #be760d;
+}
+
+.student-favorite-icon-v2.is-purple {
+  background: #f2edff;
+  color: #7657d8;
+}
+
+.student-favorite-main-v2 {
+  min-width: 0;
+}
+
+.student-favorite-title-line-v2 {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+}
+
+.student-favorite-title-line-v2 h3 {
+  margin: 0;
+  overflow: hidden;
+  color: #172536;
+  font-size: 16px;
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.student-favorite-main-v2 p {
+  margin: 5px 0 7px;
+  color: #52667f;
+  font-size: 13px;
+  line-height: 1.25;
+}
+
+.student-favorite-tags-v2 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.student-favorite-tags-v2 span {
+  min-height: 24px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 9px;
+  border: 1px solid #cfe2fa;
+  border-radius: 999px;
+  background: #f4f8ff;
+  color: #1f67d2;
+  font-size: 11.5px;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.student-favorite-status-v2 {
+  min-height: 24px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 9px;
+  border: 1px solid #d7e6f8;
+  border-radius: 999px;
+  background: #f7fbff;
+  color: #52667f;
+  font-size: 11.5px;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.student-favorite-status-v2.is-success {
+  border-color: rgba(27, 156, 98, 0.22);
+  background: rgba(27, 156, 98, 0.09);
+  color: #24724c;
+}
+
+.student-favorite-status-v2.is-muted {
+  background: #f3f7fc;
+  color: #60738d;
+}
+
+.student-favorite-meta-v2 {
+  display: grid;
+  justify-items: start;
+}
+
+.student-favorite-meta-v2 span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #52667f;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.student-favorite-meta-v2 i {
+  color: #1f67d2;
+}
+
+.student-favorite-actions-v2 {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.student-favorite-actions-v2 form {
+  margin: 0;
+}
+
+.student-favorite-open-btn-v2 {
+  min-height: 38px;
+  padding: 0 16px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.student-favorite-remove-btn-v2 {
+  width: 38px;
+  height: 38px;
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid #9fc7ff;
+  border-radius: 12px;
+  background: #f4f9ff;
+  color: #174d9c;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.student-favorite-remove-btn-v2:hover {
+  border-color: #f0c8c8;
+  background: #fff7f7;
+  color: #b84e4e;
+}
+
+.student-favorites-empty-v2 {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  padding: 46px 24px;
+  border: 1px solid #d9e7f8;
+  border-radius: 26px;
+  background: #ffffff;
+  text-align: center;
+  box-shadow: 0 12px 28px rgba(25, 66, 120, 0.055);
+}
+
+.student-favorites-empty-icon-v2 {
+  width: 64px;
+  height: 64px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 22px;
+  background: #eaf3ff;
+  color: #1f67d2;
+  font-size: 26px;
+}
+
+.student-favorites-empty-v2 h2 {
+  margin: 0;
+  color: #172536;
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.student-favorites-empty-v2 p {
+  max-width: 520px;
+  margin: 0;
+  color: #667891;
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+.student-favorites-empty-actions-v2 {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 6px;
+}
+
+.student-favorites-mini-empty-v2 {
+  padding: 24px;
+  text-align: center;
+}
+
+.student-favorites-mini-empty-v2 p {
+  margin: 0 0 10px;
+  color: #667891;
+}
+
+.student-favorites-mini-empty-v2 a {
+  color: #1f67d2;
+  font-weight: 650;
+  text-decoration: none;
+}
+
+@media (max-width: 1180px) {
+  .student-favorite-row-v2 {
+    grid-template-columns: 50px minmax(0, 1fr) auto;
+  }
+
+  .student-favorite-meta-v2 {
+    display: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .student-favorites-section-v2 {
+    padding: 18px;
+  }
+
+  .student-favorites-section-head-v2 {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .student-favorite-row-v2 {
+    grid-template-columns: 1fr;
+  }
+
+  .student-favorite-icon-v2 {
+    width: 44px;
+    height: 44px;
+  }
+
+  .student-favorite-actions-v2 {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+} 
+/* === Favorites hero: compact + unique decorative layout === */
+
+.student-favorites-hero-v2 {
+  position: relative;
+  min-height: 210px !important;
+  padding: 46px 52px !important;
+  overflow: hidden;
+  border-radius: 28px !important;
+}
+
+.student-favorites-hero-content-v2 {
+  position: relative;
+  z-index: 2;
+  max-width: 720px;
+}
+
+.student-favorites-hero-v2 h1 {
+  margin: 14px 0 10px !important;
+  font-size: clamp(42px, 4.6vw, 64px) !important;
+  line-height: 0.95 !important;
+  font-weight: 720 !important;
+  letter-spacing: -0.055em !important;
+}
+
+.student-favorites-hero-v2 p {
+  margin: 0 !important;
+  color: #5f728c !important;
+  font-size: 18px !important;
+  line-height: 1.45 !important;
+}
+
+/* сам арт-блок */
+.student-favorites-hero-art-v2 {
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 1 !important;
+  pointer-events: none !important;
+}
+
+/* Кружочки именно для Избранного — другое расположение */
+.student-favorites-hero-art-v2 .vacancies-decor-circle-one {
+  width: 130px !important;
+  height: 130px !important;
+  right: 128px !important;
+  top: 58px !important;
+  opacity: 0.42 !important;
+}
+
+.student-favorites-hero-art-v2 .vacancies-decor-circle-two {
+  width: 54px !important;
+  height: 54px !important;
+  right: 272px !important;
+  top: 86px !important;
+  border-width: 10px !important;
+  opacity: 0.55 !important;
+}
+
+.student-favorites-hero-art-v2 .vacancies-decor-circle-three {
+  width: 36px !important;
+  height: 36px !important;
+  right: 364px !important;
+  top: 138px !important;
+  opacity: 0.32 !important;
+}
+
+/* Звёздочки для Избранного */
+.student-favorites-hero-art-v2 .vacancies-decor-star-one {
+  right: 336px !important;
+  top: 70px !important;
+  font-size: 23px !important;
+  color: #7fb0ff !important;
+  opacity: 0.9 !important;
+}
+
+.student-favorites-hero-art-v2 .vacancies-decor-star-two {
+  right: 84px !important;
+  top: 52px !important;
+  font-size: 18px !important;
+  color: #8bb8ff !important;
+  opacity: 0.9 !important;
+}
+
+.student-favorites-hero-art-v2 .vacancies-decor-star-three {
+  right: 198px !important;
+  bottom: 58px !important;
+  font-size: 17px !important;
+  color: #7fb0ff !important;
+  opacity: 0.85 !important;
+}
+
+.student-favorites-hero-art-v2 .vacancies-decor-star-four {
+  position: absolute;
+  right: 92px;
+  bottom: 82px;
+  color: #8bb8ff;
+  font-size: 28px;
+  line-height: 1;
+  opacity: 0.85;
+}
+
+/* Точки для Избранного */
+.student-favorites-hero-art-v2 .vacancies-decor-dot-one {
+  width: 10px !important;
+  height: 10px !important;
+  right: 442px !important;
+  top: 128px !important;
+  opacity: 0.65 !important;
+}
+
+.student-favorites-hero-art-v2 .vacancies-decor-dot-two {
+  width: 9px !important;
+  height: 9px !important;
+  right: 144px !important;
+  bottom: 80px !important;
+  opacity: 0.55 !important;
+}
+
+/* чтобы старые абсолютные позиции не ломали */
+.student-favorites-hero-art-v2 .vacancies-decor-circle,
+.student-favorites-hero-art-v2 .vacancies-decor-star,
+.student-favorites-hero-art-v2 .vacancies-decor-dot {
+  position: absolute !important;
+}
+
+/* мобильная адаптация */
+@media (max-width: 900px) {
+  .student-favorites-hero-v2 {
+    min-height: 190px !important;
+    padding: 34px 28px !important;
+  }
+
+  .student-favorites-hero-v2 h1 {
+    font-size: 42px !important;
+  }
+
+  .student-favorites-hero-v2 p {
+    font-size: 16px !important;
+  }
+
+  .student-favorites-hero-art-v2 {
+    opacity: 0.65;
+  }
+
+  .student-favorites-hero-art-v2 .vacancies-decor-circle-one {
+    right: -24px !important;
+    top: 54px !important;
+  }
+
+  .student-favorites-hero-art-v2 .vacancies-decor-circle-two {
+    right: 86px !important;
+    top: 42px !important;
+  }
+
+  .student-favorites-hero-art-v2 .vacancies-decor-circle-three,
+  .student-favorites-hero-art-v2 .vacancies-decor-dot-one,
+  .student-favorites-hero-art-v2 .vacancies-decor-dot-two {
+    display: none !important;
+  }
+}
+/* === FINAL FIX: public compact resume header === */
+
+.public-resume-page-v4.resume-template-compact .public-resume-hero-v4 {
+  display: grid !important;
+  grid-template-columns: 140px minmax(0, 1fr) !important;
+  grid-template-areas:
+    "photo person"
+    "about about" !important;
+  align-items: center !important;
+  gap: 20px 28px !important;
+
+  width: 100% !important;
+  max-width: 1120px !important;
+  min-height: 0 !important;
+  margin: 0 auto 28px !important;
+  padding: 30px 34px !important;
+
+  position: relative !important;
+  overflow: hidden !important;
+  border-radius: 24px !important;
+}
+
+/* фото строго слева */
+.public-resume-page-v4.resume-template-compact .public-resume-photo-v4,
+.public-resume-page-v4.resume-template-compact .public-resume-avatar-v4 {
+  grid-area: photo !important;
+
+  width: 124px !important;
+  height: 124px !important;
+  min-width: 124px !important;
+  min-height: 124px !important;
+  max-width: 124px !important;
+  max-height: 124px !important;
+
+  display: block !important;
+  position: static !important;
+  transform: none !important;
+  margin: 0 !important;
+
+  border-radius: 22px !important;
+  object-fit: cover !important;
+}
+
+/* текст строго справа от фото */
+.public-resume-page-v4.resume-template-compact .public-resume-person-v4 {
+  grid-area: person !important;
+
+  display: block !important;
+  position: static !important;
+  transform: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  min-width: 0 !important;
+  max-width: 720px !important;
+}
+
+/* ФИО */
+.public-resume-page-v4.resume-template-compact .public-resume-person-v4 h1 {
+  display: block !important;
+  position: static !important;
+  transform: none !important;
+
+  margin: 0 0 8px !important;
+  padding: 0 !important;
+
+  max-width: 680px !important;
+  color: #172536 !important;
+  font-size: 34px !important;
+  line-height: 1.02 !important;
+  font-weight: 720 !important;
+  letter-spacing: -0.04em !important;
+}
+
+/* должность */
+.public-resume-page-v4.resume-template-compact .public-resume-position-v4 {
+  display: block !important;
+  position: static !important;
+
+  margin: 0 0 10px !important;
+  color: #1e66d0 !important;
+  font-size: 15px !important;
+  line-height: 1.35 !important;
+  font-weight: 650 !important;
+}
+
+/* контакты */
+.public-resume-page-v4.resume-template-compact .public-resume-contacts-v4 {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  gap: 6px 12px !important;
+
+  position: static !important;
+  transform: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+
+  color: #52667f !important;
+  font-size: 14px !important;
+  line-height: 1.35 !important;
+}
+
+.public-resume-page-v4.resume-template-compact .public-resume-contacts-v4 span {
+  display: inline-flex !important;
+  align-items: center !important;
+  margin: 0 !important;
+  white-space: nowrap !important;
+}
+
+/* блок "о себе" — отдельной строкой снизу, не поверх hero */
+.public-resume-page-v4.resume-template-compact .public-resume-about-v4 {
+  grid-area: about !important;
+
+  display: block !important;
+  position: static !important;
+  transform: none !important;
+
+  margin: 2px 0 0 !important;
+  padding: 14px 16px !important;
+
+  border: 1px solid #dce8f6 !important;
+  border-radius: 16px !important;
+  background: #fbfdff !important;
+}
+
+.public-resume-page-v4.resume-template-compact .public-resume-about-v4 p {
+  margin: 0 !important;
+  color: #52667f !important;
+  font-size: 14px !important;
+  line-height: 1.45 !important;
+}
+
+/* если фото скрыто */
+.public-resume-page-v4.resume-template-compact .public-resume-hero-no-photo {
+  grid-template-columns: 1fr !important;
+  grid-template-areas:
+    "person"
+    "about" !important;
+}
+
+/* нижняя часть */
+.public-resume-page-v4.resume-template-compact .public-resume-sheet-v4 {
+  max-width: 1120px !important;
+  margin: 0 auto !important;
+  gap: 18px !important;
+}
+
+.public-resume-page-v4.resume-template-compact .public-resume-block-v4 {
+  padding: 20px 22px !important;
+  border-radius: 20px !important;
+}
+
+.public-resume-page-v4.resume-template-compact .public-resume-block-v4 h2 {
+  margin: 0 0 14px !important;
+  font-size: 18px !important;
+  line-height: 1.2 !important;
+}
+
+.public-resume-page-v4.resume-template-compact .public-resume-entry-v4 h3 {
+  font-size: 16px !important;
+  line-height: 1.3 !important;
+}
+
+.public-resume-page-v4.resume-template-compact .public-resume-entry-v4 p,
+.public-resume-page-v4.resume-template-compact .public-resume-info-v4 p,
+.public-resume-page-v4.resume-template-compact .public-resume-muted-v4 {
+  font-size: 14px !important;
+  line-height: 1.45 !important;
+}
+
+/* мелкий шрифт для компактного */
+.public-resume-page-v4.resume-template-compact.resume-font-small .public-resume-person-v4 h1 {
+  font-size: 30px !important;
+}
+
+.public-resume-page-v4.resume-template-compact.resume-font-small .public-resume-position-v4,
+.public-resume-page-v4.resume-template-compact.resume-font-small .public-resume-contacts-v4,
+.public-resume-page-v4.resume-template-compact.resume-font-small .public-resume-about-v4 p,
+.public-resume-page-v4.resume-template-compact.resume-font-small .public-resume-entry-v4 p,
+.public-resume-page-v4.resume-template-compact.resume-font-small .public-resume-info-v4 p,
+.public-resume-page-v4.resume-template-compact.resume-font-small .public-resume-muted-v4 {
+  font-size: 13px !important;
+}
+
+.public-resume-page-v4.resume-template-compact.resume-font-small .public-resume-block-v4 h2 {
+  font-size: 16px !important;
+}
+
+/* крупный шрифт для компактного */
+.public-resume-page-v4.resume-template-compact.resume-font-large .public-resume-person-v4 h1 {
+  font-size: 38px !important;
+}
+
+.public-resume-page-v4.resume-template-compact.resume-font-large .public-resume-position-v4,
+.public-resume-page-v4.resume-template-compact.resume-font-large .public-resume-contacts-v4,
+.public-resume-page-v4.resume-template-compact.resume-font-large .public-resume-about-v4 p,
+.public-resume-page-v4.resume-template-compact.resume-font-large .public-resume-entry-v4 p,
+.public-resume-page-v4.resume-template-compact.resume-font-large .public-resume-info-v4 p,
+.public-resume-page-v4.resume-template-compact.resume-font-large .public-resume-muted-v4 {
+  font-size: 15.5px !important;
+}
+
+.public-resume-page-v4.resume-template-compact.resume-font-large .public-resume-block-v4 h2 {
+  font-size: 20px !important;
+}
+
+/* мобильная версия */
+@media (max-width: 760px) {
+  .public-resume-page-v4.resume-template-compact .public-resume-hero-v4 {
+    grid-template-columns: 1fr !important;
+    grid-template-areas:
+      "photo"
+      "person"
+      "about" !important;
+
+    padding: 24px !important;
+    justify-items: start !important;
+  }
+
+  .public-resume-page-v4.resume-template-compact .public-resume-photo-v4,
+  .public-resume-page-v4.resume-template-compact .public-resume-avatar-v4 {
+    width: 104px !important;
+    height: 104px !important;
+    min-width: 104px !important;
+    min-height: 104px !important;
+  }
+
+  .public-resume-page-v4.resume-template-compact .public-resume-person-v4 h1 {
+    font-size: 30px !important;
+  }
+}cd

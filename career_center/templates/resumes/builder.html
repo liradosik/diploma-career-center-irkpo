@@ -187,9 +187,10 @@
 
             <p class="resume-contacts-v2">
               {{ request.user.full_name|default:'ФИО не указано' }}
-              · {{ request.user.email }}
-              · {{ profile.phone|default:'телефон не указан' }}
-              · {{ profile.city|default:'город не указан' }}
+              {{ request.user.email }}
+              {% if profile.phone %} · {{ profile.phone }}{% endif %}
+              {% if profile.city %} · {{ profile.city }}{% endif %}
+              {% if profile.contact_link %} · {{ profile.contact_link }}{% endif %}
             </p>
           </header>
 
@@ -200,7 +201,12 @@
 
           <section class="resume-block-v2" data-section="contacts">
             <h3>Контактная информация</h3>
-            <p>{{ request.user.email }} · {{ profile.phone|default:'—' }} · {{ profile.city|default:'—' }}</p>
+            <p>
+              {{ request.user.email }}
+              {% if profile.phone %} · {{ profile.phone }}{% endif %}
+              {% if profile.city %} · {{ profile.city }}{% endif %}
+              {% if profile.contact_link %} · {{ profile.contact_link }}{% endif %}
+            </p>
           </section>
 
           <section class="resume-block-v2" data-section="education">

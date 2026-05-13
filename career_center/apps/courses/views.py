@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.core.paginator import Paginator
 from django.core.exceptions import ValidationError
 from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, redirect, render
@@ -19,41 +20,78 @@ def _redirect_back(request, fallback_name, **kwargs):
 @role_required(User.Role.STUDENT)
 def course_list(request):
     courses = Course.objects.filter(status=Course.Status.ACTIVE).annotate(
-        occupied_places_count=Count('registrations', filter=Q(registrations__status=CourseRegistration.Status.REGISTERED))
+        occupied_places_count=Count(
+            'registrations',
+            filter=Q(registrations__status=CourseRegistration.Status.REGISTERED),
+        )
     ).order_by('date')
+
     q = (request.GET.get('q') or '').strip()
     kind_filter = (request.GET.get('kind') or '').strip()
     format_filter = (request.GET.get('format') or '').strip()
     registration_filter = (request.GET.get('reg_status') or '').strip()
+
     if q:
-        courses = courses.filter(Q(title__icontains=q) | Q(description__icontains=q) | Q(organization__icontains=q))
+        courses = courses.filter(
+            Q(title__icontains=q)
+            | Q(description__icontains=q)
+            | Q(organization__icontains=q)
+        )
+
     if kind_filter:
         courses = courses.filter(kind=kind_filter)
+
     if format_filter:
         courses = courses.filter(format_type=format_filter)
+
     registrations = CourseRegistration.objects.filter(student=request.user).select_related('course')
     registration_map = {r.course_id: r for r in registrations}
+
     favorite_course_ids = set(
         StudentFavoriteCourse.objects.filter(student=request.user).values_list('course_id', flat=True)
     )
+
     filtered_courses = []
+
     for course in courses:
         reg = registration_map.get(course.id)
         occupied = course.occupied_places_count
         available = course.format_type == Course.Format.ONLINE or occupied < course.places
-        if registration_filter == 'registered' and not (reg and reg.status == CourseRegistration.Status.REGISTERED):
+
+        if registration_filter == 'registered' and not (
+            reg and reg.status == CourseRegistration.Status.REGISTERED
+        ):
             continue
-        if registration_filter == 'cancelled' and not (reg and reg.status == CourseRegistration.Status.CANCELLED):
+
+        if registration_filter == 'cancelled' and not (
+            reg and reg.status == CourseRegistration.Status.CANCELLED
+        ):
             continue
+
         if registration_filter == 'open' and not available:
             continue
+
         if registration_filter == 'full' and available:
             continue
+
         course.occupied_places_count = occupied
         course.available_places_count = max(course.places - occupied, 0)
         filtered_courses.append(course)
+
+    paginator = Paginator(filtered_courses, 12)
+    page_obj = paginator.get_page(request.GET.get('page'))
+
+    query_params = request.GET.copy()
+    query_params.pop('page', None)
+    querystring = query_params.urlencode()
+
     return render(request, 'courses/list.html', {
-        'courses': filtered_courses,
+        'courses': page_obj.object_list,
+        'page_obj': page_obj,
+        'querystring': querystring,
+        'page_start': page_obj.start_index() if page_obj.paginator.count else 0,
+        'page_end': page_obj.end_index() if page_obj.paginator.count else 0,
+
         'registration_map': registration_map,
         'kind_filter': kind_filter,
         'format_filter': format_filter,
