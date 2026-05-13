@@ -24,10 +24,8 @@
     <div class="status-summary-row"><span>Вакансии</span><strong>{{ vacancy_events_total }}</strong><em>событий</em></div>
   </div>
   <div class="admin-actions-grid" style="margin-top:12px;">
-    <a class="btn" href="{% url 'courses:list' %}">Подробнее по курсам</a>
-    <a class="btn" href="{% url 'vacancies:list' %}">Подробнее по вакансиям</a>
-    <a class="btn btn-link" href="{% url 'accounts:curator_students' %}">Мои студенты</a>
-    <a class="btn btn-link" href="{% url 'portfolio:review_queue' %}">Проверка портфолио</a>
+    <a class="btn" href="{% url 'accounts:curator_course_registrations' %}">Подробнее по курсам</a>
+    <a class="btn" href="{% url 'accounts:curator_vacancy_responses' %}">Подробнее по вакансиям</a>
   </div>
 </section>
 

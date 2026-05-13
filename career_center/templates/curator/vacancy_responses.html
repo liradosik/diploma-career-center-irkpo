@@ -1,0 +1,23 @@
+{% extends 'base_dashboard.html' %}
+{% block title %}Отклики студентов{% endblock %}
+{% block content %}
+<section class="hero"><div class="hero-kicker">Куратор</div><h1>Отклики студентов на вакансии</h1><p>Только студенты ваших групп.</p></section>
+<section class="section admin-metrics-grid">
+  <article class="metric-card"><div class="metric-label">Всего откликов</div><div class="metric-value">{{ responses_count }}</div></article>
+  <article class="metric-card"><div class="metric-label">Студентов откликались</div><div class="metric-value">{{ students_count }}</div></article>
+  <article class="metric-card"><div class="metric-label">Вакансий с откликами</div><div class="metric-value">{{ vacancies_count }}</div></article>
+</section>
+<section class="section card">
+  <form method="get" class="filters-grid admin-filter-grid" style="margin-bottom:12px;">
+    <input type="text" name="q" value="{{ q }}" placeholder="Поиск по студенту">
+    <input type="text" name="vacancy" value="{{ vacancy_q }}" placeholder="Вакансия">
+    <select name="group"><option value="">Все группы</option>{% for g in groups %}<option value="{{ g }}" {% if g == group_q %}selected{% endif %}>{{ g }}</option>{% endfor %}</select>
+    <button class="btn" type="submit">Применить</button>
+  </form>
+  <div class="table-wrap"><table class="table"><thead><tr><th>Студент</th><th>Группа</th><th>Вакансия</th><th>Компания</th><th>Дата отклика</th><th>Ссылки</th></tr></thead><tbody>
+    {% for response, resume_public_url in rows %}
+      <tr><td>{{ response.student.full_name }}</td><td>{{ response.student.study_group.name|default:response.student.group|default:'—' }}</td><td>{{ response.vacancy.title }}</td><td>{{ response.vacancy.company }}</td><td>{{ response.created_at|date:'d.m.Y H:i' }}</td><td><a href="{% url 'vacancies:detail' response.vacancy.id %}">Вакансия</a>{% if resume_public_url %} · <a href="{{ resume_public_url }}" target="_blank" rel="noopener">Публичное резюме</a>{% endif %}</td></tr>
+    {% empty %}<tr><td colspan="6">Данных пока нет.</td></tr>{% endfor %}
+  </tbody></table></div>
+</section>
+{% endblock %}

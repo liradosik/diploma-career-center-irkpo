@@ -355,6 +355,84 @@ def curator_activity(request):
 
 
 @role_required(User.Role.CURATOR)
+def curator_course_registrations(request):
+    students = curator_students_queryset(request.user, include_graduates=True)
+    student_ids = students.values_list('id', flat=True)
+    registrations = CourseRegistration.objects.filter(student_id__in=student_ids).select_related('student', 'student__study_group', 'course').order_by('-created_at')
+
+    q = request.GET.get('q', '').strip()
+    course_q = request.GET.get('course', '').strip()
+    group_q = request.GET.get('group', '').strip()
+    status_q = request.GET.get('status', 'all').strip()
+
+    if q:
+        registrations = registrations.filter(student__full_name__icontains=q)
+    if course_q:
+        registrations = registrations.filter(course__title__icontains=course_q)
+    if group_q:
+        registrations = registrations.filter(Q(student__study_group__name=group_q) | Q(student__group__icontains=group_q))
+    if status_q in {CourseRegistration.Status.REGISTERED, CourseRegistration.Status.CANCELLED}:
+        registrations = registrations.filter(status=status_q)
+    else:
+        status_q = 'all'
+
+    base_regs = CourseRegistration.objects.filter(student_id__in=student_ids)
+    context = {
+        'registrations': registrations[:200],
+        'q': q,
+        'course_q': course_q,
+        'group_q': group_q,
+        'status_q': status_q,
+        'groups': students.exclude(study_group__isnull=True).values_list('study_group__name', flat=True).distinct().order_by('study_group__name'),
+        'active_count': base_regs.filter(status=CourseRegistration.Status.REGISTERED).count(),
+        'cancelled_count': base_regs.filter(status=CourseRegistration.Status.CANCELLED).count(),
+        'courses_count': base_regs.values('course_id').distinct().count(),
+        'students_count': base_regs.values('student_id').distinct().count(),
+    }
+    return render(request, 'curator/course_registrations.html', context)
+
+
+@role_required(User.Role.CURATOR)
+def curator_vacancy_responses(request):
+    students = curator_students_queryset(request.user, include_graduates=True)
+    student_ids = students.values_list('id', flat=True)
+    responses = VacancyResponse.objects.filter(student_id__in=student_ids).select_related('student', 'student__study_group', 'vacancy').order_by('-created_at')
+
+    q = request.GET.get('q', '').strip()
+    vacancy_q = request.GET.get('vacancy', '').strip()
+    group_q = request.GET.get('group', '').strip()
+
+    if q:
+        responses = responses.filter(student__full_name__icontains=q)
+    if vacancy_q:
+        responses = responses.filter(vacancy__title__icontains=vacancy_q)
+    if group_q:
+        responses = responses.filter(Q(student__study_group__name=group_q) | Q(student__group__icontains=group_q))
+
+    rows = []
+    for response in responses[:200]:
+        profile = getattr(response.student, 'student_profile', None)
+        resume = getattr(response.student, 'resume_settings', None)
+        resume_public_url = ''
+        if profile and resume and resume.is_public:
+            resume_public_url = request.build_absolute_uri(f"/resumes/public/{profile.public_resume_token}/")
+        rows.append((response, resume_public_url))
+
+    base_resp = VacancyResponse.objects.filter(student_id__in=student_ids)
+    context = {
+        'rows': rows,
+        'q': q,
+        'vacancy_q': vacancy_q,
+        'group_q': group_q,
+        'groups': students.exclude(study_group__isnull=True).values_list('study_group__name', flat=True).distinct().order_by('study_group__name'),
+        'responses_count': base_resp.count(),
+        'students_count': base_resp.values('student_id').distinct().count(),
+        'vacancies_count': base_resp.values('vacancy_id').distinct().count(),
+    }
+    return render(request, 'curator/vacancy_responses.html', context)
+
+
+@role_required(User.Role.CURATOR)
 def curator_students(request):
     include_graduates = request.GET.get('include_graduates') == '1'
     students = (
