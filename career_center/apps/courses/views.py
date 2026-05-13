@@ -6,7 +6,14 @@ from django.shortcuts import get_object_or_404, redirect, render
 from apps.accounts.decorators import role_required
 from apps.accounts.models import ActivityLog, User
 
-from .models import Course, CourseRegistration
+from .models import Course, CourseRegistration, StudentFavoriteCourse
+
+
+def _redirect_back(request, fallback_name, **kwargs):
+    next_url = request.POST.get('next')
+    if next_url:
+        return redirect(next_url)
+    return redirect(fallback_name, **kwargs)
 
 
 @role_required(User.Role.STUDENT)
@@ -26,6 +33,9 @@ def course_list(request):
         courses = courses.filter(format_type=format_filter)
     registrations = CourseRegistration.objects.filter(student=request.user).select_related('course')
     registration_map = {r.course_id: r for r in registrations}
+    favorite_course_ids = set(
+        StudentFavoriteCourse.objects.filter(student=request.user).values_list('course_id', flat=True)
+    )
     filtered_courses = []
     for course in courses:
         reg = registration_map.get(course.id)
@@ -50,6 +60,7 @@ def course_list(request):
         'registration_filter': registration_filter,
         'KIND_CHOICES': Course.Kind.choices,
         'FORMAT_CHOICES': Course.Format.choices,
+        'favorite_course_ids': favorite_course_ids,
     })
 
 
@@ -62,6 +73,10 @@ def course_detail(request, pk):
     registration = None
     if request.user.role == User.Role.STUDENT:
         registration = CourseRegistration.objects.filter(student=request.user, course=course).first()
+    is_favorite = request.user.role == User.Role.STUDENT and StudentFavoriteCourse.objects.filter(
+        student=request.user,
+        course=course,
+    ).exists()
 
     registrations_qs = CourseRegistration.objects.filter(course=course).select_related('student', 'student__study_group')
     registered_count = registrations_qs.filter(status=CourseRegistration.Status.REGISTERED).count()
@@ -96,19 +111,22 @@ def course_detail(request, pk):
         'active_registrations_count': registered_count,
         'cancelled_registrations_count': cancelled_count,
         'free_places_count': max(course.places - registered_count, 0),
+        'is_favorite': is_favorite,
     })
 
 
 @role_required(User.Role.STUDENT)
 def register_course(request, pk):
+    if request.method != 'POST':
+        return redirect('courses:detail', pk=pk)
     course = get_object_or_404(Course, pk=pk, status=Course.Status.ACTIVE)
     if CourseRegistration.objects.filter(student=request.user, course=course, status=CourseRegistration.Status.REGISTERED).exists():
         messages.info(request, 'Вы уже записаны на это событие.')
-        return redirect('courses:detail', pk=pk)
+        return _redirect_back(request, 'courses:detail', pk=pk)
 
     if course.format_type == Course.Format.OFFLINE and not course.has_available_places:
         messages.error(request, 'На очный курс больше нет мест.')
-        return redirect('courses:detail', pk=pk)
+        return _redirect_back(request, 'courses:detail', pk=pk)
 
     registration, _ = CourseRegistration.objects.get_or_create(student=request.user, course=course)
     registration.status = CourseRegistration.Status.REGISTERED
@@ -126,7 +144,7 @@ def register_course(request, pk):
             related_object_id=course.id,
         )
         messages.success(request, 'Вы записаны на событие.')
-    return redirect('courses:detail', pk=pk)
+    return _redirect_back(request, 'courses:detail', pk=pk)
 
 
 @role_required(User.Role.STUDENT)
@@ -144,4 +162,14 @@ def cancel_registration(request, pk):
             related_object_id=registration.course_id,
         )
         messages.success(request, 'Запись на событие отменена.')
-    return redirect('courses:detail', pk=registration.course_id)
+    return _redirect_back(request, 'courses:detail', pk=registration.course_id)
+
+
+@role_required(User.Role.STUDENT)
+def toggle_favorite_course(request, pk):
+    course = get_object_or_404(Course, pk=pk, status=Course.Status.ACTIVE)
+    if request.method == 'POST':
+        favorite, created = StudentFavoriteCourse.objects.get_or_create(student=request.user, course=course)
+        if not created:
+            favorite.delete()
+    return _redirect_back(request, 'courses:detail', pk=pk)

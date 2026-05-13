@@ -149,9 +149,7 @@
         </div>
 
         <aside class="student-vacancy-side-v2">
-          <button class="student-vacancy-save-btn" type="button" title="Сохранить вакансию">
-            <i class="bi bi-bookmark"></i>
-          </button>
+          <form method="post" action="{% url 'vacancies:toggle_favorite' v.pk %}">{% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}"><button class="student-vacancy-save-btn" type="submit" title="Избранное">{% if v.id in favorite_vacancy_ids %}<i class="bi bi-bookmark-check-fill"></i>{% else %}<i class="bi bi-bookmark"></i>{% endif %}</button></form>
 
           <div class="student-vacancy-side-meta">
             <p>

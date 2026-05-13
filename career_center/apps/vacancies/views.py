@@ -5,7 +5,14 @@ from django.shortcuts import get_object_or_404, redirect, render
 from apps.accounts.decorators import role_required
 from apps.accounts.models import ActivityLog, User
 
-from .models import Vacancy, VacancyResponse
+from .models import StudentFavoriteVacancy, Vacancy, VacancyResponse
+
+
+def _redirect_back(request, fallback_name, **kwargs):
+    next_url = request.POST.get('next')
+    if next_url:
+        return redirect(next_url)
+    return redirect(fallback_name, **kwargs)
 
 
 @role_required(User.Role.STUDENT)
@@ -39,6 +46,9 @@ def vacancy_list(request):
     responded_vacancy_ids = set(
         VacancyResponse.objects.filter(student=request.user).values_list('vacancy_id', flat=True)
     )
+    favorite_vacancy_ids = set(
+        StudentFavoriteVacancy.objects.filter(student=request.user).values_list('vacancy_id', flat=True)
+    )
 
     return render(request, 'vacancies/list.html', {
         'vacancies': vacancies.order_by('-created_at'),
@@ -50,6 +60,7 @@ def vacancy_list(request):
         'employment_options': active_vacancies.values_list('employment_type', flat=True).distinct().order_by('employment_type'),
         'direction_options': active_vacancies.values_list('direction', flat=True).distinct().order_by('direction'),
         'responded_vacancy_ids': responded_vacancy_ids,
+        'favorite_vacancy_ids': favorite_vacancy_ids,
     })
 
 
@@ -66,11 +77,14 @@ def vacancy_detail(request, pk):
         'resume_public_url': resume_public_url,
         'resume_pdf_url': f'{resume_public_url}?download=pdf' if resume_public_url else '',
         'just_responded': request.GET.get('responded') == '1',
+        'is_favorite': StudentFavoriteVacancy.objects.filter(student=request.user, vacancy=vacancy).exists(),
     })
 
 
 @role_required(User.Role.STUDENT)
 def respond(request, pk):
+    if request.method != 'POST':
+        return redirect('vacancies:detail', pk=pk)
     vacancy = get_object_or_404(Vacancy, pk=pk, status=Vacancy.Status.ACTIVE)
     profile = getattr(request.user, 'student_profile', None)
     resume = getattr(request.user, 'resume_settings', None)
@@ -90,3 +104,13 @@ def respond(request, pk):
         return redirect(f"{redirect('vacancies:detail', pk=pk).url}?responded=1")
     messages.info(request, 'Вы уже откликнулись на эту вакансию.')
     return redirect('vacancies:detail', pk=pk)
+
+
+@role_required(User.Role.STUDENT)
+def toggle_favorite(request, pk):
+    vacancy = get_object_or_404(Vacancy, pk=pk, status=Vacancy.Status.ACTIVE)
+    if request.method == 'POST':
+        favorite, created = StudentFavoriteVacancy.objects.get_or_create(student=request.user, vacancy=vacancy)
+        if not created:
+            favorite.delete()
+    return _redirect_back(request, 'vacancies:detail', pk=pk)

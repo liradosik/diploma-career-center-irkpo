@@ -1,0 +1,15 @@
+{% extends 'base_dashboard.html' %}
+{% block title %}Избранное{% endblock %}
+{% block content %}
+<div class="student-favorites-page">
+  <section class="hero"><h1>Избранное</h1><p>Сохранённые вакансии и курсы.</p></section>
+  {% if not favorite_vacancies and not favorite_courses %}
+    <section class="card favorite-card"><p>Вы пока ничего не добавили в избранное.</p><a class="btn" href="{% url 'vacancies:list' %}">Перейти к вакансиям</a> <a class="btn" href="{% url 'courses:list' %}">Перейти к курсам</a></section>
+  {% else %}
+  <div class="favorites-grid">
+    <section class="card favorite-card"><h2>Избранные вакансии</h2>{% for f in favorite_vacancies %}<div class="favorite-item"><strong>{{ f.vacancy.title }}</strong> — {{ f.vacancy.company }} · {{ f.vacancy.format_type }} · {{ f.vacancy.employment_type }}<div><a class="btn" href="{% url 'vacancies:detail' f.vacancy_id %}">Открыть</a><form method="post" action="{% url 'vacancies:toggle_favorite' f.vacancy_id %}" style="display:inline">{% csrf_token %}<button class="btn favorite-toggle" type="submit">Убрать из избранного</button></form></div></div>{% empty %}<p>Нет избранных вакансий.</p>{% endfor %}</section>
+    <section class="card favorite-card"><h2>Избранные курсы</h2>{% for f in favorite_courses %}<div class="favorite-item"><strong>{{ f.course.title }}</strong> — {{ f.course.get_format_type_display }} · {{ f.course.get_kind_display }} · {{ f.course.date|date:"d.m.Y" }}<div><a class="btn" href="{% url 'courses:detail' f.course_id %}">Открыть</a><form method="post" action="{% url 'courses:toggle_favorite' f.course_id %}" style="display:inline">{% csrf_token %}<button class="btn favorite-toggle" type="submit">Убрать из избранного</button></form></div></div>{% empty %}<p>Нет избранных курсов.</p>{% endfor %}</section>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

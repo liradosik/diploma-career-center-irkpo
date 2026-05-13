@@ -18794,3 +18794,4 @@ html {
     align-items: stretch;
   }
 }
+.student-favorites-page .favorites-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.student-favorites-page .favorite-card{padding:20px}.student-favorites-page .favorite-item{padding:12px;border:1px solid #e4ecf8;border-radius:12px;margin:8px 0}.favorite-toggle{border-color:#b9d2f3;color:#2f5c9d}

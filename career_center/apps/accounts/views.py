@@ -20,9 +20,9 @@ from django.utils import timezone
 from django.urls import reverse
 from django.views.decorators.http import require_GET
 
-from apps.courses.models import Course, CourseRegistration
+from apps.courses.models import Course, CourseRegistration, StudentFavoriteCourse
 from apps.portfolio.models import PortfolioEntry
-from apps.vacancies.models import Vacancy, VacancyResponse
+from apps.vacancies.models import StudentFavoriteVacancy, Vacancy, VacancyResponse
 
 from .decorators import role_required
 from .forms import (
@@ -256,6 +256,26 @@ def student_support_tickets(request):
             messages.success(request, 'Обращение отправлено в техподдержку.')
             return redirect('accounts:student_support_tickets')
     return render(request, 'support/student_tickets.html', {'tickets': tickets, 'form': form, 'support_title': 'Техподдержка'})
+
+
+@role_required(User.Role.STUDENT)
+def student_favorites(request):
+    favorite_vacancies = (
+        StudentFavoriteVacancy.objects
+        .filter(student=request.user)
+        .select_related('vacancy')
+        .order_by('-created_at')
+    )
+    favorite_courses = (
+        StudentFavoriteCourse.objects
+        .filter(student=request.user)
+        .select_related('course')
+        .order_by('-created_at')
+    )
+    return render(request, 'accounts/student_favorites.html', {
+        'favorite_vacancies': favorite_vacancies,
+        'favorite_courses': favorite_courses,
+    })
 
 
 @role_required(User.Role.CURATOR)

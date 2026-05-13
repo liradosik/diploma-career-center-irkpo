@@ -66,6 +66,7 @@
           </form>
         {% endif %}
       </div>
+      <form method="post" action="{% url 'courses:toggle_favorite' course.id %}">{% csrf_token %}<button class="btn favorite-toggle" type="submit">{% if is_favorite %}Убрать из избранного{% else %}В избранное{% endif %}</button></form>
       {% endif %}
     </div>
 
