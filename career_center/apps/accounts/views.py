@@ -9,6 +9,7 @@ from openpyxl.styles import Font
 from openpyxl.utils import get_column_letter
 
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView, LogoutView
 from django.core.files.base import ContentFile
 from django.core.paginator import Paginator
@@ -256,6 +257,105 @@ def student_support_tickets(request):
             messages.success(request, 'Обращение отправлено в техподдержку.')
             return redirect('accounts:student_support_tickets')
     return render(request, 'support/student_tickets.html', {'tickets': tickets, 'form': form, 'support_title': 'Техподдержка'})
+
+
+
+@login_required
+def support_knowledge(request):
+    knowledge_categories = [
+        {
+            'name': 'Вход и аккаунт',
+            'icon': 'bi-person-lock',
+            'items': [
+                {
+                    'question': 'Не получается войти в аккаунт',
+                    'answer': 'Проверьте email и пароль. Если пароль не подходит или аккаунт не найден, создайте обращение в техподдержку.',
+                    'icon': 'bi-box-arrow-in-right',
+                },
+                {
+                    'question': 'Я забыл пароль',
+                    'answer': 'Обратитесь в техподдержку и укажите ФИО, группу и email, который использовался для входа.',
+                    'icon': 'bi-key',
+                },
+                {
+                    'question': 'В данных профиля ошибка',
+                    'answer': 'Студент может изменить контакты и описание, но группа, специальность и учебный статус редактируются администрацией.',
+                    'icon': 'bi-exclamation-diamond',
+                },
+            ],
+        },
+        {'name': 'Профиль', 'icon': 'bi-person-vcard', 'items': []},
+        {'name': 'Портфолио', 'icon': 'bi-collection', 'items': [
+            {
+                'question': 'Почему работа не отображается в резюме?',
+                'answer': 'В резюме попадают только подтверждённые записи портфолио.',
+                'icon': 'bi-journal-check',
+            },
+            {
+                'question': 'Что значит статус «Ожидает проверки»?',
+                'answer': 'Запись отправлена куратору. После проверки она будет подтверждена или отклонена.',
+                'icon': 'bi-hourglass-split',
+            },
+            {
+                'question': 'Можно ли прикреплять файлы?',
+                'answer': 'Да, к работе портфолио можно прикрепить файл или ссылку, если это предусмотрено формой.',
+                'icon': 'bi-paperclip',
+            },
+        ]},
+        {'name': 'Резюме', 'icon': 'bi-file-earmark-person', 'items': [
+            {
+                'question': 'Как открыть публичное резюме?',
+                'answer': 'В конструкторе включите публичное резюме, сохраните настройки и нажмите «Открыть публичное резюме».',
+                'icon': 'bi-globe2',
+            },
+            {
+                'question': 'Почему публичное резюме недоступно?',
+                'answer': 'Проверьте, включён ли публичный доступ в конструкторе резюме.',
+                'icon': 'bi-eye-slash',
+            },
+            {
+                'question': 'Почему PDF выглядит не так?',
+                'answer': 'Сначала выберите стиль резюме, нажмите «Сохранить», затем скачайте PDF.',
+                'icon': 'bi-filetype-pdf',
+            },
+        ]},
+        {'name': 'Курсы', 'icon': 'bi-mortarboard', 'items': [
+            {
+                'question': 'Как записаться на курс?',
+                'answer': 'Откройте раздел «Курсы и семинары» и нажмите кнопку записи на подходящем курсе.',
+                'icon': 'bi-bookmark-plus',
+            },
+            {
+                'question': 'Можно ли отменить запись?',
+                'answer': 'Да, если вы уже записаны, в карточке курса появится кнопка отмены.',
+                'icon': 'bi-bookmark-dash',
+            },
+            {
+                'question': 'Почему нет кнопки записи?',
+                'answer': 'Курс может быть скрыт, архивирован, недоступен или на очном курсе закончились места.',
+                'icon': 'bi-slash-circle',
+            },
+        ]},
+        {'name': 'Вакансии', 'icon': 'bi-briefcase', 'items': [
+            {
+                'question': 'Как откликнуться на вакансию?',
+                'answer': 'Откройте раздел «Вакансии», выберите предложение и нажмите «Откликнуться».',
+                'icon': 'bi-send-check',
+            },
+            {
+                'question': 'Можно ли сохранить вакансию?',
+                'answer': 'Да, нажмите на значок закладки. Сохранённые вакансии находятся в разделе «Избранное».',
+                'icon': 'bi-bookmark-heart',
+            },
+            {
+                'question': 'Где посмотреть избранное?',
+                'answer': 'В левом меню студента есть раздел «Избранное».',
+                'icon': 'bi-stars',
+            },
+        ]},
+    ]
+
+    return render(request, 'accounts/support_knowledge.html', {'knowledge_categories': knowledge_categories})
 
 
 @role_required(User.Role.STUDENT)
