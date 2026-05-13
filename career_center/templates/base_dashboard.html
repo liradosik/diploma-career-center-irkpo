@@ -177,16 +177,6 @@
               <span>Активность студентов</span>
             </a>
 
-            <a class="{% if request.resolver_match.url_name == 'admin_responses' %}active{% endif %}" href="{% url 'accounts:admin_responses' %}">
-              <span class="menu-icon"><i class="bi bi-send"></i></span>
-              <span>Отклики</span>
-            </a>
-
-            <a class="{% if request.resolver_match.url_name == 'admin_course_registrations' %}active{% endif %}" href="{% url 'accounts:admin_course_registrations' %}">
-              <span class="menu-icon"><i class="bi bi-calendar-check"></i></span>
-              <span>Записи на курсы</span>
-            </a>
-
             <a class="{% if request.resolver_match.url_name == 'admin_support_tickets' or request.resolver_match.url_name == 'admin_support_ticket_detail' %}active{% endif %}" href="{% url 'accounts:admin_support_tickets' %}">
               <span class="menu-icon"><i class="bi bi-chat-dots"></i></span>
               <span>Обращения</span>

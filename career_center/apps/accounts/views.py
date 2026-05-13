@@ -576,18 +576,91 @@ def admin_dashboard(request):
 
 @role_required(User.Role.ADMIN)
 def admin_activity(request):
+    registrations_registered_total = CourseRegistration.objects.filter(
+        status=CourseRegistration.Status.REGISTERED
+    ).count()
+    registrations_cancelled_total = CourseRegistration.objects.filter(
+        status=CourseRegistration.Status.CANCELLED
+    ).count()
+    responses_total = VacancyResponse.objects.count()
+
+    activity_portfolio_total = ActivityLog.objects.filter(event_type__startswith='portfolio_').count()
+    activity_courses_total = ActivityLog.objects.filter(
+        event_type=ActivityLog.EventType.COURSE_REGISTERED
+    ).count()
+    activity_vacancies_total = ActivityLog.objects.filter(
+        event_type=ActivityLog.EventType.VACANCY_APPLIED
+    ).count()
+
+    activity_total = activity_courses_total + activity_vacancies_total + activity_portfolio_total
+
+    def percent(value):
+        if not activity_total:
+            return 0
+        return round((value / activity_total) * 100, 1)
+
+    activity_counts = {
+        'Курсы': activity_courses_total,
+        'Вакансии': activity_vacancies_total,
+        'Портфолио': activity_portfolio_total,
+    }
+    main_activity_label = max(activity_counts, key=activity_counts.get) if activity_total else 'пока нет данных'
+
+    top_courses_raw = list(
+        CourseRegistration.objects
+        .filter(status=CourseRegistration.Status.REGISTERED)
+        .values(title=F('course__title'))
+        .annotate(total=Count('id'))
+        .order_by('-total', 'title')[:5]
+    )
+    max_course_total = max([item['total'] for item in top_courses_raw], default=0)
+    top_courses = [
+        {
+            'title': item['title'] or 'Без названия',
+            'total': item['total'],
+            'percent': round((item['total'] / max_course_total) * 100, 1) if max_course_total else 0,
+        }
+        for item in top_courses_raw
+    ]
+
+    top_vacancies_raw = list(
+        VacancyResponse.objects
+        .values(title=F('vacancy__title'))
+        .annotate(total=Count('id'))
+        .order_by('-total', 'title')[:5]
+    )
+    max_vacancy_total = max([item['total'] for item in top_vacancies_raw], default=0)
+    top_vacancies = [
+        {
+            'title': item['title'] or 'Без названия',
+            'total': item['total'],
+            'percent': round((item['total'] / max_vacancy_total) * 100, 1) if max_vacancy_total else 0,
+        }
+        for item in top_vacancies_raw
+    ]
+
     context = {
-        'registrations_registered_total': CourseRegistration.objects.filter(status=CourseRegistration.Status.REGISTERED).count(),
-        'registrations_cancelled_total': CourseRegistration.objects.filter(status=CourseRegistration.Status.CANCELLED).count(),
-        'responses_total': VacancyResponse.objects.count(),
+        'registrations_registered_total': registrations_registered_total,
+        'registrations_cancelled_total': registrations_cancelled_total,
+        'responses_total': responses_total,
         'courses_active': Course.objects.filter(status=Course.Status.ACTIVE).count(),
         'vacancies_active': Vacancy.objects.filter(status=Vacancy.Status.ACTIVE).count(),
-        'activity_portfolio_total': ActivityLog.objects.filter(event_type__startswith='portfolio_').count(),
-        'activity_courses_total': ActivityLog.objects.filter(
-            event_type__in=[ActivityLog.EventType.COURSE_REGISTERED, ActivityLog.EventType.COURSE_CANCELLED]
-        ).count(),
-        'activity_vacancies_total': ActivityLog.objects.filter(event_type=ActivityLog.EventType.VACANCY_APPLIED).count(),
-        'latest_activity': ActivityLog.objects.select_related('student').order_by('-created_at')[:20],
+
+        'activity_total': activity_total,
+        'activity_portfolio_total': activity_portfolio_total,
+        'activity_courses_total': activity_courses_total,
+        'activity_vacancies_total': activity_vacancies_total,
+        'activity_portfolio_percent': percent(activity_portfolio_total),
+        'activity_courses_percent': percent(activity_courses_total),
+        'activity_vacancies_percent': percent(activity_vacancies_total),
+
+        'main_activity_label': main_activity_label,
+        'top_courses': top_courses,
+        'top_vacancies': top_vacancies,
+        'top_course_title': top_courses[0]['title'] if top_courses else 'пока нет записей',
+        'top_vacancy_title': top_vacancies[0]['title'] if top_vacancies else 'пока нет откликов',
+
+        'latest_activity': ActivityLog.objects.select_related('student').order_by('-created_at')[:8],
     }
     return render(request, 'adminpanel/activity.html', context)
 

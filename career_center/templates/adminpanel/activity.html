@@ -2,45 +2,195 @@
 {% block title %}Активность студентов{% endblock %}
 
 {% block content %}
-<section class="hero">
-  <div class="hero-kicker">Администрирование</div>
-  <h1>Активность студентов</h1>
-  <p>Общая статистика по всем студентам: курсы, вакансии и последние действия.</p>
-</section>
+<div class="admin-activity-page-v3">
+  <section class="hero activity-v3-hero">
+    <div>
+      <div class="hero-kicker">Администрирование</div>
+      <h1>Активность студентов</h1>
+      <p>Аналитика по записям на курсы, откликам на вакансии и общей динамике действий студентов.</p>
+    </div>
+  </section>
 
-<section class="section admin-metrics-grid">
-  <article class="metric-card"><div class="metric-label">Активные записи на курсы</div><div class="metric-value">{{ registrations_registered_total }}</div></article>
-  <article class="metric-card"><div class="metric-label">Отменённые записи</div><div class="metric-value">{{ registrations_cancelled_total }}</div></article>
-  <article class="metric-card"><div class="metric-label">Отклики на вакансии</div><div class="metric-value">{{ responses_total }}</div></article>
-  <article class="metric-card"><div class="metric-label">Активные курсы / вакансии</div><div class="metric-value">{{ courses_active }} / {{ vacancies_active }}</div></article>
-</section>
+  <section class="activity-v3-kpi-grid">
+    <article class="activity-v3-kpi-card">
+      <span class="activity-v3-icon"><i class="bi bi-book"></i></span>
+      <div>
+        <strong>{{ registrations_registered_total }}</strong>
+        <h3>Записи на курсы</h3>
+        <p>Активные записи студентов</p>
+      </div>
+    </article>
 
-<section class="section card">
-  <h2>Активность по типам</h2>
-  <div class="status-summary">
-    <div class="status-summary-row"><span>Портфолио</span><strong>{{ activity_portfolio_total }}</strong><em>событий</em></div>
-    <div class="status-summary-row"><span>Курсы</span><strong>{{ activity_courses_total }}</strong><em>событий</em></div>
-    <div class="status-summary-row"><span>Вакансии</span><strong>{{ activity_vacancies_total }}</strong><em>событий</em></div>
-  </div>
-  <div class="admin-actions-grid" style="margin-top:12px;">
-    <a class="btn" href="{% url 'accounts:admin_course_registrations' %}">Подробнее по курсам</a>
-    <a class="btn" href="{% url 'accounts:admin_responses' %}">Подробнее по вакансиям</a>
-    <a class="btn btn-link" href="{% url 'accounts:admin_courses' %}">Открыть курсы</a>
-    <a class="btn btn-link" href="{% url 'accounts:admin_vacancies' %}">Открыть вакансии</a>
-  </div>
-</section>
+    <article class="activity-v3-kpi-card">
+      <span class="activity-v3-icon"><i class="bi bi-send"></i></span>
+      <div>
+        <strong>{{ responses_total }}</strong>
+        <h3>Отклики на вакансии</h3>
+        <p>Всего отправленных откликов</p>
+      </div>
+    </article>
 
-<section class="section card curator-activity-page">
-  <h2>Последние действия студентов</h2>
-  <div class="curator-activity-list">
-    {% for event in latest_activity %}
-      <article class="curator-activity-item">
-        <div class="curator-avatar-small">{{ event.student.full_name|default:event.student.email|slice:":1"|upper }}</div>
-        <div class="curator-activity-body"><div class="curator-activity-topline"><h3>{{ event.student.full_name }}</h3><span class="curator-activity-time">{{ event.created_at|date:'d.m.Y H:i' }}</span></div><p class="curator-activity-meta">Группа: {{ event.student.study_group.name|default:event.student.group|default:'—' }}</p><p class="curator-activity-title">{{ event.title }}</p></div>
-      </article>
-    {% empty %}
-      <p class="muted">Пока нет данных по действиям студентов.</p>
-    {% endfor %}
-  </div>
-</section>
+    <article class="activity-v3-kpi-card">
+      <span class="activity-v3-icon"><i class="bi bi-mortarboard"></i></span>
+      <div>
+        <strong>{{ courses_active }}</strong>
+        <h3>Активные курсы</h3>
+        <p>Доступны студентам</p>
+      </div>
+    </article>
+
+    <article class="activity-v3-kpi-card">
+      <span class="activity-v3-icon"><i class="bi bi-briefcase"></i></span>
+      <div>
+        <strong>{{ vacancies_active }}</strong>
+        <h3>Активные вакансии</h3>
+        <p>Отображаются в разделе</p>
+      </div>
+    </article>
+  </section>
+
+  <section class="activity-v3-main-grid">
+    <article class="activity-v3-card activity-v3-structure-card">
+      <div class="activity-v3-card-head">
+        <h2>Структура активности</h2>
+        <p>Полезные действия студентов без учёта отменённых записей.</p>
+      </div>
+
+      <div class="activity-v3-donut-layout">
+        <div
+          class="activity-v3-donut"
+          style="--courses: {{ activity_courses_percent }}%; --vacancies: {{ activity_vacancies_percent }}%;"
+          aria-label="Структура активности студентов"
+        >
+          <div>
+            <strong>{{ activity_total }}</strong>
+            <span>всего</span>
+          </div>
+        </div>
+
+        <div class="activity-v3-legend">
+          <div>
+            <span class="activity-v3-dot is-courses"></span>
+            <p>Курсы</p>
+            <strong>{{ activity_courses_total }}</strong>
+          </div>
+
+          <div>
+            <span class="activity-v3-dot is-vacancies"></span>
+            <p>Вакансии</p>
+            <strong>{{ activity_vacancies_total }}</strong>
+          </div>
+
+          <div>
+            <span class="activity-v3-dot is-portfolio"></span>
+            <p>Портфолио</p>
+            <strong>{{ activity_portfolio_total }}</strong>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="activity-v3-card activity-v3-rank-card">
+      <div class="activity-v3-card-head">
+        <h2>Популярные курсы</h2>
+        <p>Куда студенты записываются чаще всего.</p>
+      </div>
+
+      <div class="activity-v3-rank-list">
+        {% for course in top_courses %}
+          <div class="activity-v3-rank-row">
+            <span>{{ forloop.counter }}</span>
+            <div>
+              <strong>{{ course.title|default:'Без названия' }}</strong>
+              <div class="activity-v3-bar">
+                <i style="width: {{ course.percent }}%;"></i>
+              </div>
+            </div>
+            <em>{{ course.total }}</em>
+          </div>
+        {% empty %}
+          <p class="activity-v3-empty">Пока нет записей на курсы.</p>
+        {% endfor %}
+      </div>
+    </article>
+
+    <article class="activity-v3-card activity-v3-rank-card">
+      <div class="activity-v3-card-head">
+        <h2>Популярные вакансии</h2>
+        <p>На какие вакансии студенты откликаются чаще.</p>
+      </div>
+
+      <div class="activity-v3-rank-list">
+        {% for vacancy in top_vacancies %}
+          <div class="activity-v3-rank-row">
+            <span>{{ forloop.counter }}</span>
+            <div>
+              <strong>{{ vacancy.title|default:'Без названия' }}</strong>
+              <div class="activity-v3-bar">
+                <i style="width: {{ vacancy.percent }}%;"></i>
+              </div>
+            </div>
+            <em>{{ vacancy.total }}</em>
+          </div>
+        {% empty %}
+          <p class="activity-v3-empty">Пока нет откликов на вакансии.</p>
+        {% endfor %}
+      </div>
+    </article>
+  </section>
+
+  <section class="activity-v3-card activity-v3-insights-card">
+    <div class="activity-v3-card-head">
+      <h2>Ключевые выводы</h2>
+      <p>Краткая интерпретация текущей активности.</p>
+    </div>
+
+    <div class="activity-v3-insights">
+      <div>
+        <span class="activity-v3-icon activity-v3-icon-small"><i class="bi bi-graph-up-arrow"></i></span>
+        <p>Основной тип активности сейчас: <strong>{{ main_activity_label }}</strong>.</p>
+      </div>
+
+      <div>
+        <span class="activity-v3-icon activity-v3-icon-small"><i class="bi bi-mortarboard"></i></span>
+        <p>Самый востребованный курс: <strong>{{ top_course_title }}</strong>.</p>
+      </div>
+
+      <div>
+        <span class="activity-v3-icon activity-v3-icon-small"><i class="bi bi-briefcase"></i></span>
+        <p>Самая заметная вакансия: <strong>{{ top_vacancy_title }}</strong>.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="activity-v3-card activity-v3-actions-card">
+    <div class="activity-v3-card-head">
+      <h2>Подробные разделы</h2>
+      <p>Откройте таблицы для проверки записей и откликов.</p>
+    </div>
+
+    <div class="activity-v3-action-list">
+      <a class="activity-v3-action" href="{% url 'accounts:admin_course_registrations' %}">
+        <span class="activity-v3-icon activity-v3-icon-small"><i class="bi bi-calendar-check"></i></span>
+        <div>
+          <strong>Подробнее по курсам</strong>
+          <p>Список студентов, курсов и статусов записей.</p>
+        </div>
+      </a>
+
+      <a class="activity-v3-action" href="{% url 'accounts:admin_responses' %}">
+        <span class="activity-v3-icon activity-v3-icon-small"><i class="bi bi-send"></i></span>
+        <div>
+          <strong>Подробнее по вакансиям</strong>
+          <p>Отклики студентов и переходы к резюме.</p>
+        </div>
+      </a>
+    </div>
+
+    <div class="activity-v3-bottom-actions">
+      <a class="btn btn-link" href="{% url 'accounts:admin_courses' %}">Открыть курсы</a>
+      <a class="btn btn-link" href="{% url 'accounts:admin_vacancies' %}">Открыть вакансии</a>
+    </div>
+  </section>
+</div>
 {% endblock %}
