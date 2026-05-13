@@ -1,0 +1,58 @@
+{% extends 'base_dashboard.html' %}
+
+{% block title %}База знаний{% endblock %}
+
+{% block content %}
+<section class="support-knowledge-page-v3 knowledge-page-v3">
+  <section class="knowledge-hero-v3">
+    <div class="knowledge-hero-content-v3">
+      <div class="knowledge-kicker-v3">Техподдержка</div>
+      <h1>База знаний</h1>
+      <p>Ответы на частые вопросы по работе с платформой.</p>
+    </div>
+
+    <div class="knowledge-hero-decor-v3" aria-hidden="true">
+      <span class="knowledge-circle-v3 knowledge-circle-one-v3"></span>
+      <span class="knowledge-circle-v3 knowledge-circle-two-v3"></span>
+      <span class="knowledge-star-v3 knowledge-star-one-v3">✦</span>
+      <span class="knowledge-star-v3 knowledge-star-two-v3">✧</span>
+      <span class="knowledge-dot-v3 knowledge-dot-one-v3"></span>
+      <span class="knowledge-dot-v3 knowledge-dot-two-v3"></span>
+    </div>
+  </section>
+
+  <section class="knowledge-categories-v3">
+    {% for category in knowledge_categories %}
+      <article class="knowledge-category-chip-v3">
+        <i class="bi {{ category.icon }}"></i>
+        <span>{{ category.name }}</span>
+      </article>
+    {% endfor %}
+  </section>
+
+  <section class="knowledge-faq-grid-v3">
+    {% for category in knowledge_categories %}
+      {% for item in category.items %}
+        <article class="knowledge-faq-card-v3">
+          <div class="knowledge-faq-top-v3">
+            <span class="knowledge-faq-icon-v3"><i class="bi {{ item.icon }}"></i></span>
+            <span class="knowledge-faq-category-v3">{{ category.name }}</span>
+          </div>
+          <h3>{{ item.question }}</h3>
+          <p>{{ item.answer }}</p>
+        </article>
+      {% endfor %}
+    {% endfor %}
+  </section>
+
+  <section class="knowledge-cta-v3">
+    <div>
+      <h2>Не нашли ответ?</h2>
+      <p>Создайте обращение, и администратор поможет разобраться.</p>
+    </div>
+    <a class="btn btn-primary" href="{% url 'accounts:student_support_tickets' %}">
+      Написать в техподдержку
+    </a>
+  </section>
+</section>
+{% endblock %}
