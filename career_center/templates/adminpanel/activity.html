@@ -9,6 +9,16 @@
       <h1>Активность студентов</h1>
       <p>Аналитика по записям на курсы, откликам на вакансии и общей динамике действий студентов.</p>
     </div>
+    <div class="activity-v3-period-filter">
+      {% for period_key, period_item in period_options.items %}
+        <a
+          class="{% if selected_period == period_key %}is-active{% endif %}"
+          href="{% url 'accounts:admin_activity' %}?period={{ period_key }}"
+        >
+          {{ period_item.label }}
+        </a>
+      {% endfor %}
+    </div>
   </section>
 
   <section class="activity-v3-kpi-grid">
@@ -17,7 +27,10 @@
       <div>
         <strong>{{ registrations_registered_total }}</strong>
         <h3>Записи на курсы</h3>
-        <p>Активные записи студентов</p>
+        <p class="activity-v3-trend is-{{ registrations_trend_direction }}">
+          {% if registrations_trend_direction == 'up' %}↑{% elif registrations_trend_direction == 'down' %}↓{% else %}→{% endif %}
+          {{ registrations_trend_percent }}% к предыдущему периоду
+        </p>
       </div>
     </article>
 
@@ -26,7 +39,10 @@
       <div>
         <strong>{{ responses_total }}</strong>
         <h3>Отклики на вакансии</h3>
-        <p>Всего отправленных откликов</p>
+        <p class="activity-v3-trend is-{{ responses_trend_direction }}">
+          {% if responses_trend_direction == 'up' %}↑{% elif responses_trend_direction == 'down' %}↓{% else %}→{% endif %}
+          {{ responses_trend_percent }}% к предыдущему периоду
+        </p>
       </div>
     </article>
 
@@ -59,7 +75,7 @@
       <div class="activity-v3-donut-layout">
         <div
           class="activity-v3-donut"
-          style="--courses: {{ activity_courses_percent }}%; --vacancies: {{ activity_vacancies_percent }}%;"
+          style="--courses: {{ activity_courses_percent }}; --vacancies: {{ activity_vacancies_percent }}; --portfolio: {{ activity_portfolio_percent }};"
           aria-label="Структура активности студентов"
         >
           <div>
@@ -185,11 +201,6 @@
           <p>Отклики студентов и переходы к резюме.</p>
         </div>
       </a>
-    </div>
-
-    <div class="activity-v3-bottom-actions">
-      <a class="btn btn-link" href="{% url 'accounts:admin_courses' %}">Открыть курсы</a>
-      <a class="btn btn-link" href="{% url 'accounts:admin_vacancies' %}">Открыть вакансии</a>
     </div>
   </section>
 </div>
