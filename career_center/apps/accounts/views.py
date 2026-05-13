@@ -497,6 +497,24 @@ def admin_dashboard(request):
 
 
 @role_required(User.Role.ADMIN)
+def admin_activity(request):
+    context = {
+        'registrations_registered_total': CourseRegistration.objects.filter(status=CourseRegistration.Status.REGISTERED).count(),
+        'registrations_cancelled_total': CourseRegistration.objects.filter(status=CourseRegistration.Status.CANCELLED).count(),
+        'responses_total': VacancyResponse.objects.count(),
+        'courses_active': Course.objects.filter(status=Course.Status.ACTIVE).count(),
+        'vacancies_active': Vacancy.objects.filter(status=Vacancy.Status.ACTIVE).count(),
+        'activity_portfolio_total': ActivityLog.objects.filter(event_type__startswith='portfolio_').count(),
+        'activity_courses_total': ActivityLog.objects.filter(
+            event_type__in=[ActivityLog.EventType.COURSE_REGISTERED, ActivityLog.EventType.COURSE_CANCELLED]
+        ).count(),
+        'activity_vacancies_total': ActivityLog.objects.filter(event_type=ActivityLog.EventType.VACANCY_APPLIED).count(),
+        'latest_activity': ActivityLog.objects.select_related('student').order_by('-created_at')[:20],
+    }
+    return render(request, 'adminpanel/activity.html', context)
+
+
+@role_required(User.Role.ADMIN)
 def admin_students(request):
     form = AdminStudentCreateForm()
     if request.method == 'POST':

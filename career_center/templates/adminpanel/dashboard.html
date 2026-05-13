@@ -156,31 +156,8 @@
     <div class="section-heading section-heading-simple">
       <h2>Активность студентов</h2>
     </div>
-    <div class="admin-metrics-grid">
-      <article class="metric-card"><div class="metric-label">Записи на курсы</div><div class="metric-value">{{ registrations_registered_total }}</div></article>
-      <article class="metric-card"><div class="metric-label">Отменённые записи</div><div class="metric-value">{{ registrations_cancelled_total }}</div></article>
-      <article class="metric-card"><div class="metric-label">Отклики на вакансии</div><div class="metric-value">{{ responses_total }}</div></article>
-      <article class="metric-card"><div class="metric-label">Активные вакансии</div><div class="metric-value">{{ vacancies_active }}</div></article>
-    </div>
-    <div class="status-summary" style="margin-top: 14px;">
-      <div class="status-summary-row"><span>Портфолио</span><strong>{{ activity_portfolio_total }}</strong><em>событий</em></div>
-      <div class="status-summary-row"><span>Курсы</span><strong>{{ activity_courses_total }}</strong><em>событий</em></div>
-      <div class="status-summary-row"><span>Вакансии</span><strong>{{ activity_vacancies_total }}</strong><em>событий</em></div>
-    </div>
-    <div class="admin-actions-grid" style="margin-top:12px;">
-      <a class="btn" href="{% url 'accounts:admin_course_registrations' %}">Подробнее по курсам</a>
-      <a class="btn" href="{% url 'accounts:admin_responses' %}">Подробнее по вакансиям</a>
-      <a class="btn btn-link" href="{% url 'accounts:admin_courses' %}">Открыть курсы</a>
-      <a class="btn btn-link" href="{% url 'accounts:admin_vacancies' %}">Открыть вакансии</a>
-    </div>
-    <div class="curator-activity-list" style="margin-top:12px;">
-      {% for event in latest_activity %}
-      <article class="curator-activity-item">
-        <div class="curator-avatar-small">{{ event.student.full_name|default:event.student.email|slice:":1"|upper }}</div>
-        <div class="curator-activity-body"><div class="curator-activity-topline"><h3>{{ event.student.full_name }}</h3><span class="curator-activity-time">{{ event.created_at|date:'d.m.Y H:i' }}</span></div><p class="curator-activity-title">{{ event.title }}</p></div>
-      </article>
-      {% empty %}<p class="muted">Пока нет данных по действиям студентов.</p>{% endfor %}
-    </div>
+    <p class="muted">Подробная статистика по записям на курсы, откликам и последним действиям вынесена в отдельный раздел.</p>
+    <a class="btn" href="{% url 'accounts:admin_activity' %}">Открыть страницу активности</a>
   </section>
 
   <section class="dashboard-section attention-card attention-card-clean">

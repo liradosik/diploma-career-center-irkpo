@@ -172,7 +172,7 @@
           <div class="menu-section">
             <div class="menu-group-title">Активность</div>
 
-            <a class="{% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}" href="{% url 'accounts:admin_dashboard' %}">
+            <a class="{% if request.resolver_match.url_name == 'admin_activity' %}active{% endif %}" href="{% url 'accounts:admin_activity' %}">
               <span class="menu-icon"><i class="bi bi-activity"></i></span>
               <span>Активность студентов</span>
             </a>
