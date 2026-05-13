@@ -4,22 +4,28 @@
 {% block content %}
 <div class="admin-activity-page-v3">
   <section class="hero activity-v3-hero">
-    <div>
-      <div class="hero-kicker">Администрирование</div>
-      <h1>Активность студентов</h1>
-      <p>Аналитика по записям на курсы, откликам на вакансии и общей динамике действий студентов.</p>
+  <div class="activity-v3-hero-text">
+    <div class="hero-kicker">Администрирование</div>
+    <h1>Активность студентов</h1>
+    <p>Аналитика по записям на курсы, откликам на вакансии и общей динамике действий студентов.</p>
+  </div>
+
+  <form class="activity-v3-period-mini" method="get">
+    <div class="activity-v3-period-mini-wrap">
+      <i class="bi bi-calendar3"></i>
+
+      <select name="period" aria-label="Период активности" onchange="this.form.submit()">
+        {% for period_key, period_item in period_options.items %}
+          <option value="{{ period_key }}" {% if selected_period == period_key %}selected{% endif %}>
+            {{ period_item.label }}
+          </option>
+        {% endfor %}
+      </select>
+
+      <i class="bi bi-chevron-down"></i>
     </div>
-    <div class="activity-v3-period-filter">
-      {% for period_key, period_item in period_options.items %}
-        <a
-          class="{% if selected_period == period_key %}is-active{% endif %}"
-          href="{% url 'accounts:admin_activity' %}?period={{ period_key }}"
-        >
-          {{ period_item.label }}
-        </a>
-      {% endfor %}
-    </div>
-  </section>
+  </form>
+</section>
 
   <section class="activity-v3-kpi-grid">
     <article class="activity-v3-kpi-card">

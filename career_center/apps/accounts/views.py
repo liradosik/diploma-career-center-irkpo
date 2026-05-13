@@ -320,36 +320,188 @@ def curator_dashboard(request):
 
 @role_required(User.Role.CURATOR)
 def curator_activity(request):
+    period_options = {
+        '30d': {'label': 'За последние 30 дней', 'days': 30},
+        '6m': {'label': 'За последние 6 месяцев', 'days': 182},
+        '1y': {'label': 'За последний год', 'days': 365},
+    }
+    selected_period = request.GET.get('period', '30d')
+    if selected_period not in period_options:
+        selected_period = '30d'
+
+    period_days = period_options[selected_period]['days']
+    now = timezone.now()
+    period_start = now - timedelta(days=period_days)
+    prev_period_start = period_start - timedelta(days=period_days)
+
     students = curator_students_queryset(request.user)
     student_ids = students.values_list('id', flat=True)
-    activity_base = ActivityLog.objects.filter(student_id__in=student_ids).select_related('student')
-    registrations = CourseRegistration.objects.filter(student_id__in=student_ids)
-    responses = VacancyResponse.objects.filter(student_id__in=student_ids)
 
-    kind = request.GET.get('kind', 'all')
-    activity = activity_base
-    if kind == 'portfolio':
-        activity = activity.filter(event_type__startswith='portfolio_')
-    elif kind == 'courses':
-        activity = activity.filter(event_type__in=[ActivityLog.EventType.COURSE_REGISTERED, ActivityLog.EventType.COURSE_CANCELLED])
-    elif kind == 'vacancies':
-        activity = activity.filter(event_type=ActivityLog.EventType.VACANCY_APPLIED)
-    elif kind == 'pending':
-        activity = activity.filter(event_type=ActivityLog.EventType.PORTFOLIO_PENDING)
-    else:
-        kind = 'all'
+    current_registrations = CourseRegistration.objects.filter(
+        student_id__in=student_ids,
+        status=CourseRegistration.Status.REGISTERED,
+        created_at__gte=period_start,
+        created_at__lt=now,
+    )
+    current_responses = VacancyResponse.objects.filter(
+        student_id__in=student_ids,
+        created_at__gte=period_start,
+        created_at__lt=now,
+    )
+    current_portfolio = PortfolioEntry.objects.filter(
+        student_id__in=student_ids,
+        created_at__gte=period_start,
+        created_at__lt=now,
+    )
+
+    prev_registrations = CourseRegistration.objects.filter(
+        student_id__in=student_ids,
+        status=CourseRegistration.Status.REGISTERED,
+        created_at__gte=prev_period_start,
+        created_at__lt=period_start,
+    )
+    prev_responses = VacancyResponse.objects.filter(
+        student_id__in=student_ids,
+        created_at__gte=prev_period_start,
+        created_at__lt=period_start,
+    )
+    prev_portfolio = PortfolioEntry.objects.filter(
+        student_id__in=student_ids,
+        created_at__gte=prev_period_start,
+        created_at__lt=period_start,
+    )
+
+    registrations_total = current_registrations.count()
+    responses_total = current_responses.count()
+    portfolio_total = current_portfolio.count()
+
+    active_student_ids = set(current_registrations.values_list('student_id', flat=True))
+    active_student_ids.update(current_responses.values_list('student_id', flat=True))
+    active_student_ids.update(current_portfolio.values_list('student_id', flat=True))
+    active_students_total = len(active_student_ids)
+
+    prev_active_student_ids = set(prev_registrations.values_list('student_id', flat=True))
+    prev_active_student_ids.update(prev_responses.values_list('student_id', flat=True))
+    prev_active_student_ids.update(prev_portfolio.values_list('student_id', flat=True))
+    prev_active_students_total = len(prev_active_student_ids)
+
+    def calculate_trend(current, previous):
+        if previous == 0:
+            if current == 0:
+                return 0, 'same'
+            return 100, 'up'
+
+        trend_percent = int(round(((current - previous) / previous) * 100))
+        if trend_percent > 0:
+            return trend_percent, 'up'
+        if trend_percent < 0:
+            return abs(trend_percent), 'down'
+        return 0, 'same'
+
+    registrations_trend_percent, registrations_trend_direction = calculate_trend(
+        registrations_total,
+        prev_registrations.count(),
+    )
+    responses_trend_percent, responses_trend_direction = calculate_trend(
+        responses_total,
+        prev_responses.count(),
+    )
+    portfolio_trend_percent, portfolio_trend_direction = calculate_trend(
+        portfolio_total,
+        prev_portfolio.count(),
+    )
+    active_students_trend_percent, active_students_trend_direction = calculate_trend(
+        active_students_total,
+        prev_active_students_total,
+    )
+
+    activity_total = registrations_total + responses_total + portfolio_total
+
+    def percent(value):
+        if not activity_total:
+            return 0
+        return int(round((value / activity_total) * 100))
+
+    activity_courses_percent = percent(registrations_total)
+    activity_vacancies_percent = percent(responses_total)
+    activity_portfolio_percent = percent(portfolio_total)
+
+    activity_counts = {
+        'Курсы': registrations_total,
+        'Вакансии': responses_total,
+        'Портфолио': portfolio_total,
+    }
+    main_activity_label = max(activity_counts, key=activity_counts.get) if activity_total else 'пока нет данных'
+
+    top_courses_raw = list(
+        current_registrations
+        .values(title=F('course__title'))
+        .annotate(total=Count('id'))
+        .order_by('-total', 'title')[:5]
+    )
+    max_course_total = max([item['total'] for item in top_courses_raw], default=0)
+    top_courses = [
+        {
+            'title': item['title'] or 'Без названия',
+            'total': item['total'],
+            'percent': round((item['total'] / max_course_total) * 100, 1) if max_course_total else 0,
+        }
+        for item in top_courses_raw
+    ]
+
+    top_vacancies_raw = list(
+        current_responses
+        .values(title=F('vacancy__title'))
+        .annotate(total=Count('id'))
+        .order_by('-total', 'title')[:5]
+    )
+    max_vacancy_total = max([item['total'] for item in top_vacancies_raw], default=0)
+    top_vacancies = [
+        {
+            'title': item['title'] or 'Без названия',
+            'total': item['total'],
+            'percent': round((item['total'] / max_vacancy_total) * 100, 1) if max_vacancy_total else 0,
+        }
+        for item in top_vacancies_raw
+    ]
+
+    pending_portfolio_total = PortfolioEntry.objects.filter(
+        student_id__in=student_ids,
+        status=PortfolioEntry.Status.PENDING,
+    ).count()
 
     context = {
-        'activity': activity[:80],
-        'kind': kind,
-        'students_total': students.count(),
-        'course_registered_total': registrations.filter(status=CourseRegistration.Status.REGISTERED).count(),
-        'course_cancelled_total': registrations.filter(status=CourseRegistration.Status.CANCELLED).count(),
-        'vacancy_responses_total': responses.count(),
-        'portfolio_events_total': activity_base.filter(event_type__startswith='portfolio_').count(),
-        'course_events_total': activity_base.filter(event_type__in=[ActivityLog.EventType.COURSE_REGISTERED, ActivityLog.EventType.COURSE_CANCELLED]).count(),
-        'vacancy_events_total': activity_base.filter(event_type=ActivityLog.EventType.VACANCY_APPLIED).count(),
-        'recent_activity': activity_base[:10],
+        'selected_period': selected_period,
+        'period_options': period_options,
+
+        'registrations_total': registrations_total,
+        'responses_total': responses_total,
+        'portfolio_total': portfolio_total,
+        'active_students_total': active_students_total,
+
+        'registrations_trend_percent': registrations_trend_percent,
+        'registrations_trend_direction': registrations_trend_direction,
+        'responses_trend_percent': responses_trend_percent,
+        'responses_trend_direction': responses_trend_direction,
+        'portfolio_trend_percent': portfolio_trend_percent,
+        'portfolio_trend_direction': portfolio_trend_direction,
+        'active_students_trend_percent': active_students_trend_percent,
+        'active_students_trend_direction': active_students_trend_direction,
+
+        'activity_total': activity_total,
+        'activity_courses_total': registrations_total,
+        'activity_vacancies_total': responses_total,
+        'activity_portfolio_total': portfolio_total,
+        'activity_courses_percent': activity_courses_percent,
+        'activity_vacancies_percent': activity_vacancies_percent,
+        'activity_portfolio_percent': activity_portfolio_percent,
+
+        'main_activity_label': main_activity_label,
+        'top_courses': top_courses,
+        'top_vacancies': top_vacancies,
+        'top_course_title': top_courses[0]['title'] if top_courses else 'пока нет записей',
+        'top_vacancy_title': top_vacancies[0]['title'] if top_vacancies else 'пока нет откликов',
+        'pending_portfolio_total': pending_portfolio_total,
     }
     return render(request, 'curator/activity.html', context)
 

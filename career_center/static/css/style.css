@@ -16652,3 +16652,576 @@ html {
     white-space: normal;
   }
 }
+/* === Admin activity v3: period dropdown + soft KPI polish === */
+
+.admin-activity-page-v3 .activity-v3-hero {
+  min-height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+  padding: 30px 38px;
+}
+
+.admin-activity-page-v3 .activity-v3-hero-text {
+  min-width: 0;
+}
+
+.admin-activity-page-v3 .activity-v3-hero h1 {
+  margin-bottom: 10px;
+  font-size: clamp(36px, 3.5vw, 54px);
+  line-height: 1.02;
+}
+
+.admin-activity-page-v3 .activity-v3-hero p {
+  max-width: 860px;
+  color: #64748b;
+  font-size: 16px;
+}
+
+/* Period select */
+
+.activity-v3-period-filter {
+  display: none !important;
+}
+
+.activity-v3-period-select-form {
+  width: 300px;
+  flex: 0 0 300px;
+  display: grid;
+  gap: 8px;
+  padding: 10px 12px 12px;
+  border: 1px solid #d5e4f7;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: 0 8px 22px rgba(25, 66, 120, 0.055);
+}
+
+.activity-v3-period-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 4px;
+  color: #7b8da6;
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.activity-v3-period-label i {
+  color: #2f6fc9;
+  font-size: 14px;
+}
+
+.activity-v3-period-select-wrap {
+  position: relative;
+}
+
+.activity-v3-period-select-wrap select {
+  width: 100%;
+  min-height: 42px;
+  appearance: none;
+  padding: 0 42px 0 14px;
+  border: 1px solid #cfe0f6;
+  border-radius: 14px;
+  outline: none;
+  background: #ffffff;
+  color: #1d3148;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.activity-v3-period-select-wrap select:focus {
+  border-color: #9ec3f7;
+  box-shadow: 0 0 0 4px rgba(47, 111, 201, 0.10);
+}
+
+.activity-v3-period-select-wrap > i {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: #7b8da6;
+  font-size: 14px;
+}
+
+/* Softer KPI cards */
+
+.activity-v3-kpi-card {
+  min-height: 122px;
+  grid-template-columns: 54px minmax(0, 1fr);
+  gap: 16px;
+  padding: 20px 22px;
+}
+
+.activity-v3-kpi-card strong {
+  margin-bottom: 4px;
+  color: #1f334a;
+  font-size: 33px;
+  font-weight: 670;
+  letter-spacing: -0.035em;
+}
+
+.activity-v3-kpi-card h3 {
+  color: #172536;
+  font-size: 14.5px;
+  line-height: 1.25;
+  font-weight: 650;
+}
+
+.activity-v3-kpi-card p {
+  margin-top: 5px;
+  color: #6d7f96;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.activity-v3-icon {
+  width: 50px;
+  height: 50px;
+  flex-basis: 50px;
+  border-radius: 17px;
+  color: #1f67d2;
+  background: #eaf3ff;
+  font-size: 22px;
+}
+
+/* Soft trend text */
+
+.activity-v3-trend {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 8px;
+  color: #7b8da6;
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.activity-v3-trend.is-up {
+  color: #3f8b6c;
+}
+
+.activity-v3-trend.is-down {
+  color: #ad6b6b;
+}
+
+.activity-v3-trend.is-same {
+  color: #7b8da6;
+}
+
+/* Make analytics slightly tighter */
+
+.activity-v3-structure-card,
+.activity-v3-rank-card {
+  min-height: 288px;
+  height: 288px;
+}
+
+.activity-v3-card-head h2 {
+  font-size: 21px;
+}
+
+.activity-v3-card-head p {
+  font-size: 14px;
+}
+
+/* Detailed section: only two big cards */
+
+.activity-v3-actions-card .activity-v3-action-list {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.activity-v3-bottom-actions {
+  display: none !important;
+}
+
+@media (max-width: 1180px) {
+  .admin-activity-page-v3 .activity-v3-hero {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .activity-v3-period-select-form {
+    width: min(100%, 360px);
+    flex-basis: auto;
+  }
+}
+
+@media (max-width: 760px) {
+  .admin-activity-page-v3 .activity-v3-hero {
+    padding: 24px 20px;
+  }
+
+  .activity-v3-period-select-form {
+    width: 100%;
+  }
+
+  .activity-v3-actions-card .activity-v3-action-list {
+    grid-template-columns: 1fr;
+  }
+}/* === Admin activity v3 final visual polish === */
+
+.admin-activity-page-v3 {
+  gap: 14px;
+}
+
+.admin-activity-page-v3 .activity-v3-hero {
+  min-height: 150px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+  padding: 28px 36px;
+}
+
+.admin-activity-page-v3 .activity-v3-hero h1 {
+  margin-bottom: 8px;
+  font-size: clamp(34px, 3.4vw, 50px);
+  letter-spacing: -0.045em;
+}
+
+.admin-activity-page-v3 .activity-v3-hero p {
+  max-width: 880px;
+  font-size: 15.5px;
+}
+
+.activity-v3-period-filter,
+.activity-v3-period-select-form {
+  display: none !important;
+}
+
+.activity-v3-period-mini {
+  flex: 0 0 auto;
+  margin: 0;
+}
+
+.activity-v3-period-mini-wrap {
+  min-width: 238px;
+  height: 44px;
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr) 16px;
+  align-items: center;
+  gap: 8px;
+  padding: 0 14px;
+  border: 1px solid #cfe0f6;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: 0 8px 20px rgba(25, 66, 120, 0.045);
+}
+
+.activity-v3-period-mini-wrap i {
+  color: #1f67d2;
+  font-size: 14px;
+}
+
+.activity-v3-period-mini-wrap i:last-child {
+  color: #7b8da6;
+  font-size: 13px;
+}
+
+.activity-v3-period-mini select {
+  width: 100%;
+  min-height: 40px;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  appearance: none;
+  background: transparent;
+  color: #1d3148;
+  font-size: 13.5px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.activity-v3-period-mini-wrap:focus-within {
+  border-color: #9ec3f7;
+  box-shadow: 0 0 0 4px rgba(47, 111, 201, 0.10);
+}
+
+/* KPI: lighter, more balanced */
+
+.activity-v3-kpi-grid {
+  gap: 14px;
+}
+
+.activity-v3-kpi-card {
+  min-height: 112px;
+  grid-template-columns: 50px minmax(0, 1fr);
+  gap: 15px;
+  align-items: center;
+  padding: 18px 20px;
+  border-radius: 23px;
+}
+
+.activity-v3-kpi-card .activity-v3-icon {
+  width: 48px;
+  height: 48px;
+  flex-basis: 48px;
+  border-radius: 17px;
+  color: #1f67d2;
+  background: linear-gradient(135deg, #eaf3ff, #f3f8ff);
+  font-size: 21px;
+}
+
+.activity-v3-kpi-card strong {
+  margin-bottom: 2px;
+  color: #20354d;
+  font-size: 31px;
+  line-height: 1;
+  font-weight: 670;
+  letter-spacing: -0.035em;
+}
+
+.activity-v3-kpi-card h3 {
+  margin: 0;
+  color: #172536;
+  font-size: 14px;
+  line-height: 1.22;
+  font-weight: 650;
+}
+
+.activity-v3-kpi-card p:not(.activity-v3-trend) {
+  margin-top: 4px;
+  color: #71829a;
+  font-size: 12.8px;
+  line-height: 1.32;
+}
+
+.activity-v3-trend {
+  margin-top: 6px;
+  color: #7b8da6;
+  font-size: 12px;
+  line-height: 1.3;
+  font-weight: 560;
+}
+
+.activity-v3-trend.is-up {
+  color: #4a8a6f;
+}
+
+.activity-v3-trend.is-down {
+  color: #a76d6d;
+}
+
+.activity-v3-trend.is-same {
+  color: #7b8da6;
+}
+
+/* Analytics row: taller, wider, no donut overflow */
+
+.activity-v3-main-grid {
+  grid-template-columns: minmax(390px, 1fr) minmax(350px, 0.82fr) minmax(350px, 0.82fr);
+  gap: 14px;
+}
+
+.activity-v3-structure-card,
+.activity-v3-rank-card {
+  height: 322px;
+  min-height: 322px;
+  overflow: hidden;
+}
+
+.activity-v3-card {
+  padding: 22px 24px;
+}
+
+.activity-v3-card-head {
+  margin-bottom: 16px;
+}
+
+.activity-v3-card-head h2 {
+  font-size: 21px;
+  line-height: 1.15;
+}
+
+.activity-v3-card-head p {
+  font-size: 13.8px;
+  line-height: 1.42;
+}
+
+.activity-v3-donut-layout {
+  grid-template-columns: 154px minmax(0, 1fr);
+  gap: 24px;
+  align-items: center;
+  min-height: 190px;
+}
+
+.activity-v3-donut {
+  width: 148px;
+  height: 148px;
+  align-self: center;
+  justify-self: start;
+}
+
+.activity-v3-donut div {
+  width: 88px;
+  height: 88px;
+}
+
+.activity-v3-donut strong {
+  font-size: 26px;
+}
+
+.activity-v3-donut span {
+  margin-top: 3px;
+  font-size: 10px;
+}
+
+.activity-v3-legend > div {
+  min-height: 48px;
+}
+
+.activity-v3-legend p {
+  font-size: 14.5px;
+}
+
+.activity-v3-legend strong {
+  font-size: 17px;
+}
+
+.activity-v3-rank-list {
+  gap: 14px;
+  padding-top: 4px;
+}
+
+.activity-v3-rank-row {
+  grid-template-columns: 26px minmax(0, 1fr) 22px;
+  gap: 12px;
+}
+
+.activity-v3-rank-row > span {
+  width: 24px;
+  height: 24px;
+  font-size: 11.5px;
+}
+
+.activity-v3-rank-row strong {
+  margin-bottom: 8px;
+  font-size: 13.7px;
+}
+
+.activity-v3-bar {
+  height: 6px;
+}
+
+/* Bottom cards */
+
+.activity-v3-insights-card,
+.activity-v3-actions-card {
+  padding: 22px 26px;
+}
+
+.activity-v3-actions-card .activity-v3-action-list {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.activity-v3-action {
+  min-height: 88px;
+  border-radius: 21px;
+}
+
+.activity-v3-bottom-actions {
+  display: none !important;
+}
+
+@media (max-width: 1500px) {
+  .activity-v3-main-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .activity-v3-structure-card {
+    grid-column: 1 / -1;
+    height: 292px;
+    min-height: 292px;
+  }
+
+  .activity-v3-donut-layout {
+    grid-template-columns: 170px minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 1180px) {
+  .admin-activity-page-v3 .activity-v3-hero {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .activity-v3-period-mini-wrap {
+    min-width: min(100%, 300px);
+  }
+
+  .activity-v3-structure-card,
+  .activity-v3-rank-card {
+    height: auto;
+    min-height: 260px;
+  }
+}
+
+@media (max-width: 760px) {
+  .admin-activity-page-v3 .activity-v3-hero {
+    padding: 24px 20px;
+  }
+
+  .activity-v3-kpi-card {
+    grid-template-columns: 48px minmax(0, 1fr);
+  }
+
+  .activity-v3-main-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .activity-v3-donut-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .activity-v3-donut {
+    justify-self: center;
+  }
+
+  .activity-v3-actions-card .activity-v3-action-list {
+    grid-template-columns: 1fr;
+  }
+}
+/* === Admin activity period select fix === */
+
+.activity-v3-period-mini-wrap {
+  min-width: 270px;
+  width: 270px;
+  height: 42px;
+  padding: 0 13px;
+  border-radius: 16px;
+}
+
+.activity-v3-period-mini select {
+  min-width: 0;
+  height: 40px;
+  line-height: 40px;
+  padding-right: 4px;
+  border-radius: 12px;
+  background: transparent;
+  color: #1d3148;
+  font-size: 13.5px;
+  font-weight: 650;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.activity-v3-period-mini select:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.activity-v3-period-mini-wrap:focus-within {
+  border-color: #b7d3f7;
+  box-shadow: 0 0 0 3px rgba(47, 111, 201, 0.08);
+}
+
+.activity-v3-period-mini-wrap i:last-child {
+  margin-left: 2px;
+}
