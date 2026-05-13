@@ -138,6 +138,45 @@
   </div>
 </section>
 
+
+<section class="section card">
+  <h2>Статистика записи</h2>
+  <div class="admin-info-list">
+    <div><span>Всего мест</span><strong>{{ course.places }}</strong></div>
+    <div><span>Активных записей</span><strong>{{ active_registrations_count }}</strong></div>
+    <div><span>Отменённых записей</span><strong>{{ cancelled_registrations_count }}</strong></div>
+    <div><span>Свободных мест</span><strong>{{ free_places_count }}</strong></div>
+  </div>
+</section>
+
+<section class="section card">
+  <h2>Записавшиеся студенты</h2>
+  {% if course_registrations %}
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>ФИО</th><th>Email</th><th>Группа</th><th>Специальность</th><th>Статус</th><th>Дата записи</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for reg in course_registrations %}
+            <tr>
+              <td>{{ reg.student.full_name }}</td>
+              <td>{{ reg.student.email }}</td>
+              <td>{{ reg.student.study_group.name|default:reg.student.group|default:'—' }}</td>
+              <td>{{ reg.student.study_group.specialty_name|default:reg.student.specialty|default:'—' }}</td>
+              <td>{% if reg.status == 'registered' %}записан{% else %}отменил{% endif %}</td>
+              <td>{{ reg.created_at|date:'d.m.Y H:i' }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p>Пока нет записей на этот курс.</p>
+  {% endif %}
+</section>
 <section class="section card curator-delete-card curator-delete-bottom-card">
   <h2>Удаление курса</h2>
 

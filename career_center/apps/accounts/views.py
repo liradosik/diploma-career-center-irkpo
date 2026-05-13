@@ -322,9 +322,12 @@ def curator_dashboard(request):
 def curator_activity(request):
     students = curator_students_queryset(request.user)
     student_ids = students.values_list('id', flat=True)
-    activity = ActivityLog.objects.filter(student_id__in=student_ids).select_related('student')
+    activity_base = ActivityLog.objects.filter(student_id__in=student_ids).select_related('student')
+    registrations = CourseRegistration.objects.filter(student_id__in=student_ids)
+    responses = VacancyResponse.objects.filter(student_id__in=student_ids)
 
     kind = request.GET.get('kind', 'all')
+    activity = activity_base
     if kind == 'portfolio':
         activity = activity.filter(event_type__startswith='portfolio_')
     elif kind == 'courses':
@@ -336,7 +339,19 @@ def curator_activity(request):
     else:
         kind = 'all'
 
-    return render(request, 'curator/activity.html', {'activity': activity[:80], 'kind': kind})
+    context = {
+        'activity': activity[:80],
+        'kind': kind,
+        'students_total': students.count(),
+        'course_registered_total': registrations.filter(status=CourseRegistration.Status.REGISTERED).count(),
+        'course_cancelled_total': registrations.filter(status=CourseRegistration.Status.CANCELLED).count(),
+        'vacancy_responses_total': responses.count(),
+        'portfolio_events_total': activity_base.filter(event_type__startswith='portfolio_').count(),
+        'course_events_total': activity_base.filter(event_type__in=[ActivityLog.EventType.COURSE_REGISTERED, ActivityLog.EventType.COURSE_CANCELLED]).count(),
+        'vacancy_events_total': activity_base.filter(event_type=ActivityLog.EventType.VACANCY_APPLIED).count(),
+        'recent_activity': activity_base[:10],
+    }
+    return render(request, 'curator/activity.html', context)
 
 
 @role_required(User.Role.CURATOR)
@@ -433,6 +448,12 @@ def admin_dashboard(request):
         'courses_active': course_summary.get(Course.Status.ACTIVE, 0),
         'registrations_total': CourseRegistration.objects.count(),
         'responses_total': VacancyResponse.objects.count(),
+        'registrations_registered_total': CourseRegistration.objects.filter(status=CourseRegistration.Status.REGISTERED).count(),
+        'registrations_cancelled_total': CourseRegistration.objects.filter(status=CourseRegistration.Status.CANCELLED).count(),
+        'activity_portfolio_total': ActivityLog.objects.filter(event_type__startswith='portfolio_').count(),
+        'activity_courses_total': ActivityLog.objects.filter(event_type__in=[ActivityLog.EventType.COURSE_REGISTERED, ActivityLog.EventType.COURSE_CANCELLED]).count(),
+        'activity_vacancies_total': ActivityLog.objects.filter(event_type=ActivityLog.EventType.VACANCY_APPLIED).count(),
+        'latest_activity': ActivityLog.objects.select_related('student').order_by('-created_at')[:10],
         'portfolio_pending_total': PortfolioEntry.objects.filter(status=PortfolioEntry.Status.PENDING).count(),
         'support_new_total': SupportTicket.objects.filter(status=SupportTicket.Status.NEW).count(),
         'support_in_progress_total': SupportTicket.objects.filter(status=SupportTicket.Status.IN_PROGRESS).count(),
@@ -1175,11 +1196,21 @@ def admin_course_detail(request, course_id):
             messages.error(request, 'Название курса для подтверждения введено неверно.')
             return redirect('accounts:admin_course_detail', course_id=course.id)
 
-    registrations_count = CourseRegistration.objects.filter(course=course).count()
+    registrations_qs = CourseRegistration.objects.filter(course=course).select_related('student', 'student__study_group')
+    active_registrations_count = registrations_qs.filter(status=CourseRegistration.Status.REGISTERED).count()
+    cancelled_registrations_count = registrations_qs.filter(status=CourseRegistration.Status.CANCELLED).count()
     return render(
         request,
         'adminpanel/course_detail.html',
-        {'course': course, 'form': form, 'registrations_count': registrations_count},
+        {
+            'course': course,
+            'form': form,
+            'registrations_count': active_registrations_count,
+            'course_registrations': registrations_qs,
+            'active_registrations_count': active_registrations_count,
+            'cancelled_registrations_count': cancelled_registrations_count,
+            'free_places_count': max(course.places - active_registrations_count, 0),
+        },
     )
 
 

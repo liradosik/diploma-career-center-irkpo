@@ -53,14 +53,50 @@ def course_list(request):
     })
 
 
-@role_required(User.Role.STUDENT)
+@role_required(User.Role.STUDENT, User.Role.CURATOR, User.Role.ADMIN)
 def course_detail(request, pk):
     course = get_object_or_404(Course.objects.filter(status=Course.Status.ACTIVE).annotate(
         occupied_places_count=Count('registrations', filter=Q(registrations__status=CourseRegistration.Status.REGISTERED))
     ), pk=pk)
     course.available_places_count = max(course.places - course.occupied_places_count, 0)
-    registration = CourseRegistration.objects.filter(student=request.user, course=course).first()
-    return render(request, 'courses/detail.html', {'course': course, 'registration': registration})
+    registration = None
+    if request.user.role == User.Role.STUDENT:
+        registration = CourseRegistration.objects.filter(student=request.user, course=course).first()
+
+    registrations_qs = CourseRegistration.objects.filter(course=course).select_related('student', 'student__study_group')
+    registered_count = registrations_qs.filter(status=CourseRegistration.Status.REGISTERED).count()
+    cancelled_count = registrations_qs.filter(status=CourseRegistration.Status.CANCELLED).count()
+
+    curator_registrations = []
+    curator_not_registered_students = []
+    if request.user.role == User.Role.CURATOR:
+        curator_group_ids = list(request.user.managed_study_groups.values_list('id', flat=True))
+        if curator_group_ids:
+            curator_registrations = list(registrations_qs.filter(student__study_group_id__in=curator_group_ids))
+            registered_student_ids = {
+                reg.student_id for reg in curator_registrations if reg.status == CourseRegistration.Status.REGISTERED
+            }
+            curator_not_registered_students = list(
+                User.objects.filter(
+                    role=User.Role.STUDENT,
+                    study_group_id__in=curator_group_ids,
+                    is_active=True,
+                )
+                .exclude(id__in=registered_student_ids)
+                .select_related('study_group', 'study_group__specialty_ref')
+                .order_by('full_name')
+            )
+
+    return render(request, 'courses/detail.html', {
+        'course': course,
+        'registration': registration,
+        'course_registrations': list(registrations_qs) if request.user.role == User.Role.ADMIN else [],
+        'curator_course_registrations': curator_registrations,
+        'curator_not_registered_students': curator_not_registered_students,
+        'active_registrations_count': registered_count,
+        'cancelled_registrations_count': cancelled_count,
+        'free_places_count': max(course.places - registered_count, 0),
+    })
 
 
 @role_required(User.Role.STUDENT)
