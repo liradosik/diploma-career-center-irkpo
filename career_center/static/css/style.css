@@ -21899,3 +21899,62 @@ html {
     min-height: auto;
   }
 }
+/* === Student course/vacancy detail: align hero actions === */
+
+.student-course-detail-actions-v2,
+.student-vacancy-detail-actions-v2 {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  gap: 10px !important;
+  margin-top: 24px !important;
+}
+
+.student-course-detail-actions-v2 form,
+.student-vacancy-detail-actions-v2 form {
+  margin: 0 !important;
+  display: inline-flex !important;
+}
+
+.student-course-detail-actions-v2 .btn,
+.student-course-detail-actions-v2 button,
+.student-course-detail-actions-v2 .student-course-detail-registered,
+.student-course-detail-actions-v2 .student-course-detail-full,
+.student-vacancy-detail-actions-v2 .btn,
+.student-vacancy-detail-actions-v2 button,
+.student-vacancy-detail-actions-v2 .student-vacancy-detail-responded {
+  min-height: 48px !important;
+  width: auto !important;
+  min-width: 190px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  padding: 10px 18px !important;
+  border-radius: 16px !important;
+  white-space: nowrap !important;
+  line-height: 1.2 !important;
+}
+
+.student-course-detail-actions-v2 .favorite-toggle,
+.student-vacancy-detail-actions-v2 .favorite-toggle {
+  min-width: 210px !important;
+}
+
+@media (max-width: 760px) {
+  .student-course-detail-actions-v2,
+  .student-vacancy-detail-actions-v2 {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  .student-course-detail-actions-v2 .btn,
+  .student-course-detail-actions-v2 button,
+  .student-course-detail-actions-v2 .student-course-detail-registered,
+  .student-course-detail-actions-v2 .student-course-detail-full,
+  .student-vacancy-detail-actions-v2 .btn,
+  .student-vacancy-detail-actions-v2 button,
+  .student-vacancy-detail-actions-v2 .student-vacancy-detail-responded {
+    width: 100% !important;
+  }
+}

@@ -25,7 +25,7 @@
       {{ vacancy.company }}
     </p>
 
-    <div class="student-vacancy-detail-actions-v2">
+        <div class="student-vacancy-detail-actions-v2">
       {% if response %}
         <span class="student-vacancy-detail-responded">
           <i class="bi bi-check2-circle"></i>
@@ -40,8 +40,20 @@
           </button>
         </form>
       {% endif %}
+
+      <form method="post" action="{% url 'vacancies:toggle_favorite' vacancy.pk %}">
+        {% csrf_token %}
+        <button class="btn favorite-toggle" type="submit">
+          {% if is_favorite %}
+            <i class="bi bi-bookmark-check"></i>
+            Убрать из избранного
+          {% else %}
+            <i class="bi bi-bookmark"></i>
+            В избранное
+          {% endif %}
+        </button>
+      </form>
     </div>
-    <form method="post" action="{% url 'vacancies:toggle_favorite' vacancy.pk %}">{% csrf_token %}<button class="btn favorite-toggle" type="submit">{% if is_favorite %}Убрать из избранного{% else %}В избранное{% endif %}</button></form>
   </div>
 
   <div class="student-vacancy-detail-hero-art vacancy-detail-soft-decor" aria-hidden="true">
