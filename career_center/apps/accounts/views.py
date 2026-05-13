@@ -426,49 +426,48 @@ def curator_activity(request):
     activity_vacancies_percent = percent(responses_total)
     activity_portfolio_percent = percent(portfolio_total)
 
-    activity_counts = {
-        'Курсы': registrations_total,
-        'Вакансии': responses_total,
-        'Портфолио': portfolio_total,
-    }
+    activity_counts = {'Курсы': registrations_total, 'Вакансии': responses_total, 'Портфолио': portfolio_total}
     main_activity_label = max(activity_counts, key=activity_counts.get) if activity_total else 'пока нет данных'
 
-    top_courses_raw = list(
-        current_registrations
-        .values(title=F('course__title'))
-        .annotate(total=Count('id'))
-        .order_by('-total', 'title')[:5]
+    students_with_activity = (
+        students
+        .select_related('study_group')
+        .annotate(
+            reg_actions=Count(
+                'course_registrations',
+                filter=Q(
+                    course_registrations__status=CourseRegistration.Status.REGISTERED,
+                    course_registrations__created_at__gte=period_start,
+                    course_registrations__created_at__lt=now,
+                ),
+            ),
+            resp_actions=Count(
+                'vacancy_responses',
+                filter=Q(
+                    vacancy_responses__created_at__gte=period_start,
+                    vacancy_responses__created_at__lt=now,
+                ),
+            ),
+            portfolio_actions=Count(
+                'portfolio_entries',
+                filter=Q(
+                    portfolio_entries__created_at__gte=period_start,
+                    portfolio_entries__created_at__lt=now,
+                ),
+            ),
+        )
+        .annotate(total_actions=F('reg_actions') + F('resp_actions') + F('portfolio_actions'))
+        .order_by('-total_actions', 'full_name')
     )
-    max_course_total = max([item['total'] for item in top_courses_raw], default=0)
-    top_courses = [
-        {
-            'title': item['title'] or 'Без названия',
-            'total': item['total'],
-            'percent': round((item['total'] / max_course_total) * 100, 1) if max_course_total else 0,
-        }
-        for item in top_courses_raw
-    ]
+    top_active_students = [student for student in students_with_activity if student.total_actions > 0][:5]
+    most_active_student_name = top_active_students[0].full_name if top_active_students else 'пока нет данных'
 
-    top_vacancies_raw = list(
-        current_responses
-        .values(title=F('vacancy__title'))
-        .annotate(total=Count('id'))
-        .order_by('-total', 'title')[:5]
-    )
-    max_vacancy_total = max([item['total'] for item in top_vacancies_raw], default=0)
-    top_vacancies = [
-        {
-            'title': item['title'] or 'Без названия',
-            'total': item['total'],
-            'percent': round((item['total'] / max_vacancy_total) * 100, 1) if max_vacancy_total else 0,
-        }
-        for item in top_vacancies_raw
-    ]
-
-    pending_portfolio_total = PortfolioEntry.objects.filter(
-        student_id__in=student_ids,
-        status=PortfolioEntry.Status.PENDING,
-    ).count()
+    students_total = students.count()
+    students_without_activity = max(students_total - active_students_total, 0)
+    students_with_course_actions = current_registrations.values('student_id').distinct().count()
+    students_with_vacancy_actions = current_responses.values('student_id').distinct().count()
+    students_without_courses = max(students_total - students_with_course_actions, 0)
+    students_without_vacancies = max(students_total - students_with_vacancy_actions, 0)
 
     context = {
         'selected_period': selected_period,
@@ -497,11 +496,11 @@ def curator_activity(request):
         'activity_portfolio_percent': activity_portfolio_percent,
 
         'main_activity_label': main_activity_label,
-        'top_courses': top_courses,
-        'top_vacancies': top_vacancies,
-        'top_course_title': top_courses[0]['title'] if top_courses else 'пока нет записей',
-        'top_vacancy_title': top_vacancies[0]['title'] if top_vacancies else 'пока нет откликов',
-        'pending_portfolio_total': pending_portfolio_total,
+        'top_active_students': top_active_students,
+        'most_active_student_name': most_active_student_name,
+        'students_without_activity': students_without_activity,
+        'students_without_courses': students_without_courses,
+        'students_without_vacancies': students_without_vacancies,
     }
     return render(request, 'curator/activity.html', context)
 
