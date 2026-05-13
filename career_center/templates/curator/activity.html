@@ -4,7 +4,31 @@
 <section class="hero">
   <div class="hero-kicker">Куратор</div>
   <h1>Активность студентов</h1>
-  <p>События по портфолио, курсам и вакансиям закреплённых студентов.</p>
+  <p>Сводка по вашим группам: курсы, отклики, портфолио и последние действия студентов.</p>
+</section>
+
+<section class="section admin-metrics-grid">
+  <article class="metric-card"><div class="metric-label">Студентов в группах</div><div class="metric-value">{{ students_total }}</div></article>
+  <article class="metric-card"><div class="metric-label">Записи на курсы</div><div class="metric-value">{{ course_registered_total }}</div></article>
+  <article class="metric-card"><div class="metric-label">Отмены записей</div><div class="metric-value">{{ course_cancelled_total }}</div></article>
+  <article class="metric-card"><div class="metric-label">Отклики на вакансии</div><div class="metric-value">{{ vacancy_responses_total }}</div></article>
+</section>
+
+<section class="section card">
+  <div class="section-heading section-heading-simple">
+    <h2>Активность по типам</h2>
+  </div>
+  <div class="status-summary">
+    <div class="status-summary-row"><span>Портфолио</span><strong>{{ portfolio_events_total }}</strong><em>событий</em></div>
+    <div class="status-summary-row"><span>Курсы</span><strong>{{ course_events_total }}</strong><em>событий</em></div>
+    <div class="status-summary-row"><span>Вакансии</span><strong>{{ vacancy_events_total }}</strong><em>событий</em></div>
+  </div>
+  <div class="admin-actions-grid" style="margin-top:12px;">
+    <a class="btn" href="{% url 'courses:list' %}">Подробнее по курсам</a>
+    <a class="btn" href="{% url 'vacancies:list' %}">Подробнее по вакансиям</a>
+    <a class="btn btn-link" href="{% url 'accounts:curator_students' %}">Мои студенты</a>
+    <a class="btn btn-link" href="{% url 'portfolio:review_queue' %}">Проверка портфолио</a>
+  </div>
 </section>
 
 <section class="section card curator-activity-page">
@@ -17,27 +41,13 @@
   </div>
 
   <div class="curator-activity-list">
-    {% for event in activity %}
+    {% for event in recent_activity %}
       <article class="curator-activity-item">
         <div class="curator-avatar-small">{{ event.student.full_name|default:event.student.email|slice:":1"|upper }}</div>
-        <div class="curator-activity-body">
-          <div class="curator-activity-topline">
-            <h3>{{ event.student.full_name }}</h3>
-            <span class="curator-activity-time">{{ event.created_at|date:'d.m.Y H:i' }}</span>
-          </div>
-          <p class="curator-activity-meta">Группа: {{ event.student.group|default:'—' }}</p>
-          <p class="curator-activity-title">{{ event.title }}</p>
-          {% if event.description %}<p class="curator-activity-description">{{ event.description }}</p>{% endif %}
-        </div>
-        <span class="curator-activity-type">
-          {% if event.event_type == 'course_registered' or event.event_type == 'course_cancelled' %}Курс{% elif event.event_type == 'vacancy_applied' %}Вакансия{% else %}Портфолио{% endif %}
-        </span>
+        <div class="curator-activity-body"><div class="curator-activity-topline"><h3>{{ event.student.full_name }}</h3><span class="curator-activity-time">{{ event.created_at|date:'d.m.Y H:i' }}</span></div><p class="curator-activity-meta">Группа: {{ event.student.study_group.name|default:event.student.group|default:'—' }}</p><p class="curator-activity-title">{{ event.title }}</p></div>
       </article>
     {% empty %}
-      <div class="curator-activity-empty">
-        <strong>Пока нет активности студентов</strong>
-        <p>События появятся после действий студентов или проверки портфолио.</p>
-      </div>
+      <p class="muted">Пока нет последних действий.</p>
     {% endfor %}
   </div>
 </section>
