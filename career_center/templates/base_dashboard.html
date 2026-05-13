@@ -54,6 +54,11 @@
       <span class="menu-icon"><i class="bi bi-mortarboard"></i></span>
       <span>Курсы и семинары</span>
     </a>
+
+    <a class="{% if request.resolver_match.url_name == 'student_favorites' %}active{% endif %}" href="{% url 'accounts:student_favorites' %}">
+      <span class="menu-icon"><i class="bi bi-bookmarks"></i></span>
+      <span>Избранное</span>
+    </a>
   </div>
 
   <div class="menu-section">

@@ -73,3 +73,17 @@ class CourseRegistration(models.Model):
     def save(self, *args, **kwargs):
         self.clean()
         return super().save(*args, **kwargs)
+
+
+class StudentFavoriteCourse(models.Model):
+    student = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='favorite_courses')
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='favorited_by_students')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=('student', 'course'), name='uniq_student_favorite_course'),
+        ]
+
+    def __str__(self):
+        return f'{self.student} ♥ {self.course}'
