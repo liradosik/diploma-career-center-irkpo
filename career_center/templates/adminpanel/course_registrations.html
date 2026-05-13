@@ -4,83 +4,199 @@
 {% block title %}Записи на курсы{% endblock %}
 
 {% block content %}
-<section class="hero">
-  <div class="hero-kicker">Администрирование</div>
-  <h1>Записи на курсы</h1>
-  <p>Список регистраций студентов на курсы, семинары и практики.</p>
-</section>
+<div class="admin-list-page admin-course-registrations-page">
+  <section class="hero admin-list-hero">
+    <div class="hero-kicker">Администрирование</div>
+    <h1>Записи на курсы</h1>
+    <p>Список регистраций студентов на курсы, семинары и практики.</p>
+  </section>
 
-<section class="section card admin-wide-card">
-  <h2>Список записей</h2>
-
-  <form method="get" class="filters admin-clean-filters admin-activity-filters">
-    <input
-      name="q"
-      placeholder="Студент"
-      value="{{ request.GET.q }}"
-    >
-
-    <input
-      name="course"
-      placeholder="Курс или семинар"
-      value="{{ request.GET.course }}"
-    >
-
-    <input
-      name="group"
-      placeholder="Группа"
-      value="{{ request.GET.group }}"
-    >
-
-    <select name="format_type">
-      <option value="">Формат</option>
-      <option value="online" {% if request.GET.format_type == 'online' %}selected{% endif %}>Онлайн</option>
-      <option value="offline" {% if request.GET.format_type == 'offline' %}selected{% endif %}>Очно</option>
-    </select>
-
-    <input
-      name="date_from"
-      type="date"
-      value="{{ request.GET.date_from }}"
-    >
-
-    <input
-      name="date_to"
-      type="date"
-      value="{{ request.GET.date_to }}"
-    >
-
-    <button class="btn btn-link" type="submit">Применить</button>
-  </form>
-
-  <div class="admin-activity-list">
-    {% for reg in registrations %}
-      <div class="admin-activity-row">
-        <div class="admin-activity-main">
-          <strong>{{ reg.student.full_name }}</strong>
-          <span>{{ reg.student.group|default:'Группа не указана' }}</span>
-        </div>
-
-        <div class="admin-activity-meta">
-          <span class="admin-activity-label">Курс</span>
-          <strong>{{ reg.course.title }}</strong>
-        </div>
-
-        <div class="admin-activity-meta">
-          <span class="admin-activity-label">Формат</span>
-          <span>{{ FORMAT_LABELS|dict_get:reg.course.format_type }}</span>
-        </div>
-
-        <div class="admin-activity-meta">
-          <span class="admin-activity-label">Дата записи</span>
-          <span>{{ reg.created_at|date:'d.m.Y H:i' }}</span>
-        </div>
+  <section class="admin-list-kpi-grid">
+    <article class="admin-list-kpi-card">
+      <span class="admin-list-icon"><i class="bi bi-calendar-check"></i></span>
+      <div>
+        <strong>{{ active_count }}</strong>
+        <p>Активных записей</p>
       </div>
-    {% empty %}
-      <div class="admin-empty-state">
-        Записей на курсы пока нет.
+    </article>
+
+    <article class="admin-list-kpi-card">
+      <span class="admin-list-icon"><i class="bi bi-arrow-counterclockwise"></i></span>
+      <div>
+        <strong>{{ cancelled_count }}</strong>
+        <p>Отменённых записей</p>
       </div>
-    {% endfor %}
-  </div>
-</section>
+    </article>
+
+    <article class="admin-list-kpi-card">
+      <span class="admin-list-icon"><i class="bi bi-mortarboard"></i></span>
+      <div>
+        <strong>{{ courses_count }}</strong>
+        <p>Курсов в записях</p>
+      </div>
+    </article>
+
+    <article class="admin-list-kpi-card">
+      <span class="admin-list-icon"><i class="bi bi-people"></i></span>
+      <div>
+        <strong>{{ students_count }}</strong>
+        <p>Студентов с записями</p>
+      </div>
+    </article>
+  </section>
+
+  <section class="admin-list-card">
+    <div class="admin-list-card-head">
+      <div>
+        <h2>Список записей</h2>
+        <p>Отфильтруйте студента, курс, группу, формат или статус записи.</p>
+      </div>
+
+      <a class="admin-list-back-link" href="{% url 'accounts:admin_activity' %}">
+        <i class="bi bi-arrow-left"></i>
+        К активности
+      </a>
+    </div>
+
+    <form method="get" class="admin-list-filter-grid">
+      <div class="admin-filter-field">
+        <label>Студент</label>
+        <input name="q" placeholder="ФИО или email" value="{{ q }}">
+      </div>
+
+      <div class="admin-filter-field">
+        <label>Название курса</label>
+        <input name="course" placeholder="Название курса"{{ course_q }}">
+      </div>
+
+      <div class="admin-filter-field">
+        <label>Группа</label>
+        <input name="group" placeholder="Например: И - 422" value="{{ group_q }}">
+      </div>
+
+      <div class="admin-filter-field">
+        <label>Формат</label>
+        <select name="format_type">
+          <option value="">Все форматы</option>
+          <option value="online" {% if format_type == 'online' %}selected{% endif %}>Онлайн</option>
+          <option value="offline" {% if format_type == 'offline' %}selected{% endif %}>Очно</option>
+        </select>
+      </div>
+
+      <div class="admin-filter-field">
+        <label>Статус</label>
+        <select name="status">
+          <option value="all" {% if status_q == 'all' %}selected{% endif %}>Все статусы</option>
+          <option value="registered" {% if status_q == 'registered' %}selected{% endif %}>Записан</option>
+          <option value="cancelled" {% if status_q == 'cancelled' %}selected{% endif %}>Отменил</option>
+        </select>
+      </div>
+
+      <div class="admin-filter-field">
+        <label>Дата от</label>
+        <input name="date_from" type="date" value="{{ date_from }}">
+      </div>
+
+      <div class="admin-filter-field">
+        <label>Дата до</label>
+        <input name="date_to" type="date" value="{{ date_to }}">
+      </div>
+
+      <div class="admin-filter-actions">
+        <button class="admin-list-btn" type="submit">
+          <i class="bi bi-search"></i>
+          Применить
+        </button>
+
+        <a class="admin-list-btn is-secondary" href="{% url 'accounts:admin_course_registrations' %}">
+          Сбросить
+        </a>
+      </div>
+    </form>
+
+    <div class="admin-table-wrap">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Студент</th>
+            <th>Группа</th>
+            <th>Курс</th>
+            <th>Формат</th>
+            <th>Статус</th>
+            <th>Дата записи</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {% for reg in registrations %}
+            <tr>
+              <td>
+                <div class="admin-table-user">
+                  <span>{{ reg.student.full_name|default:reg.student.email|slice:":1"|upper }}</span>
+                  <div>
+                    <strong>{{ reg.student.full_name|default:'Без имени' }}</strong>
+                    <p>{{ reg.student.email }}</p>
+                  </div>
+                </div>
+              </td>
+
+              <td>
+                <span class="admin-soft-chip">
+                  {{ reg.student.study_group.name|default:reg.student.group|default:'—' }}
+                </span>
+              </td>
+
+              <td>
+                <strong class="admin-table-title">{{ reg.course.title }}</strong>
+              </td>
+
+              <td class="admin-muted-cell">
+                {{ FORMAT_LABELS|dict_get:reg.course.format_type }}
+              </td>
+
+              <td>
+                {% if reg.status == 'registered' %}
+                  <span class="admin-status-badge is-success">записан</span>
+                {% else %}
+                  <span class="admin-status-badge is-danger">отменил</span>
+                {% endif %}
+              </td>
+
+              <td class="admin-date-cell">
+                {{ reg.created_at|date:'d.m.Y H:i' }}
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="6">
+                <div class="admin-empty-state">
+                  <strong>Данных пока нет</strong>
+                  <p>Попробуйте изменить фильтры или проверить записи позже.</p>
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    {% if page_obj.paginator.num_pages > 1 %}
+      <div class="admin-pagination">
+        {% if page_obj.has_previous %}
+          <a href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ page_obj.previous_page_number }}">Назад</a>
+        {% else %}
+          <span class="is-disabled">Назад</span>
+        {% endif %}
+
+        <strong>{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</strong>
+
+        {% if page_obj.has_next %}
+          <a href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ page_obj.next_page_number }}">Вперёд</a>
+        {% else %}
+          <span class="is-disabled">Вперёд</span>
+        {% endif %}
+      </div>
+    {% endif %}
+  </section>
+</div>
 {% endblock %}

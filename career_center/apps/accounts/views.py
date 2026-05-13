@@ -11,6 +11,7 @@ from openpyxl.utils import get_column_letter
 from django.contrib import messages
 from django.contrib.auth.views import LoginView, LogoutView
 from django.core.files.base import ContentFile
+from django.core.paginator import Paginator
 from django.db import transaction
 from django.db.models import Count, F, Max, Q
 from django.http import HttpResponse
@@ -509,7 +510,13 @@ def curator_activity(request):
 def curator_course_registrations(request):
     students = curator_students_queryset(request.user, include_graduates=True)
     student_ids = students.values_list('id', flat=True)
-    registrations = CourseRegistration.objects.filter(student_id__in=student_ids).select_related('student', 'student__study_group', 'course').order_by('-created_at')
+
+    registrations = (
+        CourseRegistration.objects
+        .filter(student_id__in=student_ids)
+        .select_related('student', 'student__study_group', 'course')
+        .order_by('-created_at')
+    )
 
     q = request.GET.get('q', '').strip()
     course_q = request.GET.get('course', '').strip()
@@ -517,24 +524,48 @@ def curator_course_registrations(request):
     status_q = request.GET.get('status', 'all').strip()
 
     if q:
-        registrations = registrations.filter(student__full_name__icontains=q)
+        registrations = registrations.filter(
+            Q(student__full_name__icontains=q) |
+            Q(student__email__icontains=q)
+        )
     if course_q:
         registrations = registrations.filter(course__title__icontains=course_q)
     if group_q:
-        registrations = registrations.filter(Q(student__study_group__name=group_q) | Q(student__group__icontains=group_q))
+        registrations = registrations.filter(
+            Q(student__study_group__name=group_q) |
+            Q(student__group__icontains=group_q)
+        )
     if status_q in {CourseRegistration.Status.REGISTERED, CourseRegistration.Status.CANCELLED}:
         registrations = registrations.filter(status=status_q)
     else:
         status_q = 'all'
 
     base_regs = CourseRegistration.objects.filter(student_id__in=student_ids)
+
+    paginator = Paginator(registrations, 12)
+    page_obj = paginator.get_page(request.GET.get('page'))
+
+    query_params = request.GET.copy()
+    query_params.pop('page', None)
+    querystring = query_params.urlencode()
+
     context = {
-        'registrations': registrations[:200],
+        'registrations': page_obj.object_list,
+        'page_obj': page_obj,
+        'querystring': querystring,
+
         'q': q,
         'course_q': course_q,
         'group_q': group_q,
         'status_q': status_q,
-        'groups': students.exclude(study_group__isnull=True).values_list('study_group__name', flat=True).distinct().order_by('study_group__name'),
+        'groups': (
+            students
+            .exclude(study_group__isnull=True)
+            .values_list('study_group__name', flat=True)
+            .distinct()
+            .order_by('study_group__name')
+        ),
+
         'active_count': base_regs.filter(status=CourseRegistration.Status.REGISTERED).count(),
         'cancelled_count': base_regs.filter(status=CourseRegistration.Status.CANCELLED).count(),
         'courses_count': base_regs.values('course_id').distinct().count(),
@@ -547,21 +578,36 @@ def curator_course_registrations(request):
 def curator_vacancy_responses(request):
     students = curator_students_queryset(request.user, include_graduates=True)
     student_ids = students.values_list('id', flat=True)
-    responses = VacancyResponse.objects.filter(student_id__in=student_ids).select_related('student', 'student__study_group', 'vacancy').order_by('-created_at')
+
+    responses = (
+        VacancyResponse.objects
+        .filter(student_id__in=student_ids)
+        .select_related('student', 'student__study_group', 'vacancy')
+        .order_by('-created_at')
+    )
 
     q = request.GET.get('q', '').strip()
     vacancy_q = request.GET.get('vacancy', '').strip()
     group_q = request.GET.get('group', '').strip()
 
     if q:
-        responses = responses.filter(student__full_name__icontains=q)
+        responses = responses.filter(
+            Q(student__full_name__icontains=q) |
+            Q(student__email__icontains=q)
+        )
     if vacancy_q:
         responses = responses.filter(vacancy__title__icontains=vacancy_q)
     if group_q:
-        responses = responses.filter(Q(student__study_group__name=group_q) | Q(student__group__icontains=group_q))
+        responses = responses.filter(
+            Q(student__study_group__name=group_q) |
+            Q(student__group__icontains=group_q)
+        )
+
+    paginator = Paginator(responses, 12)
+    page_obj = paginator.get_page(request.GET.get('page'))
 
     rows = []
-    for response in responses[:200]:
+    for response in page_obj.object_list:
         profile = getattr(response.student, 'student_profile', None)
         resume = getattr(response.student, 'resume_settings', None)
         resume_public_url = ''
@@ -569,13 +615,28 @@ def curator_vacancy_responses(request):
             resume_public_url = request.build_absolute_uri(f"/resumes/public/{profile.public_resume_token}/")
         rows.append((response, resume_public_url))
 
+    query_params = request.GET.copy()
+    query_params.pop('page', None)
+    querystring = query_params.urlencode()
+
     base_resp = VacancyResponse.objects.filter(student_id__in=student_ids)
+
     context = {
         'rows': rows,
+        'page_obj': page_obj,
+        'querystring': querystring,
+
         'q': q,
         'vacancy_q': vacancy_q,
         'group_q': group_q,
-        'groups': students.exclude(study_group__isnull=True).values_list('study_group__name', flat=True).distinct().order_by('study_group__name'),
+        'groups': (
+            students
+            .exclude(study_group__isnull=True)
+            .values_list('study_group__name', flat=True)
+            .distinct()
+            .order_by('study_group__name')
+        ),
+
         'responses_count': base_resp.count(),
         'students_count': base_resp.values('student_id').distinct().count(),
         'vacancies_count': base_resp.values('vacancy_id').distinct().count(),
@@ -1597,50 +1658,150 @@ def admin_course_detail(request, course_id):
 
 @role_required(User.Role.ADMIN)
 def admin_responses(request):
-    responses = VacancyResponse.objects.select_related('student', 'vacancy').order_by('-created_at')
+    responses = (
+        VacancyResponse.objects
+        .select_related('student', 'student__study_group', 'vacancy')
+        .order_by('-created_at')
+    )
+
     q = request.GET.get('q', '').strip()
     vacancy = request.GET.get('vacancy', '').strip()
     group = request.GET.get('group', '').strip()
     specialty = request.GET.get('specialty', '').strip()
     date_from = request.GET.get('date_from', '').strip()
     date_to = request.GET.get('date_to', '').strip()
+
     if q:
-        responses = responses.filter(student__full_name__icontains=q)
+        responses = responses.filter(
+            Q(student__full_name__icontains=q) |
+            Q(student__email__icontains=q)
+        )
     if vacancy:
         responses = responses.filter(vacancy__title__icontains=vacancy)
     if group:
-        responses = responses.filter(student__group__icontains=group)
+        responses = responses.filter(
+            Q(student__study_group__name=group) |
+            Q(student__group__icontains=group)
+        )
     if specialty:
-        responses = responses.filter(student__specialty__icontains=specialty)
+        responses = responses.filter(
+            Q(student__study_group__specialty_ref__name__icontains=specialty) |
+            Q(student__specialty__icontains=specialty)
+        )
     if date_from:
         responses = responses.filter(created_at__date__gte=date_from)
     if date_to:
         responses = responses.filter(created_at__date__lte=date_to)
-    return render(request, 'adminpanel/responses.html', {'responses': responses})
+
+    paginator = Paginator(responses, 12)
+    page_obj = paginator.get_page(request.GET.get('page'))
+
+    query_params = request.GET.copy()
+    query_params.pop('page', None)
+    querystring = query_params.urlencode()
+
+    rows = []
+    for response in page_obj.object_list:
+        resume_url = response.resume_link_snapshot or ''
+        rows.append((response, resume_url))
+
+    base_responses = VacancyResponse.objects.select_related('student', 'vacancy')
+
+    context = {
+        'rows': rows,
+        'page_obj': page_obj,
+        'querystring': querystring,
+
+        'q': q,
+        'vacancy_q': vacancy,
+        'group_q': group,
+        'specialty_q': specialty,
+        'date_from': date_from,
+        'date_to': date_to,
+
+        'responses_count': base_responses.count(),
+        'students_count': base_responses.values('student_id').distinct().count(),
+        'vacancies_count': base_responses.values('vacancy_id').distinct().count(),
+        'groups_count': (
+            User.objects
+            .filter(role=User.Role.STUDENT, vacancy_responses__isnull=False)
+            .values('study_group_id', 'group')
+            .distinct()
+            .count()
+        ),
+    }
+    return render(request, 'adminpanel/responses.html', context)
 
 
 @role_required(User.Role.ADMIN)
 def admin_course_registrations(request):
-    registrations = CourseRegistration.objects.select_related('student', 'course').order_by('-created_at')
+    registrations = (
+        CourseRegistration.objects
+        .select_related('student', 'student__study_group', 'course')
+        .order_by('-created_at')
+    )
+
     q = request.GET.get('q', '').strip()
     course = request.GET.get('course', '').strip()
     group = request.GET.get('group', '').strip()
     format_type = request.GET.get('format_type', '').strip()
+    status = request.GET.get('status', 'all').strip()
     date_from = request.GET.get('date_from', '').strip()
     date_to = request.GET.get('date_to', '').strip()
+
     if q:
-        registrations = registrations.filter(student__full_name__icontains=q)
+        registrations = registrations.filter(
+            Q(student__full_name__icontains=q) |
+            Q(student__email__icontains=q)
+        )
     if course:
         registrations = registrations.filter(course__title__icontains=course)
     if group:
-        registrations = registrations.filter(student__group__icontains=group)
+        registrations = registrations.filter(
+            Q(student__study_group__name=group) |
+            Q(student__group__icontains=group)
+        )
     if format_type in {Course.Format.ONLINE, Course.Format.OFFLINE}:
         registrations = registrations.filter(course__format_type=format_type)
+    else:
+        format_type = ''
+    if status in {CourseRegistration.Status.REGISTERED, CourseRegistration.Status.CANCELLED}:
+        registrations = registrations.filter(status=status)
+    else:
+        status = 'all'
     if date_from:
         registrations = registrations.filter(created_at__date__gte=date_from)
     if date_to:
         registrations = registrations.filter(created_at__date__lte=date_to)
-    return render(request, 'adminpanel/course_registrations.html', {'registrations': registrations})
+
+    paginator = Paginator(registrations, 12)
+    page_obj = paginator.get_page(request.GET.get('page'))
+
+    query_params = request.GET.copy()
+    query_params.pop('page', None)
+    querystring = query_params.urlencode()
+
+    base_regs = CourseRegistration.objects.select_related('student', 'course')
+
+    context = {
+        'registrations': page_obj.object_list,
+        'page_obj': page_obj,
+        'querystring': querystring,
+
+        'q': q,
+        'course_q': course,
+        'group_q': group,
+        'format_type': format_type,
+        'status_q': status,
+        'date_from': date_from,
+        'date_to': date_to,
+
+        'active_count': base_regs.filter(status=CourseRegistration.Status.REGISTERED).count(),
+        'cancelled_count': base_regs.filter(status=CourseRegistration.Status.CANCELLED).count(),
+        'courses_count': base_regs.values('course_id').distinct().count(),
+        'students_count': base_regs.values('student_id').distinct().count(),
+    }
+    return render(request, 'adminpanel/course_registrations.html', context)
 
 
 @role_required(User.Role.ADMIN)

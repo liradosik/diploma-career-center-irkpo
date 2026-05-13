@@ -10,21 +10,23 @@
     <p>Аналитика по записям на курсы, откликам на вакансии и общей динамике действий студентов.</p>
   </div>
 
-  <form class="activity-v3-period-mini" method="get">
-    <div class="activity-v3-period-mini-wrap">
-      <i class="bi bi-calendar3"></i>
+  <form method="get" class="activity-v3-period-form">
+  <label class="activity-v3-period-label" for="admin-activity-period">
+    <i class="bi bi-calendar3"></i>
+    <span>Период</span>
+  </label>
 
-      <select name="period" aria-label="Период активности" onchange="this.form.submit()">
-        {% for period_key, period_item in period_options.items %}
-          <option value="{{ period_key }}" {% if selected_period == period_key %}selected{% endif %}>
-            {{ period_item.label }}
-          </option>
-        {% endfor %}
-      </select>
-
-      <i class="bi bi-chevron-down"></i>
-    </div>
-  </form>
+  <div class="activity-v3-period-select-wrap">
+    <select id="admin-activity-period" name="period" onchange="this.form.submit()">
+      {% for value, option in period_options.items %}
+        <option value="{{ value }}" {% if selected_period == value %}selected{% endif %}>
+          {{ option.label }}
+        </option>
+      {% endfor %}
+    </select>
+    <i class="bi bi-chevron-down"></i>
+  </div>
+</form>
 </section>
 
   <section class="activity-v3-kpi-grid">
