@@ -41,6 +41,7 @@ from .views import (
     student_dashboard,
     student_favorites,
     student_support_tickets,
+    support_knowledge,
     public_support_ticket_create,
 )
 
@@ -51,6 +52,7 @@ urlpatterns = [
     path('redirect/', redirect_by_role, name='redirect_by_role'),
     path('student/dashboard/', student_dashboard, name='student_dashboard'),
     path('student/support/', student_support_tickets, name='student_support_tickets'),
+    path('support/knowledge/', support_knowledge, name='support_knowledge'),
     path('student/profile/', profile_edit, name='profile_edit'),
     path('student/favorites/', student_favorites, name='student_favorites'),
     path('curator/dashboard/', curator_dashboard, name='curator_dashboard'),
