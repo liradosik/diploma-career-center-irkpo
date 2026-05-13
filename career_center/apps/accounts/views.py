@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, timedelta
 import base64
 import csv
 import io
@@ -576,20 +576,54 @@ def admin_dashboard(request):
 
 @role_required(User.Role.ADMIN)
 def admin_activity(request):
-    registrations_registered_total = CourseRegistration.objects.filter(
-        status=CourseRegistration.Status.REGISTERED
-    ).count()
-    registrations_cancelled_total = CourseRegistration.objects.filter(
-        status=CourseRegistration.Status.CANCELLED
-    ).count()
-    responses_total = VacancyResponse.objects.count()
+    period_options = {
+        '30d': {'label': 'За последние 30 дней', 'days': 30},
+        '6m': {'label': 'За последние 6 месяцев', 'days': 182},
+        '1y': {'label': 'За последний год', 'days': 365},
+    }
+    selected_period = request.GET.get('period', '30d')
+    if selected_period not in period_options:
+        selected_period = '30d'
 
-    activity_portfolio_total = ActivityLog.objects.filter(event_type__startswith='portfolio_').count()
+    period_days = period_options[selected_period]['days']
+    now = timezone.now()
+    period_start = now - timedelta(days=period_days)
+    prev_period_start = period_start - timedelta(days=period_days)
+
+    registrations_registered_total = CourseRegistration.objects.filter(
+        status=CourseRegistration.Status.REGISTERED,
+        created_at__gte=period_start,
+        created_at__lt=now,
+    ).count()
+    responses_total = VacancyResponse.objects.filter(
+        created_at__gte=period_start,
+        created_at__lt=now,
+    ).count()
+
+    prev_registrations_total = CourseRegistration.objects.filter(
+        status=CourseRegistration.Status.REGISTERED,
+        created_at__gte=prev_period_start,
+        created_at__lt=period_start,
+    ).count()
+    prev_responses_total = VacancyResponse.objects.filter(
+        created_at__gte=prev_period_start,
+        created_at__lt=period_start,
+    ).count()
+
+    activity_portfolio_total = ActivityLog.objects.filter(
+        event_type__startswith='portfolio_',
+        created_at__gte=period_start,
+        created_at__lt=now,
+    ).count()
     activity_courses_total = ActivityLog.objects.filter(
-        event_type=ActivityLog.EventType.COURSE_REGISTERED
+        event_type=ActivityLog.EventType.COURSE_REGISTERED,
+        created_at__gte=period_start,
+        created_at__lt=now,
     ).count()
     activity_vacancies_total = ActivityLog.objects.filter(
-        event_type=ActivityLog.EventType.VACANCY_APPLIED
+        event_type=ActivityLog.EventType.VACANCY_APPLIED,
+        created_at__gte=period_start,
+        created_at__lt=now,
     ).count()
 
     activity_total = activity_courses_total + activity_vacancies_total + activity_portfolio_total
@@ -597,7 +631,26 @@ def admin_activity(request):
     def percent(value):
         if not activity_total:
             return 0
-        return round((value / activity_total) * 100, 1)
+        return int(round((value / activity_total) * 100))
+
+    def calculate_trend(current, previous):
+        if previous == 0:
+            if current == 0:
+                return 0, 'same'
+            return 100, 'up'
+        trend_percent = int(round(((current - previous) / previous) * 100))
+        if trend_percent > 0:
+            return trend_percent, 'up'
+        if trend_percent < 0:
+            return abs(trend_percent), 'down'
+        return 0, 'same'
+
+    registrations_trend_percent, registrations_trend_direction = calculate_trend(
+        registrations_registered_total, prev_registrations_total
+    )
+    responses_trend_percent, responses_trend_direction = calculate_trend(
+        responses_total, prev_responses_total
+    )
 
     activity_counts = {
         'Курсы': activity_courses_total,
@@ -608,7 +661,11 @@ def admin_activity(request):
 
     top_courses_raw = list(
         CourseRegistration.objects
-        .filter(status=CourseRegistration.Status.REGISTERED)
+        .filter(
+            status=CourseRegistration.Status.REGISTERED,
+            created_at__gte=period_start,
+            created_at__lt=now,
+        )
         .values(title=F('course__title'))
         .annotate(total=Count('id'))
         .order_by('-total', 'title')[:5]
@@ -625,6 +682,7 @@ def admin_activity(request):
 
     top_vacancies_raw = list(
         VacancyResponse.objects
+        .filter(created_at__gte=period_start, created_at__lt=now)
         .values(title=F('vacancy__title'))
         .annotate(total=Count('id'))
         .order_by('-total', 'title')[:5]
@@ -641,10 +699,15 @@ def admin_activity(request):
 
     context = {
         'registrations_registered_total': registrations_registered_total,
-        'registrations_cancelled_total': registrations_cancelled_total,
         'responses_total': responses_total,
+        'registrations_trend_percent': registrations_trend_percent,
+        'responses_trend_percent': responses_trend_percent,
+        'registrations_trend_direction': registrations_trend_direction,
+        'responses_trend_direction': responses_trend_direction,
         'courses_active': Course.objects.filter(status=Course.Status.ACTIVE).count(),
         'vacancies_active': Vacancy.objects.filter(status=Vacancy.Status.ACTIVE).count(),
+        'selected_period': selected_period,
+        'period_options': period_options,
 
         'activity_total': activity_total,
         'activity_portfolio_total': activity_portfolio_total,
@@ -659,8 +722,6 @@ def admin_activity(request):
         'top_vacancies': top_vacancies,
         'top_course_title': top_courses[0]['title'] if top_courses else 'пока нет записей',
         'top_vacancy_title': top_vacancies[0]['title'] if top_vacancies else 'пока нет откликов',
-
-        'latest_activity': ActivityLog.objects.select_related('student').order_by('-created_at')[:8],
     }
     return render(request, 'adminpanel/activity.html', context)
 
