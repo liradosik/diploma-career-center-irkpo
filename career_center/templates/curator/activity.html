@@ -7,7 +7,7 @@
     <div>
       <div class="hero-kicker">Куратор</div>
       <h1>Активность студентов</h1>
-      <p>Аналитика по курсам, вакансиям и портфолио закреплённых студентов.</p>
+      <p>Аналитика по действиям закреплённых студентов: курсы, отклики и портфолио.</p>
     </div>
 
     <form method="get" class="activity-v3-period-form">
@@ -122,49 +122,48 @@
 
     <article class="activity-v3-card activity-v3-rank-card">
       <div class="activity-v3-card-head">
-        <h2>Популярные курсы</h2>
-        <p>Куда ваши студенты записываются чаще всего.</p>
+        <h2>Активные студенты</h2>
+        <p>Кто чаще всего выполняет действия за выбранный период.</p>
       </div>
 
       <div class="activity-v3-rank-list">
-        {% for course in top_courses %}
+        {% for student in top_active_students %}
           <div class="activity-v3-rank-row">
             <span>{{ forloop.counter }}</span>
             <div>
-              <strong>{{ course.title|default:'Без названия' }}</strong>
-              <div class="activity-v3-bar">
-                <i style="width: {{ course.percent }}%;"></i>
-              </div>
+              <strong>{{ student.full_name }}</strong>
+              <p class="activity-v3-row-meta">{{ student.study_group.name|default:student.group|default:'Группа не указана' }}</p>
             </div>
-            <em>{{ course.total }}</em>
+            <em>{{ student.total_actions }}</em>
           </div>
         {% empty %}
-          <p class="activity-v3-empty">Пока нет записей на курсы за выбранный период.</p>
+          <p class="activity-v3-empty">Пока нет активных студентов за выбранный период.</p>
         {% endfor %}
       </div>
     </article>
 
-    <article class="activity-v3-card activity-v3-rank-card">
+    <article class="activity-v3-card activity-v3-rank-card curator-attention-card">
       <div class="activity-v3-card-head">
-        <h2>Популярные вакансии</h2>
-        <p>На какие вакансии ваши студенты откликаются чаще.</p>
+        <h2>Требуют внимания</h2>
+        <p>Где нужна дополнительная работа со студентами.</p>
       </div>
 
-      <div class="activity-v3-rank-list">
-        {% for vacancy in top_vacancies %}
-          <div class="activity-v3-rank-row">
-            <span>{{ forloop.counter }}</span>
-            <div>
-              <strong>{{ vacancy.title|default:'Без названия' }}</strong>
-              <div class="activity-v3-bar">
-                <i style="width: {{ vacancy.percent }}%;"></i>
-              </div>
-            </div>
-            <em>{{ vacancy.total }}</em>
-          </div>
-        {% empty %}
-          <p class="activity-v3-empty">Пока нет откликов на вакансии за выбранный период.</p>
-        {% endfor %}
+      <div class="activity-v3-legend">
+        <div>
+          <span class="activity-v3-dot is-portfolio"></span>
+          <p>Без активности</p>
+          <strong>{{ students_without_activity }}</strong>
+        </div>
+        <div>
+          <span class="activity-v3-dot is-courses"></span>
+          <p>Без записей на курсы</p>
+          <strong>{{ students_without_courses }}</strong>
+        </div>
+        <div>
+          <span class="activity-v3-dot is-vacancies"></span>
+          <p>Без откликов на вакансии</p>
+          <strong>{{ students_without_vacancies }}</strong>
+        </div>
       </div>
     </article>
   </section>
@@ -183,12 +182,12 @@
 
       <div>
         <span class="activity-v3-icon activity-v3-icon-small"><i class="bi bi-mortarboard"></i></span>
-        <p>Самый востребованный курс: <strong>{{ top_course_title }}</strong>.</p>
+        <p>Самый активный студент: <strong>{{ most_active_student_name }}</strong>.</p>
       </div>
 
       <div>
         <span class="activity-v3-icon activity-v3-icon-small"><i class="bi bi-briefcase"></i></span>
-        <p>Самая заметная вакансия: <strong>{{ top_vacancy_title }}</strong>.</p>
+        <p>Требуют внимания: <strong>{{ students_without_activity }}</strong> студентов без активности.</p>
       </div>
     </div>
   </section>
@@ -199,8 +198,8 @@
       <p>Откройте таблицы для проверки записей и откликов ваших студентов.</p>
     </div>
 
-    <div class="activity-v3-actions-grid">
-      <a class="activity-v3-action-link" href="{% url 'accounts:curator_course_registrations' %}">
+    <div class="activity-v3-action-list">
+      <a class="activity-v3-action" href="{% url 'accounts:curator_course_registrations' %}">
         <span class="activity-v3-icon activity-v3-icon-small"><i class="bi bi-calendar-check"></i></span>
         <div>
           <strong>Подробнее по курсам</strong>
@@ -208,7 +207,7 @@
         </div>
       </a>
 
-      <a class="activity-v3-action-link" href="{% url 'accounts:curator_vacancy_responses' %}">
+      <a class="activity-v3-action" href="{% url 'accounts:curator_vacancy_responses' %}">
         <span class="activity-v3-icon activity-v3-icon-small"><i class="bi bi-send"></i></span>
         <div>
           <strong>Подробнее по вакансиям</strong>
