@@ -1175,11 +1175,21 @@ def admin_course_detail(request, course_id):
             messages.error(request, 'Название курса для подтверждения введено неверно.')
             return redirect('accounts:admin_course_detail', course_id=course.id)
 
-    registrations_count = CourseRegistration.objects.filter(course=course).count()
+    registrations_qs = CourseRegistration.objects.filter(course=course).select_related('student', 'student__study_group')
+    active_registrations_count = registrations_qs.filter(status=CourseRegistration.Status.REGISTERED).count()
+    cancelled_registrations_count = registrations_qs.filter(status=CourseRegistration.Status.CANCELLED).count()
     return render(
         request,
         'adminpanel/course_detail.html',
-        {'course': course, 'form': form, 'registrations_count': registrations_count},
+        {
+            'course': course,
+            'form': form,
+            'registrations_count': active_registrations_count,
+            'course_registrations': registrations_qs,
+            'active_registrations_count': active_registrations_count,
+            'cancelled_registrations_count': cancelled_registrations_count,
+            'free_places_count': max(course.places - active_registrations_count, 0),
+        },
     )
 
 
