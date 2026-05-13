@@ -322,9 +322,12 @@ def curator_dashboard(request):
 def curator_activity(request):
     students = curator_students_queryset(request.user)
     student_ids = students.values_list('id', flat=True)
-    activity = ActivityLog.objects.filter(student_id__in=student_ids).select_related('student')
+    activity_base = ActivityLog.objects.filter(student_id__in=student_ids).select_related('student')
+    registrations = CourseRegistration.objects.filter(student_id__in=student_ids)
+    responses = VacancyResponse.objects.filter(student_id__in=student_ids)
 
     kind = request.GET.get('kind', 'all')
+    activity = activity_base
     if kind == 'portfolio':
         activity = activity.filter(event_type__startswith='portfolio_')
     elif kind == 'courses':
@@ -336,7 +339,97 @@ def curator_activity(request):
     else:
         kind = 'all'
 
-    return render(request, 'curator/activity.html', {'activity': activity[:80], 'kind': kind})
+    context = {
+        'activity': activity[:80],
+        'kind': kind,
+        'students_total': students.count(),
+        'course_registered_total': registrations.filter(status=CourseRegistration.Status.REGISTERED).count(),
+        'course_cancelled_total': registrations.filter(status=CourseRegistration.Status.CANCELLED).count(),
+        'vacancy_responses_total': responses.count(),
+        'portfolio_events_total': activity_base.filter(event_type__startswith='portfolio_').count(),
+        'course_events_total': activity_base.filter(event_type__in=[ActivityLog.EventType.COURSE_REGISTERED, ActivityLog.EventType.COURSE_CANCELLED]).count(),
+        'vacancy_events_total': activity_base.filter(event_type=ActivityLog.EventType.VACANCY_APPLIED).count(),
+        'recent_activity': activity_base[:10],
+    }
+    return render(request, 'curator/activity.html', context)
+
+
+@role_required(User.Role.CURATOR)
+def curator_course_registrations(request):
+    students = curator_students_queryset(request.user, include_graduates=True)
+    student_ids = students.values_list('id', flat=True)
+    registrations = CourseRegistration.objects.filter(student_id__in=student_ids).select_related('student', 'student__study_group', 'course').order_by('-created_at')
+
+    q = request.GET.get('q', '').strip()
+    course_q = request.GET.get('course', '').strip()
+    group_q = request.GET.get('group', '').strip()
+    status_q = request.GET.get('status', 'all').strip()
+
+    if q:
+        registrations = registrations.filter(student__full_name__icontains=q)
+    if course_q:
+        registrations = registrations.filter(course__title__icontains=course_q)
+    if group_q:
+        registrations = registrations.filter(Q(student__study_group__name=group_q) | Q(student__group__icontains=group_q))
+    if status_q in {CourseRegistration.Status.REGISTERED, CourseRegistration.Status.CANCELLED}:
+        registrations = registrations.filter(status=status_q)
+    else:
+        status_q = 'all'
+
+    base_regs = CourseRegistration.objects.filter(student_id__in=student_ids)
+    context = {
+        'registrations': registrations[:200],
+        'q': q,
+        'course_q': course_q,
+        'group_q': group_q,
+        'status_q': status_q,
+        'groups': students.exclude(study_group__isnull=True).values_list('study_group__name', flat=True).distinct().order_by('study_group__name'),
+        'active_count': base_regs.filter(status=CourseRegistration.Status.REGISTERED).count(),
+        'cancelled_count': base_regs.filter(status=CourseRegistration.Status.CANCELLED).count(),
+        'courses_count': base_regs.values('course_id').distinct().count(),
+        'students_count': base_regs.values('student_id').distinct().count(),
+    }
+    return render(request, 'curator/course_registrations.html', context)
+
+
+@role_required(User.Role.CURATOR)
+def curator_vacancy_responses(request):
+    students = curator_students_queryset(request.user, include_graduates=True)
+    student_ids = students.values_list('id', flat=True)
+    responses = VacancyResponse.objects.filter(student_id__in=student_ids).select_related('student', 'student__study_group', 'vacancy').order_by('-created_at')
+
+    q = request.GET.get('q', '').strip()
+    vacancy_q = request.GET.get('vacancy', '').strip()
+    group_q = request.GET.get('group', '').strip()
+
+    if q:
+        responses = responses.filter(student__full_name__icontains=q)
+    if vacancy_q:
+        responses = responses.filter(vacancy__title__icontains=vacancy_q)
+    if group_q:
+        responses = responses.filter(Q(student__study_group__name=group_q) | Q(student__group__icontains=group_q))
+
+    rows = []
+    for response in responses[:200]:
+        profile = getattr(response.student, 'student_profile', None)
+        resume = getattr(response.student, 'resume_settings', None)
+        resume_public_url = ''
+        if profile and resume and resume.is_public:
+            resume_public_url = request.build_absolute_uri(f"/resumes/public/{profile.public_resume_token}/")
+        rows.append((response, resume_public_url))
+
+    base_resp = VacancyResponse.objects.filter(student_id__in=student_ids)
+    context = {
+        'rows': rows,
+        'q': q,
+        'vacancy_q': vacancy_q,
+        'group_q': group_q,
+        'groups': students.exclude(study_group__isnull=True).values_list('study_group__name', flat=True).distinct().order_by('study_group__name'),
+        'responses_count': base_resp.count(),
+        'students_count': base_resp.values('student_id').distinct().count(),
+        'vacancies_count': base_resp.values('vacancy_id').distinct().count(),
+    }
+    return render(request, 'curator/vacancy_responses.html', context)
 
 
 @role_required(User.Role.CURATOR)
@@ -433,6 +526,12 @@ def admin_dashboard(request):
         'courses_active': course_summary.get(Course.Status.ACTIVE, 0),
         'registrations_total': CourseRegistration.objects.count(),
         'responses_total': VacancyResponse.objects.count(),
+        'registrations_registered_total': CourseRegistration.objects.filter(status=CourseRegistration.Status.REGISTERED).count(),
+        'registrations_cancelled_total': CourseRegistration.objects.filter(status=CourseRegistration.Status.CANCELLED).count(),
+        'activity_portfolio_total': ActivityLog.objects.filter(event_type__startswith='portfolio_').count(),
+        'activity_courses_total': ActivityLog.objects.filter(event_type__in=[ActivityLog.EventType.COURSE_REGISTERED, ActivityLog.EventType.COURSE_CANCELLED]).count(),
+        'activity_vacancies_total': ActivityLog.objects.filter(event_type=ActivityLog.EventType.VACANCY_APPLIED).count(),
+        'latest_activity': ActivityLog.objects.select_related('student').order_by('-created_at')[:10],
         'portfolio_pending_total': PortfolioEntry.objects.filter(status=PortfolioEntry.Status.PENDING).count(),
         'support_new_total': SupportTicket.objects.filter(status=SupportTicket.Status.NEW).count(),
         'support_in_progress_total': SupportTicket.objects.filter(status=SupportTicket.Status.IN_PROGRESS).count(),
@@ -473,6 +572,24 @@ def admin_dashboard(request):
         'latest_students': students_qs.order_by('-date_joined')[:5],
     }
     return render(request, 'adminpanel/dashboard.html', context)
+
+
+@role_required(User.Role.ADMIN)
+def admin_activity(request):
+    context = {
+        'registrations_registered_total': CourseRegistration.objects.filter(status=CourseRegistration.Status.REGISTERED).count(),
+        'registrations_cancelled_total': CourseRegistration.objects.filter(status=CourseRegistration.Status.CANCELLED).count(),
+        'responses_total': VacancyResponse.objects.count(),
+        'courses_active': Course.objects.filter(status=Course.Status.ACTIVE).count(),
+        'vacancies_active': Vacancy.objects.filter(status=Vacancy.Status.ACTIVE).count(),
+        'activity_portfolio_total': ActivityLog.objects.filter(event_type__startswith='portfolio_').count(),
+        'activity_courses_total': ActivityLog.objects.filter(
+            event_type__in=[ActivityLog.EventType.COURSE_REGISTERED, ActivityLog.EventType.COURSE_CANCELLED]
+        ).count(),
+        'activity_vacancies_total': ActivityLog.objects.filter(event_type=ActivityLog.EventType.VACANCY_APPLIED).count(),
+        'latest_activity': ActivityLog.objects.select_related('student').order_by('-created_at')[:20],
+    }
+    return render(request, 'adminpanel/activity.html', context)
 
 
 @role_required(User.Role.ADMIN)
@@ -1175,11 +1292,21 @@ def admin_course_detail(request, course_id):
             messages.error(request, 'Название курса для подтверждения введено неверно.')
             return redirect('accounts:admin_course_detail', course_id=course.id)
 
-    registrations_count = CourseRegistration.objects.filter(course=course).count()
+    registrations_qs = CourseRegistration.objects.filter(course=course).select_related('student', 'student__study_group')
+    active_registrations_count = registrations_qs.filter(status=CourseRegistration.Status.REGISTERED).count()
+    cancelled_registrations_count = registrations_qs.filter(status=CourseRegistration.Status.CANCELLED).count()
     return render(
         request,
         'adminpanel/course_detail.html',
-        {'course': course, 'form': form, 'registrations_count': registrations_count},
+        {
+            'course': course,
+            'form': form,
+            'registrations_count': active_registrations_count,
+            'course_registrations': registrations_qs,
+            'active_registrations_count': active_registrations_count,
+            'cancelled_registrations_count': cancelled_registrations_count,
+            'free_places_count': max(course.places - active_registrations_count, 0),
+        },
     )
 
 
