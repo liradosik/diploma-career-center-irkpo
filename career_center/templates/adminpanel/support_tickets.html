@@ -1,21 +1,170 @@
 {% extends 'base_dashboard.html' %}
+
 {% block title %}Обращения{% endblock %}
+
 {% block content %}
-<section class="admin-support-list">
-  <div class="page-heading"><h1>Обращения в поддержку</h1></div>
-  <form method="get" class="card form-grid">
-    <p><label>Статус</label><select name="status"><option value="">Все</option>{% for v,l in status_choices %}<option value="{{ v }}" {% if status_filter == v %}selected{% endif %}>{{ l }}</option>{% endfor %}</select></p>
-    <p><label>Категория</label><select name="category"><option value="">Все</option>{% for v,l in category_choices %}<option value="{{ v }}" {% if category_filter == v %}selected{% endif %}>{{ l }}</option>{% endfor %}</select></p>
-    <p><label>Источник</label><select name="source"><option value="">Все</option>{% for v,l in source_choices %}<option value="{{ v }}" {% if source_filter == v %}selected{% endif %}>{{ l }}</option>{% endfor %}</select></p>
-    <p><label>Тип отправителя</label><select name="requester_type"><option value="">Все</option>{% for v,l in requester_type_choices %}<option value="{{ v }}" {% if requester_type_filter == v %}selected{% endif %}>{{ l }}</option>{% endfor %}</select></p>
-    <p><button type="submit" class="btn-primary">Применить</button></p>
+<section class="admin-support-page-v4">
+
+    <section class="dashboard-hero admin-dashboard-hero-clean admin-support-hero-v5">
+    <div class="admin-dashboard-hero-text">
+      <div class="hero-kicker">Администрирование</div>
+      <h1>Обращения в поддержку</h1>
+      <p>Просматривайте и обрабатывайте обращения студентов, кураторов и пользователей публичной формы.</p>
+    </div>
+  </section>
+
+  <form method="get" class="admin-support-filter-card-v4">
+    <div class="admin-support-filter-grid-v4">
+      <label>
+        <span>Статус</span>
+        <select name="status">
+          <option value="">Все</option>
+          {% for v,l in status_choices %}
+            <option value="{{ v }}" {% if status_filter == v %}selected{% endif %}>{{ l }}</option>
+          {% endfor %}
+        </select>
+      </label>
+
+      <label>
+        <span>Категория</span>
+        <select name="category">
+          <option value="">Все</option>
+          {% for v,l in category_choices %}
+            <option value="{{ v }}" {% if category_filter == v %}selected{% endif %}>{{ l }}</option>
+          {% endfor %}
+        </select>
+      </label>
+
+      <label>
+        <span>Источник</span>
+        <select name="source">
+          <option value="">Все</option>
+          {% for v,l in source_choices %}
+            <option value="{{ v }}" {% if source_filter == v %}selected{% endif %}>{{ l }}</option>
+          {% endfor %}
+        </select>
+      </label>
+
+      <label>
+        <span>Тип обращения</span>
+        <select name="requester_type">
+          <option value="">Все</option>
+          {% for v,l in requester_type_choices %}
+            <option value="{{ v }}" {% if requester_type_filter == v %}selected{% endif %}>{{ l }}</option>
+          {% endfor %}
+        </select>
+      </label>
+    </div>
+
+    <div class="admin-support-filter-actions-v4">
+      <button type="submit" class="btn btn-primary">
+        <i class="bi bi-funnel"></i>
+        Применить
+      </button>
+
+      <a class="btn" href="{% url 'accounts:admin_support_tickets' %}">
+        <i class="bi bi-arrow-clockwise"></i>
+        Сбросить
+      </a>
+    </div>
   </form>
-  {% for ticket in tickets %}
-    <a href="{% url 'accounts:admin_support_ticket_detail' ticket.id %}" class="card support-ticket-card">
-      <h3>{{ ticket.subject }}</h3>
-      <p>{{ ticket.author_label }}</p>
-      <p>{{ ticket.get_category_display }} · <span class="support-ticket-status status-{{ ticket.status }}">{{ ticket.get_status_display }}</span> · {{ ticket.created_at|date:'d.m.Y H:i' }}</p>
-    </a>
-  {% empty %}<p class="muted">Обращений не найдено.</p>{% endfor %}
+
+  <nav class="admin-support-tabs-v4" aria-label="Фильтр по статусу">
+    {% for tab in status_tabs %}
+      <a
+        class="admin-support-tab-v4 {{ tab.class }} {% if status_filter == tab.value %}is-active{% endif %}{% if not status_filter and not tab.value %}is-active{% endif %}"
+        href="{% url 'accounts:admin_support_tickets' %}?{% if status_querystring %}{{ status_querystring }}&{% endif %}status={{ tab.value }}"
+      >
+        <i class="bi {{ tab.icon }}"></i>
+        <span>{{ tab.label }}</span>
+        <strong>{{ tab.count }}</strong>
+      </a>
+    {% endfor %}
+  </nav>
+
+  <section class="admin-support-list-v4">
+    {% for row in ticket_rows %}
+      {% with ticket=row.ticket %}
+        <article class="admin-support-ticket-v4">
+          <div class="admin-support-avatar-v4">
+            {% if row.avatar_url %}
+              <img src="{{ row.avatar_url }}" alt="{{ row.author_name }}">
+            {% else %}
+              <span>{{ row.initials }}</span>
+            {% endif %}
+          </div>
+
+          <div class="admin-support-author-v4">
+            <h3>{{ row.author_name }}</h3>
+            <p>
+              {{ row.author_role }}
+              {% if row.author_group %}
+                <span>·</span>
+                {{ row.author_group }}
+              {% endif %}
+            </p>
+          </div>
+
+          <div class="admin-support-ticket-main-v4">
+            <div class="admin-support-ticket-title-v4">
+              <h2>{{ ticket.subject }}</h2>
+              <p>{{ ticket.message|striptags|truncatechars:105 }}</p>
+            </div>
+
+            <div class="admin-support-ticket-meta-v4">
+              <span>
+                <i class="bi bi-folder2-open"></i>
+                {{ ticket.get_category_display }}
+              </span>
+
+              <span>
+                <i class="bi bi-box-arrow-in-right"></i>
+                {{ ticket.get_source_display }}
+              </span>
+            </div>
+          </div>
+
+          <div class="admin-support-ticket-status-v4">
+            <span class="admin-support-status-badge-v4 status-{{ ticket.status }}">
+              {% if ticket.status == 'new' %}
+                <i class="bi bi-dot"></i>
+              {% elif ticket.status == 'in_progress' %}
+                <i class="bi bi-clock"></i>
+              {% elif ticket.status == 'resolved' %}
+                <i class="bi bi-check2"></i>
+              {% else %}
+                <i class="bi bi-archive"></i>
+              {% endif %}
+              {{ ticket.get_status_display }}
+            </span>
+          </div>
+
+          <time class="admin-support-ticket-date-v4" datetime="{{ ticket.created_at|date:'c' }}">
+            <span>{{ ticket.created_at|date:'d.m.Y' }}</span>
+            <strong>{{ ticket.created_at|date:'H:i' }}</strong>
+          </time>
+
+          <a class="admin-support-open-v4" href="{% url 'accounts:admin_support_ticket_detail' ticket.id %}">
+            Открыть
+            <i class="bi bi-chevron-right"></i>
+          </a>
+        </article>
+      {% endwith %}
+    {% empty %}
+      <div class="admin-support-empty-v4">
+        <span>
+          <i class="bi bi-chat-left-text"></i>
+        </span>
+
+        <h2>Обращений не найдено</h2>
+        <p>Попробуйте изменить фильтры или сбросить параметры поиска.</p>
+
+        <a class="btn" href="{% url 'accounts:admin_support_tickets' %}">
+          Сбросить фильтры
+        </a>
+      </div>
+    {% endfor %}
+  </section>
+
 </section>
 {% endblock %}

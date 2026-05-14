@@ -208,7 +208,10 @@ def student_dashboard(request):
         resume_public_url = request.build_absolute_uri(f"/resumes/public/{profile.public_resume_token}/")
 
     current_course = None
-    if request.user.admission_year:
+
+    if request.user.study_group and request.user.study_group.course_number:
+        current_course = request.user.study_group.course_number
+    elif request.user.admission_year:
         current_course = max(date.today().year - request.user.admission_year + 1, 1)
 
     curator = None
@@ -1942,24 +1945,119 @@ def admin_course_registrations(request):
 
 @role_required(User.Role.ADMIN)
 def admin_support_tickets(request):
-    tickets = SupportTicket.objects.select_related('student', 'student__study_group', 'requester', 'requester__study_group').order_by('-created_at')
+    tickets = (
+        SupportTicket.objects
+        .select_related('student', 'student__study_group', 'requester', 'requester__study_group')
+        .order_by('-created_at')
+    )
+
     status = request.GET.get('status', '').strip()
     category = request.GET.get('category', '').strip()
-    if status in {choice[0] for choice in SupportTicket.Status.choices}:
-        tickets = tickets.filter(status=status)
     source = request.GET.get('source', '').strip()
     requester_type = request.GET.get('requester_type', '').strip()
+
+    if status in {choice[0] for choice in SupportTicket.Status.choices}:
+        tickets = tickets.filter(status=status)
     if category in {choice[0] for choice in SupportTicket.Category.choices}:
         tickets = tickets.filter(category=category)
     if source in {choice[0] for choice in SupportTicket.Source.choices}:
         tickets = tickets.filter(source=source)
     if requester_type in {choice[0] for choice in SupportTicket.RequesterType.choices}:
         tickets = tickets.filter(requester_type=requester_type)
+
+    base_tickets = SupportTicket.objects.all()
+
+    def make_initials(name):
+        cleaned = (name or '').strip()
+        if not cleaned:
+            return '?'
+        parts = [part for part in cleaned.replace('-', ' ').split() if part]
+        if len(parts) >= 2:
+            return f'{parts[0][0]}{parts[1][0]}'.upper()
+        return cleaned[:2].upper()
+
+    ticket_rows = []
+    for ticket in tickets:
+        requester = ticket.requester or ticket.student
+
+        avatar_url = ''
+        if requester and requester.photo:
+            try:
+                avatar_url = requester.photo.url
+            except ValueError:
+                avatar_url = ''
+
+        if requester:
+            author_name = requester.full_name or requester.email
+            author_role = requester.get_role_display()
+            author_group = ''
+            if requester.study_group:
+                author_group = requester.study_group.name
+            elif requester.group:
+                author_group = requester.group
+        else:
+            author_name = ticket.public_full_name or 'Пользователь без входа'
+            author_role = 'Без входа'
+            author_group = ticket.public_email or ticket.public_contact or ''
+
+        ticket_rows.append({
+            'ticket': ticket,
+            'avatar_url': avatar_url,
+            'initials': make_initials(author_name),
+            'author_name': author_name,
+            'author_role': author_role,
+            'author_group': author_group,
+        })
+
+    status_tabs = [
+        {
+            'value': '',
+            'label': 'Все',
+            'count': base_tickets.count(),
+            'icon': 'bi-list-ul',
+            'class': 'is-all',
+        },
+        {
+            'value': SupportTicket.Status.NEW,
+            'label': 'Новые',
+            'count': base_tickets.filter(status=SupportTicket.Status.NEW).count(),
+            'icon': 'bi-dot',
+            'class': 'is-new',
+        },
+        {
+            'value': SupportTicket.Status.IN_PROGRESS,
+            'label': 'В работе',
+            'count': base_tickets.filter(status=SupportTicket.Status.IN_PROGRESS).count(),
+            'icon': 'bi-dot',
+            'class': 'is-progress',
+        },
+        {
+            'value': SupportTicket.Status.RESOLVED,
+            'label': 'Решено',
+            'count': base_tickets.filter(status=SupportTicket.Status.RESOLVED).count(),
+            'icon': 'bi-dot',
+            'class': 'is-resolved',
+        },
+        {
+            'value': SupportTicket.Status.CLOSED,
+            'label': 'Закрыто',
+            'count': base_tickets.filter(status=SupportTicket.Status.CLOSED).count(),
+            'icon': 'bi-archive',
+            'class': 'is-closed',
+        },
+    ]
+
+    query_params = request.GET.copy()
+    query_params.pop('status', None)
+    query_params.pop('page', None)
+    status_querystring = query_params.urlencode()
+
     return render(
         request,
         'adminpanel/support_tickets.html',
         {
             'tickets': tickets,
+            'ticket_rows': ticket_rows,
             'status_filter': status,
             'category_filter': category,
             'status_choices': SupportTicket.Status.choices,
@@ -1968,6 +2066,8 @@ def admin_support_tickets(request):
             'requester_type_choices': SupportTicket.RequesterType.choices,
             'source_filter': source,
             'requester_type_filter': requester_type,
+            'status_tabs': status_tabs,
+            'status_querystring': status_querystring,
         },
     )
 
@@ -2018,7 +2118,12 @@ def profile_edit(request):
     academic_form = StudentAcademicReadonlyForm(instance=request.user)
     resume = getattr(request.user, 'resume_settings', None)
     resume_public_url = request.build_absolute_uri(f"/resumes/public/{profile.public_resume_token}/") if profile else ''
-    current_course = max(date.today().year - request.user.admission_year + 1, 1) if request.user.admission_year else None
+    if request.user.study_group and request.user.study_group.course_number:
+        current_course = request.user.study_group.course_number
+    elif request.user.admission_year:
+        current_course = max(date.today().year - request.user.admission_year + 1, 1)
+    else:
+        current_course = None
     return render(request, 'accounts/profile_edit.html', {
         'user_form': user_form,
         'profile_form': profile_form,
